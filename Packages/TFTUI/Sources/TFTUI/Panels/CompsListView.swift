@@ -149,9 +149,7 @@ private struct CompRow: View {
                         UnitPortraitPlaceholder(name: pair.unit.name, cost: pair.unit.cost, size: 34)
                     }
                     Spacer(minLength: 8)
-                    HStack(spacing: 4) {
-                        ForEach(distinctTraits, id: \.self) { TraitTag($0) }
-                    }
+                    TraitTagRow(distinctTraits)
                 }
             }
         }
@@ -163,7 +161,7 @@ private struct CompRow: View {
     }
 
     private var distinctTraits: [String] {
-        Array(Set(comp.units.flatMap(\.traits))).sorted().prefix(4).map { $0 }
+        Array(Set(comp.units.flatMap(\.traits))).sorted()
     }
 }
 
