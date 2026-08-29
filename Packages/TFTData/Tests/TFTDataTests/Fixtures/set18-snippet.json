@@ -1,0 +1,212 @@
+{
+  "items": [
+    {
+      "apiName": "DA_Component_BFSword",
+      "name": "B.F. Sword",
+      "composition": [],
+      "isAugment": false,
+      "desc": null,
+      "icon": "assets/maps/tft/icons/items/hexcore/tft_item_bfsword.tex"
+    },
+    {
+      "apiName": "DA_Component_RecurveBow",
+      "name": "Recurve Bow",
+      "composition": [],
+      "isAugment": false,
+      "desc": null,
+      "icon": "assets/maps/tft/icons/items/hexcore/tft_item_recurvebow.tex"
+    },
+    {
+      "apiName": "DA_RedBuff",
+      "name": "Red Buff",
+      "composition": [
+        "DA_Component_RecurveBow",
+        "DA_Component_RecurveBow"
+      ],
+      "isAugment": false,
+      "desc": null,
+      "icon": "assets/maps/tft/icons/items/hexcore/tft_item_rapidfirecannon.tex"
+    },
+    {
+      "apiName": "DA_SpearOfShojin",
+      "name": "Spear of Shojin",
+      "composition": [
+        "DA_Component_TearOfTheGoddess",
+        "DA_Component_BFSword"
+      ],
+      "isAugment": false,
+      "desc": null,
+      "icon": "assets/maps/tft/icons/items/hexcore/tft_item_spearofshojin.tex"
+    },
+    {
+      "apiName": "DA_MoonlightRitual18",
+      "name": "Moonlight Ritual",
+      "composition": [],
+      "isAugment": false,
+      "desc": "Your lowest star 1-cost or 2-cost champion stars up in combat.",
+      "icon": "assets/ux/tft/hud/zaps/wands/set18_mechanicicon.tex"
+    },
+    {
+      "apiName": "DA_FocusedFire",
+      "name": "Focused Fire",
+      "composition": [],
+      "isAugment": true,
+      "desc": "Your team gains @AD*100@% Attack Damage. Every @Timer@ seconds, they gain @StackAD*100@% more.",
+      "icon": "assets/maps/tft/icons/augments/hexcore/marksman_i.tex"
+    },
+    {
+      "apiName": "DA_ChampDeliveryPlusPlus",
+      "name": "Champ Delivery++",
+      "composition": [],
+      "isAugment": true,
+      "desc": "Gain @NumInitialChamps@ @ChampCost@-cost champions. After @Delay@ rounds, gain @NumDelayedChamps@ more.",
+      "icon": "assets/maps/tft/icons/augments/hexcore/missing-t1.tex"
+    },
+    {
+      "apiName": "DA_AdvancedLoan",
+      "name": "Advanced Loan",
+      "composition": [],
+      "isAugment": true,
+      "desc": "Gain @GoldInstantBasic@ Gold. Your next augment is one tier lower.",
+      "icon": "assets/maps/tft/icons/augments/hexcore/advancedloan_ii.tex"
+    }
+  ],
+  "sets": {
+    "18": {
+      "name": "Set10",
+      "champions": [
+        {
+          "apiName": "DA_18_Xayah",
+          "name": "Xayah",
+          "cost": 1,
+          "traits": [
+            "Elderwood",
+            "Fae",
+            "Rapidfire"
+          ]
+        },
+        {
+          "apiName": "DA_18_Ahri",
+          "name": "Ahri",
+          "cost": 4,
+          "traits": [
+            "Blossom",
+            "Spellweaver"
+          ]
+        },
+        {
+          "apiName": "DA_Gromp18_AP",
+          "name": "Gromp",
+          "cost": 2,
+          "traits": [
+            "Riftbeast",
+            "Adaptor"
+          ]
+        },
+        {
+          "apiName": "TFT_BlueGolem",
+          "name": "Golem",
+          "cost": 1,
+          "traits": []
+        },
+        {
+          "apiName": "DA_Draven18",
+          "name": "Draven",
+          "cost": 5,
+          "traits": [
+            "Bounty Seeker"
+          ]
+        },
+        {
+          "apiName": "DA_Lux18_Base",
+          "name": "Lux",
+          "cost": 5,
+          "traits": [
+            "Avatar"
+          ]
+        }
+      ],
+      "traits": [
+        {
+          "apiName": "DA_18_Elderwood",
+          "name": "Elderwood",
+          "effects": [
+            {
+              "minUnits": 3,
+              "maxUnits": 4,
+              "style": 1
+            },
+            {
+              "minUnits": 5,
+              "maxUnits": 6,
+              "style": 3
+            },
+            {
+              "minUnits": 7,
+              "maxUnits": 8,
+              "style": 5
+            },
+            {
+              "minUnits": 9,
+              "maxUnits": 10,
+              "style": 5
+            },
+            {
+              "minUnits": 11,
+              "maxUnits": 25000,
+              "style": 6
+            }
+          ]
+        },
+        {
+          "apiName": "DA_18_LuxUniqueTrait",
+          "name": "Avatar",
+          "effects": [
+            {
+              "minUnits": 1,
+              "maxUnits": 25000,
+              "style": 4
+            }
+          ]
+        },
+        {
+          "apiName": "DA_Riftbeast18",
+          "name": "Riftbeast",
+          "effects": [
+            {
+              "minUnits": 3,
+              "maxUnits": 4,
+              "style": 1
+            },
+            {
+              "minUnits": 5,
+              "maxUnits": 6,
+              "style": 3
+            },
+            {
+              "minUnits": 7,
+              "maxUnits": 9,
+              "style": 5
+            },
+            {
+              "minUnits": 10,
+              "maxUnits": 25000,
+              "style": 5
+            }
+          ]
+        },
+        {
+          "apiName": "DA_DravenUniqueTrait18",
+          "name": "Bounty Seeker",
+          "effects": [
+            {
+              "minUnits": 1,
+              "maxUnits": 25000,
+              "style": 4
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
