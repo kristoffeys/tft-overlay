@@ -48,6 +48,7 @@ public final class OverlayPanelController<Content: View> {
     private let configuration: Configuration
     private let state = OverlayPanelState()
 
+    private var idleRevertInterval: TimeInterval
     private var idleTimer: Timer?
     private var lastActivity: TimeInterval = ProcessInfo.processInfo.systemUptime
     private var moveObserver: NSObjectProtocol?
@@ -60,6 +61,7 @@ public final class OverlayPanelController<Content: View> {
     ) {
         self.configuration = configuration
         self.geometryStore = geometryStore
+        idleRevertInterval = configuration.idleRevertInterval
 
         let startingSize = configuration.initialLayoutMode == .compact ? configuration.compactSize : configuration
             .expandedSize
@@ -101,6 +103,19 @@ public final class OverlayPanelController<Content: View> {
         if let resizeObserver {
             NotificationCenter.default.removeObserver(resizeObserver)
         }
+    }
+
+    // MARK: - Shutdown (#7)
+
+    /// Explicit teardown for a clean quit: stops the idle timer, persists
+    /// current geometry, and orders the panel out. Safe to call more than
+    /// once. Process exit doesn't reliably run `deinit` on an app-lifetime
+    /// object held by `AppDelegate`, so callers should invoke this from
+    /// `applicationWillTerminate` rather than relying on it.
+    public func teardown() {
+        stopIdleTimer()
+        persistCurrentGeometry()
+        hide()
     }
 
     // MARK: - Visibility
@@ -199,6 +214,29 @@ public final class OverlayPanelController<Content: View> {
         persistCurrentGeometry()
     }
 
+    /// Moves the panel to a screen-corner anchor (settings-driven "position"
+    /// preference), keeping its current size.
+    public func moveToAnchor(_ anchor: OverlayAnchor) {
+        guard let screen = panel.screen ?? NSScreen.main else { return }
+        let frame = OverlayPositioning.frame(for: panel.frame.size, in: screen.visibleFrame, anchor: anchor)
+        applyFrame(frame)
+        persistCurrentGeometry()
+    }
+
+    // MARK: - Idle timeout (settings-driven, live)
+
+    public func setIdleRevertInterval(_ interval: TimeInterval) {
+        idleRevertInterval = max(interval, 0)
+    }
+
+    // MARK: - Diagnostics (#5)
+
+    /// A snapshot of the panel's current placement/appearance, for
+    /// diagnostics export. Frame is in screen points.
+    public var currentGeometry: OverlayGeometry {
+        OverlayGeometry(frame: panel.frame, layoutMode: state.layoutMode, opacity: state.opacity, scale: state.scale)
+    }
+
     // MARK: - Resize handling
 
     private func applyResize(_ proposedSize: CGSize) {
@@ -238,7 +276,7 @@ public final class OverlayPanelController<Content: View> {
         if OverlayPositioning.shouldAutoRevert(
             lastActivity: lastActivity,
             now: now,
-            idleInterval: configuration.idleRevertInterval
+            idleInterval: idleRevertInterval
         ) {
             setInteractive(false)
         }
