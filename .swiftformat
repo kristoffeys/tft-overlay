@@ -1,0 +1,8 @@
+--swiftversion 5.10
+--indent 4
+--maxwidth 120
+--self remove
+--trimwhitespace always
+--wraparguments before-first
+--wrapparameters before-first
+--exclude .build,**/.build,DerivedData

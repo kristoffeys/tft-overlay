@@ -6,7 +6,7 @@ A native macOS overlay and companion app for **Teamfight Tactics**.
 
 There is no TFT overlay on macOS. Every existing one — Blitz, Mobalytics, MetaTFT — is built on Overwolf, which is Windows-only.
 
-The situation got sharper in 2026: TFT **removes native macOS support** with the Set 18 / Patch 18.1 Unreal Engine migration (the new TFT client ships 2026-10-09). Riot calls the removal temporary and is targeting a return "early in Enchanted Wilds", with no committed date.
+In 2026 it stopped being a gap and became the only option: TFT **dropped native macOS support on 2026-08-26**, with Set 18 "Enchanted Wilds" / patch 18.1 and the migration from the Hextech engine to Unreal. This is already in effect — not a forecast. Riot calls the removal temporary but has committed to no return date. (Separately, a standalone TFT client is due 2026-10-09, four patches into Set 18; that is a different thing and does not restore macOS.)
 
 So on macOS today, TFT runs under [**Mactician**](https://sergeinaumov.dev/mactician) — an MIT-licensed community launcher that runs the Android TFT build in an Android Emulator on Apple Silicon. That is this project's primary host.
 

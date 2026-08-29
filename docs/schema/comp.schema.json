@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tft-overlay.local/schema/comp.schema.json",
+  "title": "TFT Comp",
+  "description": "A hand-authored or (in Phase 3) machine-derived Teamfight Tactics team composition. schemaVersion tracks this file's shape so Phase 3's harvested-and-clustered comps can be validated and rendered by the same detail view without a UI change.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "set",
+    "patch",
+    "tier",
+    "playstyle",
+    "difficulty",
+    "units",
+    "carries",
+    "boardPositioning",
+    "augmentPreferences",
+    "levelPlan",
+    "earlyOpener",
+    "pivotNotes"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Semver of this schema, not of the comp. Bump when the shape of this file changes."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Kebab-case slug, unique within data/comps/, stable across patches so the overlay can keep a user's pinned/favorited comp across updates."
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "set": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "TFT set number this comp is written for, e.g. 18."
+    },
+    "patch": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "Patch this comp was authored/validated against, e.g. \"18.1\". A comps site or harvester (Phase 3, option b) can supersede a comp by publishing a newer patch value under the same id."
+    },
+    "source": {
+      "type": "string",
+      "enum": ["hand-authored", "match-derived", "licensed-feed"],
+      "default": "hand-authored",
+      "description": "Provenance of this comp's data, per ADR 0002. Phase 1 ships hand-authored only; Phase 3 introduces match-derived without changing any other field."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["S", "A", "B", "C", "D"],
+      "description": "Editorial power ranking for the current patch."
+    },
+    "playstyle": {
+      "type": "string",
+      "enum": ["fast_8", "slow_roll", "reroll"],
+      "description": "fast_8: level aggressively to 8 and roll down there. slow_roll: hold level, roll at a fixed level to 3-star cheap units before leveling further. reroll: commit to leveling low and rerolling for one or two 3-starred cheap/mid units."
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["easy", "medium", "hard"]
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "units": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "cost", "starTarget", "role", "traits"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Champion name exactly as it appears in-game this set."
+          },
+          "cost": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "starTarget": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 3,
+            "description": "Star level this comp expects the unit to reach by the fight that matters (usually final board)."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["carry", "frontline", "utility", "support"]
+          },
+          "traits": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "flex": {
+            "type": "boolean",
+            "default": false,
+            "description": "True if this unit is a common swap-out depending on lobby contest, not a core piece."
+          }
+        }
+      }
+    },
+    "carries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["unit", "itemPriority"],
+        "properties": {
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Must match a units[].name entry with role \"carry\"."
+          },
+          "itemPriority": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 },
+            "description": "Completed items in priority order, best-in-slot first."
+          },
+          "itemNotes": {
+            "type": "string",
+            "maxLength": 300
+          }
+        }
+      }
+    },
+    "boardPositioning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grid"],
+      "properties": {
+        "grid": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "description": "4 rows x 7 hex columns, your side of the board. Row 0 is the frontline row (closest to the enemy), row 3 is the row closest to your bench. Each cell is a unit name from units[] or null for an empty hex.",
+          "items": {
+            "type": "array",
+            "minItems": 7,
+            "maxItems": 7,
+            "items": {
+              "type": ["string", "null"]
+            }
+          }
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Positioning callouts that a grid can't express, e.g. corner vs. center hiding for a backline carry."
+        }
+      }
+    },
+    "augmentPreferences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tier1", "tier2", "tier3"],
+      "properties": {
+        "tier1": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "tier2": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "tier3": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      },
+      "description": "Preferred augments per silver/gold/prismatic tier, most preferred first. Empty arrays are valid if no augment is a standout for this comp."
+    },
+    "levelPlan": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["stage", "level"],
+        "properties": {
+          "stage": {
+            "type": "string",
+            "pattern": "^[0-9]+-[0-9]+$",
+            "description": "Round label, e.g. \"3-2\"."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 200
+          }
+        }
+      }
+    },
+    "earlyOpener": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "Stages 1-1 through 2-5: what to greed/prioritize before the comp's identity is committed to."
+    },
+    "pivotNotes": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500,
+      "description": "When this comp is contested or the opener whiffs, what to pivot into and the tell that triggers it."
+    }
+  }
+}

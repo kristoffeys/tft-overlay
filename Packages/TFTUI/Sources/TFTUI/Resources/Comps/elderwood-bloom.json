@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "elderwood-bloom",
+  "name": "Elderwood Bloom",
+  "set": 18,
+  "patch": "18.1",
+  "source": "hand-authored",
+  "tier": "A",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "Slow-rolls cheap Elderwood units to 3-star while stacking the Elderwood plant buff to 7, then levels to 8 for an Ezreal/LeBlanc dual-carry finish.",
+  "units": [
+    { "name": "Ornn", "cost": 1, "starTarget": 2, "role": "frontline", "traits": ["Elderwood", "Defender"] },
+    { "name": "Xayah", "cost": 1, "starTarget": 2, "role": "utility", "traits": ["Elderwood", "Fae", "Rapidfire"] },
+    { "name": "Alistar", "cost": 2, "starTarget": 3, "role": "frontline", "traits": ["Elderwood", "Brawler"] },
+    { "name": "LeBlanc", "cost": 2, "starTarget": 3, "role": "carry", "traits": ["Elderwood", "Spellweaver"] },
+    { "name": "Hecarim", "cost": 3, "starTarget": 2, "role": "frontline", "traits": ["Elderwood", "Vanguard"] },
+    { "name": "Lillia", "cost": 4, "starTarget": 2, "role": "support", "traits": ["Fae", "Defender"] },
+    { "name": "Ezreal", "cost": 4, "starTarget": 2, "role": "carry", "traits": ["Elderwood", "Executioner"] },
+    { "name": "Gnar", "cost": 5, "starTarget": 2, "role": "frontline", "traits": ["Elderwood", "Sprykin", "Brawler"], "flex": true }
+  ],
+  "carries": [
+    {
+      "unit": "Ezreal",
+      "itemPriority": ["Guinsoo's Rageblade", "Infinity Edge", "Rapid Firecannon"],
+      "itemNotes": "Runaan's Hurricane or Statikk Shiv are fine substitutes if crit components aren't open; Ezreal wants attack speed to proc his caster-AD pattern, not raw crit."
+    },
+    {
+      "unit": "LeBlanc",
+      "itemPriority": ["Jeweled Gauntlet", "Archangel's Staff", "Blue Buff"],
+      "itemNotes": "Any AP burst item pairs fine; the priority is mana/AP to reset her burst combo as fast as possible."
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [null, "Ornn", null, "Hecarim", null, "Gnar", null],
+      [null, null, "Alistar", null, null, null, null],
+      ["Xayah", null, null, null, null, null, "Lillia"],
+      [null, "LeBlanc", null, null, null, "Ezreal", null]
+    ],
+    "notes": "Ezreal and LeBlanc sit in opposite back corners so a single dive target can't reach both; Alistar sits just behind the front line so his knockup lands on backline divers instead of the frontline trade."
+  },
+  "augmentPreferences": {
+    "tier1": ["Challenger's Grace"],
+    "tier2": ["Elderwood Emblem", "Know Your Enemy"],
+    "tier3": ["Elderwood Emblem"]
+  },
+  "levelPlan": [
+    { "stage": "2-1", "level": 3, "notes": "Roll only if a 2-star 1-cost Elderwood unit is available; otherwise hold." },
+    { "stage": "3-2", "level": 6, "notes": "Start the slow roll here: hold at 6 and roll for Alistar/LeBlanc 3-star." },
+    { "stage": "4-2", "level": 7 },
+    { "stage": "4-5", "level": 8, "notes": "Roll down for the Elderwood-7 breakpoint (Ezreal, Gnar) and Ezreal/LeBlanc copies." },
+    { "stage": "5-1", "level": 8, "notes": "Continue rolling if HP allows; otherwise bank econ and hold the board." }
+  ],
+  "earlyOpener": "Fast to level 4 by 2-1. Greedily pick up any cheap Elderwood or Fae unit you see (Ornn, Xayah, Alistar, LeBlanc) without spending gold to 2-star them yet; play a generic strong early frontline in the meantime and take a neutral econ augment at 2-1 to preserve gold for the slow roll.",
+  "pivotNotes": "If Alistar and LeBlanc aren't showing or are heavily contested by 3-2, pivot to whichever open 2-cost carry the lobby isn't taking (e.g. a Caitlyn Hunter or Sejuani Juggernaut line) and keep the same Ornn/Hecarim frontline, since both slot into most frontlines without a reset."
+}
