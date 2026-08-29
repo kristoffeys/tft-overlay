@@ -32,7 +32,12 @@ Every change ships through a pull request:
    before the fix and passes after.
 4. Open a PR. Reference the GitHub issue it closes.
 5. **Wait for CI to pass.** Do not merge on a red or pending build.
-6. Merge once green, then delete the branch.
+6. Merge once green with `gh pr merge --rebase`, then delete the branch.
+
+**Use `--rebase`, never `--squash`.** Squashing collapses carefully separated
+commits into one and throws away the atomicity that made them reviewable. If the
+branch's commits are not worth keeping individually, they were not atomic and the
+branch needs restructuring, not squashing.
 
 Never commit directly to `main`.
 
