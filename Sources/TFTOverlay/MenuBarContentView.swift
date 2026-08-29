@@ -19,7 +19,7 @@ struct MenuBarContentView: View {
                 appDelegate.cyclePanelForward()
             }
             Button("Preferences…") {
-                appDelegate.showPreferencesPlaceholder()
+                appDelegate.showPreferences()
             }
             Divider()
             Button("Quit") {

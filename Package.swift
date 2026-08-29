@@ -38,5 +38,10 @@ let package = Package(
                 ]),
             ]
         ),
+        .testTarget(
+            name: "TFTOverlayTests",
+            dependencies: ["TFTOverlay"],
+            path: "Tests/TFTOverlayTests"
+        ),
     ]
 )
