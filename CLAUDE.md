@@ -58,6 +58,25 @@ For any change that affects what the user sees:
 WindowServer surface, say so plainly in your report — state what you did verify and
 what you could not. Never assume or fabricate a visual result.
 
+## Concurrent agents in a shared worktree
+
+When several agents work in the same worktree at once, **repo-wide git commands are
+destructive**. `git checkout .`, `git restore .`, `git reset`, `git stash`, `git clean`
+and `git add -A` all reach outside the caller's own files and silently wipe other
+agents' uncommitted work. This has already happened once here: five tracked files in
+`Packages/TFTData` reverted to HEAD mid-edit and the work had to be redone.
+
+Rules for any agent that does not own the whole worktree:
+
+- The only permitted git commands are read-only: `status`, `diff`, `log`.
+- To discard your own change, edit the file back or delete it. Never use git for it.
+- If a file outside your area looks wrong, report it. Do not fix or revert it.
+- The coordinator owns all commits, branches and merges.
+
+Prefer giving each concurrent agent its own worktree when the work allows it. A shared
+worktree is only safe when every agent stays strictly inside disjoint paths *and*
+follows the rules above.
+
 ## Architecture constraints
 
 - `Packages/TFTUI` and `Packages/OverlayKit` must not depend on each other. The app
