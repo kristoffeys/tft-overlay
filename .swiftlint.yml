@@ -1,0 +1,29 @@
+included:
+  - Sources
+  - Packages
+
+excluded:
+  - .build
+  - "Packages/*/.build"
+
+opt_in_rules:
+  - empty_count
+  - closure_spacing
+  - sorted_imports
+
+disabled_rules:
+  - todo
+  # SwiftFormat owns comma style (--commas always) and auto-applies it.
+  # Leaving this rule on makes the two tools fight over every collection literal.
+  - trailing_comma
+
+line_length:
+  warning: 140
+  error: 200
+
+identifier_name:
+  min_length: 2
+  excluded:
+    # Coordinates; universally idiomatic and clearer than the alternatives.
+    - x
+    - y
