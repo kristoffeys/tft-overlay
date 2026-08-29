@@ -17,12 +17,14 @@ struct DemoRootView: View {
     @State private var comps: [Comp] = (try? CompLoader.bundledFixtures()) ?? []
     @State private var selectedComp: Comp?
     @State private var tab: Tab = .list
+    @StateObject private var pinnedStore = PinnedCompsStore(defaults: UserDefaults(suiteName: "TFTUIDemo") ?? .standard)
 
     enum Tab: String, CaseIterable, Identifiable {
         case list = "Comps"
         case detail = "Detail"
         case items = "Items"
         case compact = "Compact"
+        case reference = "Reference"
         var id: String {
             rawValue
         }
@@ -36,16 +38,23 @@ struct DemoRootView: View {
             .pickerStyle(.segmented)
             .padding(10)
 
+            PinnedCompsRailView(comps: comps, store: pinnedStore) { comp in
+                selectedComp = comp
+                tab = .detail
+            }
+            .padding(.horizontal, 10)
+            .padding(.bottom, 8)
+
             Group {
                 switch tab {
                 case .list:
-                    CompsListView(comps: comps) { comp in
+                    CompsListView(comps: comps, pinnedStore: pinnedStore) { comp in
                         selectedComp = comp
                         tab = .detail
                     }
                 case .detail:
                     if let comp = selectedComp ?? comps.first {
-                        CompDetailView(comp: comp)
+                        CompDetailView(comp: comp, pinnedStore: pinnedStore)
                     } else {
                         Text("No comps loaded").foregroundStyle(.white)
                     }
@@ -55,6 +64,11 @@ struct DemoRootView: View {
                     ScrollView {
                         CompactItemCheatSheetView()
                             .padding(40)
+                    }
+                case .reference:
+                    UnitTraitReferenceView(comps: comps) { comp in
+                        selectedComp = comp
+                        tab = .detail
                     }
                 }
             }
