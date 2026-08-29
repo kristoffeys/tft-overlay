@@ -5,14 +5,20 @@ import SwiftUI
 public struct CompsListView: View {
     let comps: [Comp]
     let onSelect: (Comp) -> Void
+    @ObservedObject private var pinnedStoreBox: PinnedCompsStoreBox
 
     @State private var searchText = ""
     @State private var tierFilter: Comp.Tier?
     @State private var playstyleFilter: Comp.Playstyle?
 
-    public init(comps: [Comp], onSelect: @escaping (Comp) -> Void = { _ in }) {
+    public init(comps: [Comp], pinnedStore: PinnedCompsStore? = nil, onSelect: @escaping (Comp) -> Void = { _ in }) {
         self.comps = comps
+        pinnedStoreBox = PinnedCompsStoreBox(pinnedStore)
         self.onSelect = onSelect
+    }
+
+    private var pinnedStore: PinnedCompsStore? {
+        pinnedStoreBox.store
     }
 
     private var filtered: [Comp] {
@@ -43,7 +49,7 @@ public struct CompsListView: View {
                         Button {
                             onSelect(comp)
                         } label: {
-                            CompRow(comp: comp)
+                            CompRow(comp: comp, pinnedStore: pinnedStore)
                         }
                         .buttonStyle(.plain)
                     }
@@ -129,6 +135,7 @@ private struct FilterChip: View {
 
 private struct CompRow: View {
     let comp: Comp
+    let pinnedStore: PinnedCompsStore?
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -143,6 +150,11 @@ private struct CompRow: View {
                     Text(comp.playstyle.displayName)
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(TFTTheme.textSecondary)
+                    if let pinnedStore {
+                        PinToggleButton(isPinned: pinnedStore.isPinned(comp.id)) {
+                            pinnedStore.toggle(comp.id)
+                        }
+                    }
                 }
                 HStack(spacing: 6) {
                     ForEach(comp.carryUnits, id: \.unit.id) { pair in

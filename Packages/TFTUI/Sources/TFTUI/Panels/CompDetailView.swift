@@ -5,9 +5,15 @@ import SwiftUI
 /// plan, early opener, pivot notes, preferred augments.
 public struct CompDetailView: View {
     let comp: Comp
+    @ObservedObject private var pinnedStoreBox: PinnedCompsStoreBox
 
-    public init(comp: Comp) {
+    public init(comp: Comp, pinnedStore: PinnedCompsStore? = nil) {
         self.comp = comp
+        pinnedStoreBox = PinnedCompsStoreBox(pinnedStore)
+    }
+
+    private var pinnedStore: PinnedCompsStore? {
+        pinnedStoreBox.store
     }
 
     public var body: some View {
@@ -35,6 +41,11 @@ public struct CompDetailView: View {
                     .foregroundStyle(TFTTheme.textPrimary)
                 Spacer()
                 DifficultyIndicator(comp.difficulty)
+                if let pinnedStore {
+                    PinToggleButton(isPinned: pinnedStore.isPinned(comp.id)) {
+                        pinnedStore.toggle(comp.id)
+                    }
+                }
             }
             HStack(spacing: 10) {
                 Text(comp.playstyle.displayName)
