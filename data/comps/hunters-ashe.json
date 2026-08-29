@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "hunters-ashe",
+  "name": "Hunter's Ashe",
+  "set": 18,
+  "patch": "18.1",
+  "source": "hand-authored",
+  "tier": "S",
+  "playstyle": "fast_8",
+  "difficulty": "hard",
+  "description": "Levels fast to 8 behind a Riftbeast frontline and rolls down for a 3-star Ashe, using the full 5-unit Hunter line so her 'unmoved Hunters gain Damage Amp' bonus applies to a backline carry that never repositions.",
+  "units": [
+    { "name": "Cinderling", "cost": 1, "starTarget": 2, "role": "frontline", "traits": ["Riftbeast", "Hunter"] },
+    { "name": "Caitlyn", "cost": 2, "starTarget": 2, "role": "utility", "traits": ["Coven", "Hunter"] },
+    { "name": "Krug", "cost": 3, "starTarget": 2, "role": "frontline", "traits": ["Riftbeast", "Brawler"] },
+    { "name": "Tristana", "cost": 3, "starTarget": 2, "role": "utility", "traits": ["Fae", "Sprykin", "Hunter"] },
+    { "name": "Sivir", "cost": 4, "starTarget": 2, "role": "carry", "traits": ["Primal", "Hunter"] },
+    { "name": "Ashe", "cost": 5, "starTarget": 3, "role": "carry", "traits": ["Blossom", "Hunter"] },
+    { "name": "The Elder Dragon", "cost": 5, "starTarget": 1, "role": "frontline", "traits": ["Riftbeast", "Apex Predator"], "flex": true }
+  ],
+  "carries": [
+    {
+      "unit": "Ashe",
+      "itemPriority": ["Infinity Edge", "Giant Slayer", "Runaan's Hurricane"],
+      "itemNotes": "Crit and multi-target items both scale her frost-arrow volley; Bloodthirster is a fine 4th/replacement item for sustain into long fights."
+    },
+    {
+      "unit": "Sivir",
+      "itemPriority": ["Guinsoo's Rageblade", "Statikk Shiv", "Rapid Firecannon"],
+      "itemNotes": "Attack-speed/on-hit items over raw AD; she is the secondary carry and dies to itemize her like a second hypercarry."
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [null, "Krug", "The Elder Dragon", "The Elder Dragon", "Cinderling", null, null],
+      [null, null, null, null, null, null, null],
+      ["Caitlyn", null, null, null, null, null, "Tristana"],
+      [null, "Ashe", null, null, null, "Sivir", null]
+    ],
+    "notes": "The Elder Dragon occupies two hexes (it counts as 2 board slots); keep it and Krug centered to eat the front-line dive so Ashe and Sivir, in the back corners, never need to move mid-fight."
+  },
+  "augmentPreferences": {
+    "tier1": ["Challenger's Grace"],
+    "tier2": ["Hunter Emblem", "Know Your Enemy"],
+    "tier3": ["Hunter Emblem"]
+  },
+  "levelPlan": [
+    { "stage": "2-1", "level": 4 },
+    { "stage": "3-2", "level": 6 },
+    { "stage": "4-1", "level": 7 },
+    { "stage": "4-5", "level": 8, "notes": "Hit 8 on curve; slot in Elder Dragon/Krug and start rolling for Ashe and Sivir 2-star as a floor." },
+    { "stage": "5-2", "level": 8, "notes": "Spend remaining gold rolling for a 3-star Ashe, the comp's win condition." }
+  ],
+  "earlyOpener": "Play fast: take every augment and unit that helps hit level 4 by 2-1 and level 6 by 3-2. Use cheap Riftbeast/Hunter 1-costs like Cinderling as an econ-friendly early frontline, but do not spend gold 2-starring them.",
+  "pivotNotes": "This comp needs 8 gold to function since Ashe is a 5-cost. If HP is too low to safely reach level 8 by stage 4, pivot down to a level-6 Hunter line using Caitlyn as a temporary carry, keeping the same Riftbeast frontline until HP stabilizes."
+}
