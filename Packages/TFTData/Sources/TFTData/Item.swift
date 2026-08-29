@@ -1,4 +1,4 @@
-public struct Item: Identifiable, Hashable, Sendable {
+public struct Item: Identifiable, Hashable, Sendable, Codable {
     public let id: String
     public let name: String
     public let componentIDs: [String]

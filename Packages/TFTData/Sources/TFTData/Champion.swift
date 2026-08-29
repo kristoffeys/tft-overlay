@@ -1,5 +1,5 @@
 /// A set champion. Pure data — no UI or networking types leak out of this package.
-public struct Champion: Identifiable, Hashable, Sendable {
+public struct Champion: Identifiable, Hashable, Sendable, Codable {
     public let id: String
     public let name: String
     public let cost: Int

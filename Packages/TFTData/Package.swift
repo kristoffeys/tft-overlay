@@ -10,7 +10,11 @@ let package = Package(
         .library(name: "TFTData", targets: ["TFTData"]),
     ],
     targets: [
-        .target(name: "TFTData"),
-        .testTarget(name: "TFTDataTests", dependencies: ["TFTData"]),
+        .target(name: "TFTData", resources: [.copy("Resources/fallback-set-data.json")]),
+        .testTarget(
+            name: "TFTDataTests",
+            dependencies: ["TFTData"],
+            resources: [.copy("Fixtures")]
+        ),
     ]
 )
