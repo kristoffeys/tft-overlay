@@ -49,7 +49,12 @@ class MappingWarning(Exception):
 
 
 def slugify(name: str) -> str:
-    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    """Comp id. Apostrophes are dropped, not turned into a separator, because
+    the id is a stable key: pins persist by it, so "Hunter's Ashe" has to keep
+    slugging to `hunters-ashe` (and "Rivals Kha'Zix" to `rivals-khazix`) even
+    though the display name it comes from now carries the apostrophe the set
+    ships. Splitting on it would rename shipped comps and drop those pins."""
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower().replace("'", "").replace("’", "")).strip("-")
     return slug
 
 
@@ -77,6 +82,45 @@ def _resolve_champion(name: str, champion_data: ChampionData):
         if re.sub(r"[^a-z0-9]", "", candidate_name.lower()) == normalized:
             return info
     return None
+
+
+def _display_name(name: str, champion_data: ChampionData) -> str:
+    """`name` respelled the way the live set data spells it, when it names a
+    champion at all; unchanged otherwise.
+
+    tftactics' champion icons carry plain-ASCII alt text ("Khazix", "Kogmaw",
+    "RekSai", "Leblanc") while the set ships "Kha'Zix", "Kog'Maw", "Rek'Sai",
+    "LeBlanc". Unit entries already came out right because they are built from
+    the resolved `ChampionInfo`; every *other* place a scraped champion name is
+    written -- the comp title, the early-game priority list, the swap notes --
+    used to pass the alt text straight through, which is how `rivals-khazix`
+    shipped a title reading "Rivals Khazix" directly above its own unit list
+    reading "Kha'Zix" (#98)."""
+    info = _resolve_champion(name, champion_data)
+    return info.name if info else name
+
+
+def _display_names(names, champion_data: ChampionData) -> list:
+    return [_display_name(name, champion_data) for name in names]
+
+
+_TITLE_WORD_RE = re.compile(r"[A-Za-z][A-Za-z0-9'’]*")
+
+
+def resolve_champion_names_in_text(text: str, champion_data: ChampionData) -> str:
+    """`text` with each word that names a champion respelled as the set spells
+    it. Used for the comp title, which is a phrase ("Rivals Khazix"), not a
+    bare name.
+
+    Word at a time, so it only ever fixes single-word champion names. A
+    multi-word name ("Mama Beak") or a parenthesised variant ("Lux (Inferno)")
+    is left alone rather than guessed at from one word -- and the alt-text
+    mangling this exists for only hits single-word names anyway. Words that
+    resolve to no champion (traits, "Rivals", the possessive "Hunter's") come
+    back untouched."""
+    if not text:
+        return text
+    return _TITLE_WORD_RE.sub(lambda m: _display_name(m.group(0), champion_data), text)
 
 
 def _star_target(cost: int, is_carry: bool) -> int:
@@ -108,6 +152,8 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
     units at all -- nothing to ship. Individual unresolvable units are
     dropped with a warning rather than failing the whole comp, since a
     schema-valid comp missing one obscure unit beats no comp at all."""
+    display_name = resolve_champion_names_in_text(raw.name, champion_data)
+    early_units = _display_names(raw.early_units, champion_data)
     units = []
     carry_units_raw = []
     for raw_unit in raw.units:
@@ -169,11 +215,11 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
         positioning_notes = "Positioning not available from source for this comp."
 
     level_plan = []
-    if raw.early_units:
+    if early_units:
         level_plan.append({
             "stage": _DEFAULT_EARLY_STAGE,
             "level": 6,
-            "notes": "Prioritize: " + ", ".join(raw.early_units),
+            "notes": "Prioritize: " + ", ".join(early_units),
         })
     # Only *level-gated* options belong in the level plan, and only when the
     # source actually names a level. A swap ("play Vi instead of Gnar") has
@@ -189,7 +235,10 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
         level_plan.append({
             "stage": _LEVEL_TO_STAGE.get(level, _DEFAULT_LATE_STAGE),
             "level": level,
-            "notes": f"At level {level} you can add: {', '.join(option['units'])}.",
+            "notes": (
+                f"At level {level} you can add: "
+                f"{', '.join(_display_names(option['units'], champion_data))}."
+            ),
         })
     if not level_plan:
         level_plan.append({
@@ -200,9 +249,9 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
 
     top_traits = [t["name"] for t in raw.trait_counts if t.get("name")][:2]
     early_opener = (
-        ("Prioritize " + ", ".join(raw.early_units) + " early; these carry the comp online before its "
+        ("Prioritize " + ", ".join(early_units) + " early; these carry the comp online before its "
          "full identity is committed.")
-        if raw.early_units
+        if early_units
         else ("Play for economy and take units/augments supporting " + " and ".join(top_traits) + " until your "
               "board commits." if top_traits else "Early-game plan not available from source.")
     )
@@ -210,7 +259,8 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
     # Anything without both sides is dropped rather than described with a
     # placeholder — a comp that says nothing beats a comp that says "None".
     swaps = [
-        f"{', '.join(opt['out_units'])} → {', '.join(opt['units'])}"
+        f"{', '.join(_display_names(opt['out_units'], champion_data))} → "
+        f"{', '.join(_display_names(opt['units'], champion_data))}"
         for opt in raw.flex_options
         if opt.get("kind") == "swap" and opt.get("out_units") and opt.get("units")
     ]
@@ -230,8 +280,8 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
 
     return {
         "schemaVersion": "1.0.0",
-        "id": slugify(raw.name),
-        "name": raw.name,
+        "id": slugify(display_name),
+        "name": display_name,
         "set": set_number,
         "patch": patch,
         "source": "scraped-feed",

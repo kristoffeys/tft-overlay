@@ -23,6 +23,7 @@ def champion_data():
             "Ashe": ChampionInfo(name="Ashe", cost=5, traits=["Blossom", "Hunter"]),
             "Sivir": ChampionInfo(name="Sivir", cost=4, traits=["Primal", "Hunter"]),
             "Cinderling": ChampionInfo(name="Cinderling", cost=1, traits=["Riftbeast", "Hunter"]),
+            "Kha'Zix": ChampionInfo(name="Kha'Zix", cost=3, traits=["Rival"]),
         },
     )
 
@@ -34,7 +35,11 @@ def validator():
 
 
 def test_slugify_produces_schema_conformant_ids():
-    assert slugify("Hunter's Ashe") == "hunter-s-ashe"
+    # An apostrophe is dropped, not split on: ids are the key pins persist by,
+    # so the shipped `hunters-ashe` / `rivals-khazix` must keep slugging to
+    # themselves now that display names carry the apostrophe the set ships.
+    assert slugify("Hunter's Ashe") == "hunters-ashe"
+    assert slugify("Rivals Kha'Zix") == "rivals-khazix"
     assert slugify("Spellweaver  Defenders") == "spellweaver-defenders"
 
 
@@ -70,7 +75,7 @@ def test_map_comp_produces_schema_valid_output(champion_data, validator):
     assert comp is not None
     errors = list(validator.iter_errors(comp))
     assert not errors, f"schema errors: {[e.message for e in errors]}"
-    assert comp["id"] == "hunter-s-ashe"
+    assert comp["id"] == "hunters-ashe"
     assert comp["source"] == "scraped-feed"
     assert {c["unit"] for c in comp["carries"]} == {"Sivir", "Ashe"}
     assert not warnings
@@ -140,6 +145,45 @@ def test_swap_options_become_pivot_notes_not_fake_levels(champion_data, validato
     assert "Sivir → Cinderling" in comp["pivotNotes"]
     # Only the real level gate reaches the level plan.
     assert any("At level 9" in (e.get("notes") or "") for e in comp["levelPlan"])
+    assert not list(validator.iter_errors(comp))
+
+
+def test_apostrophised_champion_names_reach_every_display_field(champion_data, validator):
+    """The source's champion icons carry plain-ASCII alt text ("Khazix",
+    "Kogmaw", "RekSai") while the set ships "Kha'Zix", "Kog'Maw", "Rek'Sai".
+    Unit entries were always built from the resolved champion, but the title,
+    the early-game priority list and the swap notes passed the alt text
+    straight through -- which is how `rivals-khazix` shipped a title reading
+    "Rivals Khazix" one line above its own unit list reading "Kha'Zix" (#98).
+    """
+    raw = RawComp(
+        tier="A",
+        name="Rivals Khazix",
+        playstyle_text="Slow Roll (7)",
+        units=[
+            {"name": "Khazix", "items": ["Jeweled Gauntlet"]},
+            {"name": "Cinderling", "items": []},
+        ],
+        early_units=["Khazix", "Cinderling"],
+        flex_options=[
+            {"kind": "level", "level": "9", "out_units": [], "units": ["Khazix"]},
+            {"kind": "swap", "level": None, "out_units": ["Khazix"], "units": ["Sivir"]},
+        ],
+    )
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=lambda _m: None)
+
+    assert comp is not None
+    assert comp["name"] == "Rivals Kha'Zix"
+    # Pins persist by id, so the display fix must not rename the comp.
+    assert comp["id"] == "rivals-khazix"
+    assert comp["units"][0]["name"] == "Kha'Zix"
+    assert comp["carries"][0]["unit"] == "Kha'Zix"
+    assert "Kha'Zix" in comp["earlyOpener"]
+    assert any("Kha'Zix" in (entry.get("notes") or "") for entry in comp["levelPlan"])
+    assert "Kha'Zix → Sivir" in comp["pivotNotes"]
+    # Nothing anywhere still spells it the source's way (the lowercase id is
+    # unaffected by this case-sensitive check).
+    assert "Khazix" not in json.dumps(comp)
     assert not list(validator.iter_errors(comp))
 
 
