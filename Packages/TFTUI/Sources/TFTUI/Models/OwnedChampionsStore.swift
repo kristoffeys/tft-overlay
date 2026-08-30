@@ -62,8 +62,16 @@ public final class OwnedChampionsStore: ObservableObject {
     /// The whole roster goes stale every game; this is the one-tap reset
     /// that makes "empty" the safe default between games rather than a
     /// leftover roster from the last one.
+    ///
+    /// Unconditional on purpose. Skipping the write when `ownedKeys` is
+    /// already empty looks like a free optimisation, but in-memory state is
+    /// only a snapshot taken at `init`: a second store over the same
+    /// defaults (a re-created `@StateObject`, or a SwiftUI preview running
+    /// beside the app — `init` defaults to `.standard`) can hold an empty
+    /// set while the defaults still hold last game's roster, and the guard
+    /// would leave that roster persisted. One redundant write is cheaper
+    /// than leaving stale state on disk.
     public func clear() {
-        guard !ownedKeys.isEmpty else { return }
         ownedKeys.removeAll()
         persist()
     }
