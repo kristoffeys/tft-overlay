@@ -216,16 +216,6 @@ final class StageCompanionSnapshotTests: XCTestCase {
                 """
             )
 
-            // Known defect, issue #100: this fixture's Early band detail wants
-            // 468pt inside the 436pt it gets, so the whole panel measures
-            // 492pt against its 460pt frame. Recorded rather than papered over
-            // with a looser tolerance, so the width assertion stays strict for
-            // every other comp and this expectation itself fails once #100 is
-            // fixed. #95 is a testing-infrastructure change; the layout fix is
-            // not in its scope.
-            if comp.id == "solar-riftbeasts" {
-                XCTExpectFailure("solar-riftbeasts overflows the expanded panel by 32pt (#100)")
-            }
             try assertRendersWithin(
                 view.content,
                 size: CGSize(width: expanded.width, height: whole),
@@ -251,6 +241,37 @@ final class StageCompanionSnapshotTests: XCTestCase {
                     size: CGSize(width: expanded.width - 24, height: height),
                     rightMargin: 4
                 )
+            }
+        }
+    }
+
+    // MARK: - Nothing overflows the resized panel either (#100)
+
+    /// `AppDelegate` lets the player resize the expanded panel down to 420pt
+    /// wide (`minSize`); a fix verified only at the 460pt default could still
+    /// overflow there. `measuredSize` does not clamp, so this is a direct test
+    /// of the defect class `solar-riftbeasts` hit — a child wider than the
+    /// width it was proposed — rather than a proxy for it: `ViewSnapshot.render`
+    /// centres and double-clips an over-wide child, which is exactly how this
+    /// defect passed the old raster-only harness before #95.
+    ///
+    /// Every comp and every band, at both widths, so this is the one place a
+    /// future comp with an unusually large roster, item list or component set
+    /// gets caught before it ships rather than after.
+    func testEveryCompAndBandFitsBothPanelWidths() throws {
+        for width in [expanded.width, 420] as [CGFloat] {
+            for comp in try CompLoader.bundledFixtures() {
+                for band in StageBand.allCases {
+                    let measured = try ViewSnapshot.measuredSize(
+                        of: companion(comp, band: band).content,
+                        proposedWidth: width
+                    )
+                    XCTAssertLessThanOrEqual(
+                        measured.width,
+                        width + ViewSnapshot.widthTolerance,
+                        "\(comp.id) at \(band) wants \(measured.width)pt inside a \(width)pt panel"
+                    )
+                }
             }
         }
     }
