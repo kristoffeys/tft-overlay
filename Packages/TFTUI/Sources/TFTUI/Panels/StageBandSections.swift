@@ -192,6 +192,13 @@ struct LevelPlanRows: View {
                             Text(notes)
                                 .font(.system(size: 11, weight: .medium))
                                 .foregroundStyle(TFTTheme.textSecondary)
+                                // Wrap, don't truncate. The row lives in an
+                                // `HStack` with a `Spacer`, which offers the
+                                // text its one-line ideal width and then
+                                // ellipsises whatever did not fit — silently
+                                // dropping advice, which is the whole thing
+                                // this panel is not allowed to do.
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
                     Spacer(minLength: 0)

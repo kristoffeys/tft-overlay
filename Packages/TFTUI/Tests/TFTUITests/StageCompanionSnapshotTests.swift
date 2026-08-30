@@ -104,6 +104,34 @@ final class StageCompanionSnapshotTests: XCTestCase {
         }
     }
 
+    /// A plan row's notes sit in an `HStack` next to a `Spacer`, which offers
+    /// the text its one-line ideal width and then ellipsises the remainder.
+    /// That is silent loss of advice in the render — the same failure as
+    /// dropping the row — and it showed up the moment two `5-2` rows merged
+    /// into one sentence pair.
+    func testALongPlanNoteWrapsRatherThanTruncating() throws {
+        let width = expanded.width - 44
+        let short = LevelPlanEntry(stage: "5-2", level: 9, notes: "Add Zyra.")
+        let long = LevelPlanEntry(
+            stage: "5-2",
+            level: 9,
+            notes: "At level 9 you can add: Ashe, Ivern, Maokai. At level 9 you can add: Alistar, Gnar."
+        )
+        let oneLine = try ViewSnapshot.measuredSize(
+            of: LevelPlanRows(entries: [short]),
+            proposedWidth: width
+        ).height
+        let wrapped = try ViewSnapshot.measuredSize(
+            of: LevelPlanRows(entries: [long]),
+            proposedWidth: width
+        ).height
+        XCTAssertGreaterThan(
+            wrapped,
+            oneLine,
+            "a note too long for one line measured \(wrapped)pt against \(oneLine)pt — it is being truncated"
+        )
+    }
+
     // MARK: - Unplaced rows keep their own identity
 
     /// Two rows the scraper mangled the same way share `LevelPlanEntry.id`, and
