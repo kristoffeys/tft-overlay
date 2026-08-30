@@ -176,6 +176,13 @@
       "notes": "At level 9 you can add: Ivern, Taric."
     }
   ],
+  "earlyUnits": [
+    "Kobuko",
+    "Rakan",
+    "Xayah",
+    "Rammus",
+    "Tristana"
+  ],
   "earlyOpener": "Prioritize Kobuko, Rakan, Xayah, Rammus, Tristana early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Gnar → Kobuko."
 }

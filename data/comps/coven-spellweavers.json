@@ -169,6 +169,13 @@
       "notes": "At level 9 you can add: Alune."
     }
   ],
+  "earlyUnits": [
+    "Camille",
+    "Rakan",
+    "Caitlyn",
+    "Elise",
+    "Cassiopeia"
+  ],
   "earlyOpener": "Prioritize Camille, Rakan, Caitlyn, Elise, Cassiopeia early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Cassiopeia → Alune."
 }

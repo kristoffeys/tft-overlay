@@ -170,6 +170,13 @@
       "notes": "Prioritize: Ornn, Varus, Xayah, Alistar, Shen"
     }
   ],
+  "earlyUnits": [
+    "Ornn",
+    "Varus",
+    "Xayah",
+    "Alistar",
+    "Shen"
+  ],
   "earlyOpener": "Prioritize Ornn, Varus, Xayah, Alistar, Shen early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Draven, Ivern → Sentinel, Lux (Elderwood)."
 }

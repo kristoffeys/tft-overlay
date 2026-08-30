@@ -170,6 +170,13 @@
       "notes": "At level 9 you can add: Ivern, Lux (Blossom), Taric."
     }
   ],
+  "earlyUnits": [
+    "Akali",
+    "Ornn",
+    "Varus",
+    "Shen",
+    "Master Yi"
+  ],
   "earlyOpener": "Prioritize Akali, Ornn, Varus, Shen, Master Yi early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Akali, Diana, Amumu → Gromp, Scuttlecrab, Taric."
 }

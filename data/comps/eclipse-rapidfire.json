@@ -169,6 +169,13 @@
       "notes": "At level 9 you can add: Ivern, Lux (Lunar)."
     }
   ],
+  "earlyUnits": [
+    "Leona",
+    "Rakan",
+    "Xayah",
+    "Kayle",
+    "Sejuani"
+  ],
   "earlyOpener": "Prioritize Leona, Rakan, Xayah, Kayle, Sejuani early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Rakan, Lillia → Maokai, Taric."
 }

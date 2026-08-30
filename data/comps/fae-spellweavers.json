@@ -171,6 +171,13 @@
       "notes": "At level 9 you can add: Zyra."
     }
   ],
+  "earlyUnits": [
+    "Karma",
+    "Rakan",
+    "Yorick",
+    "Yunara",
+    "Azir"
+  ],
   "earlyOpener": "Prioritize Karma, Rakan, Yorick, Yunara, Azir early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
 }

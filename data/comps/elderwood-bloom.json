@@ -52,6 +52,7 @@
     { "stage": "4-5", "level": 8, "notes": "Roll down for the Elderwood-7 breakpoint (Ezreal, Gnar) and Ezreal/LeBlanc copies." },
     { "stage": "5-1", "level": 8, "notes": "Continue rolling if HP allows; otherwise bank econ and hold the board." }
   ],
+  "earlyUnits": ["Ornn", "Xayah", "Alistar", "LeBlanc"],
   "earlyOpener": "Fast to level 4 by 2-1. Greedily pick up any cheap Elderwood or Fae unit you see (Ornn, Xayah, Alistar, LeBlanc) without spending gold to 2-star them yet; play a generic strong early frontline in the meantime and take a neutral econ augment at 2-1 to preserve gold for the slow roll.",
   "pivotNotes": "If Alistar and LeBlanc aren't showing or are heavily contested by 3-2, pivot to whichever open 2-cost carry the lobby isn't taking (e.g. a Caitlyn Hunter or Sejuani Juggernaut line) and keep the same Ornn/Hecarim frontline, since both slot into most frontlines without a reset."
 }
