@@ -31,6 +31,9 @@ struct OverlayContentView: View {
         // startup load — every icon view already treats that as a normal
         // update, not a special case.
         .tftAssetCatalog(appState.assetCatalog)
+        // Recipes start from the bundled set snapshot rather than empty, so
+        // "what is this made of" is answered before any load finishes.
+        .tftItemRecipes(appState.itemRecipes)
     }
 
     /// The tab bar plus whichever panel is showing. The bar is persistent:
