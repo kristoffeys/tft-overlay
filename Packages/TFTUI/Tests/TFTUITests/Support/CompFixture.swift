@@ -21,7 +21,10 @@ enum CompFixture {
         id: String,
         tier: Comp.Tier,
         units: [CompUnit],
-        carries: [CompCarry] = []
+        carries: [CompCarry] = [],
+        levelPlan: [LevelPlanEntry] = [],
+        earlyOpener: String = "",
+        pivotNotes: String = ""
     ) throws -> Comp {
         let unitsJSON = units.map { unit in
             """
@@ -30,8 +33,15 @@ enum CompFixture {
             """
         }.joined(separator: ",")
         let carriesJSON = carries.map { carry in
+            let items = carry.itemPriority.map { "\"\($0)\"" }.joined(separator: ",")
+            return """
+            {"unit": "\(carry.unit)", "itemPriority": [\(items)]}
             """
-            {"unit": "\(carry.unit)", "itemPriority": []}
+        }.joined(separator: ",")
+        let levelPlanJSON = levelPlan.map { entry in
+            let notes = entry.notes.map { "\"\($0)\"" } ?? "null"
+            return """
+            {"stage": "\(entry.stage)", "level": \(entry.level), "notes": \(notes)}
             """
         }.joined(separator: ",")
         let json = """
@@ -49,9 +59,9 @@ enum CompFixture {
           "carries": [\(carriesJSON)],
           "boardPositioning": {"grid": [[]]},
           "augmentPreferences": {"tier1": [], "tier2": [], "tier3": []},
-          "levelPlan": [],
-          "earlyOpener": "",
-          "pivotNotes": ""
+          "levelPlan": [\(levelPlanJSON)],
+          "earlyOpener": "\(earlyOpener)",
+          "pivotNotes": "\(pivotNotes)"
         }
         """
         return try CompLoader.load(Data(json.utf8))
