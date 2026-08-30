@@ -340,6 +340,54 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
         }
     }
 
+    /// Exactly one match is a reachable state, and the note has to read like
+    /// English in it.
+    ///
+    /// It used to render "The 1 comps you are closest to" — the panel visibly
+    /// not proofreading itself, in the one place whose whole job is to be
+    /// believed.
+    func testTheBasisNoteReadsAsEnglishForASingleMatch() throws {
+        let comps = try [
+            CompFixture.dominantShape(
+                id: "only-match",
+                tier: .a,
+                names: ["Soleunique", "Four", "Fourb", "Three", "Two", "Twob", "One", "Oneb"]
+            ),
+            CompFixture.dominantShape(
+                id: "no-overlap",
+                tier: .s,
+                names: ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta", "Eta", "Theta"]
+            ),
+        ]
+        let owned = store()
+        owned.add("Soleunique")
+        let view = try panel(comps: comps, store: owned)
+
+        XCTAssertEqual(view.suggestions.count, 1, "This fixture is meant to match exactly one comp")
+        XCTAssertTrue(
+            view.basisNoteText.hasPrefix("The comp you are closest to"),
+            "With one match the note reads \"\(view.basisNoteText)\""
+        )
+        XCTAssertFalse(
+            view.basisNoteText.contains("1 comps"),
+            "The note says \"1 comps\": \"\(view.basisNoteText)\""
+        )
+    }
+
+    /// More than one match keeps the count and the plural.
+    func testTheBasisNoteCountsAndPluralisesSeveralMatches() throws {
+        let owned = store()
+        for name in ["Diana", "Hecarim", "Tristana"] {
+            owned.add(name)
+        }
+        let view = try panel(store: owned)
+        XCTAssertGreaterThan(view.suggestions.count, 1)
+        XCTAssertTrue(
+            view.basisNoteText.hasPrefix("The \(view.suggestions.count) comps you are closest to"),
+            "With \(view.suggestions.count) matches the note reads \"\(view.basisNoteText)\""
+        )
+    }
+
     /// Both empty states carry their own copy, so the note has nothing to
     /// explain and must not draw an ordering claim over an empty list.
     func testTheBasisNoteIsHiddenWhenThereIsNoRankingToDescribe() throws {

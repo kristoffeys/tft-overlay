@@ -262,6 +262,22 @@ public struct MyChampionsView: View {
         ownedCount > 0 && !suggestions.isEmpty
     }
 
+    /// The basis note's copy, as a string so a test can read it.
+    ///
+    /// Pluralised, because exactly one match is a real state — mark a single
+    /// champion no other comp uses and you get it — and "The 1 comps you are
+    /// closest to" is the panel visibly not proofreading itself, in the one
+    /// place whose whole job is to be believed. `head` above already gets
+    /// this right for its champion count; this follows it.
+    var basisNoteText: String {
+        let lead = suggestions.count == 1
+            ? "The comp you are closest to"
+            : "The \(suggestions.count) comps you are closest to"
+        return lead
+            + ", by the units you have — weighted towards carries and expensive units. "
+            + "Near-ties fall back to this app's authored tier list, not to win rates."
+    }
+
     /// Says what the order is, in the panel, where a player can see it.
     ///
     /// Above the scroll view, like the openers panel's note and for the same
@@ -275,9 +291,7 @@ public struct MyChampionsView: View {
             Image(systemName: "info.circle")
                 .font(.system(size: 10, weight: .heavy))
                 .foregroundStyle(TFTTheme.textTertiary)
-            Text("The \(suggestions.count) comps you are closest to, by the units you have — weighted "
-                + "towards carries and expensive units. Near-ties fall back to this app's authored "
-                + "tier list, not to win rates.")
+            Text(basisNoteText)
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(TFTTheme.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
