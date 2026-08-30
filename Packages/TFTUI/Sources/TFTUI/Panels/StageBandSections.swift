@@ -154,11 +154,24 @@ struct StageBandDetail: View {
         }
     }
 
+    /// The itemise card, with each item's components under it (#111).
+    ///
+    /// This band is height-budgeted — 570pt above the fold, derived in #110 —
+    /// so the cost was measured before it was spent: the component row adds
+    /// 25pt to this card and nothing to any other, since `itemisePriority` is
+    /// only ever set on the mid band. Mid's worst case in the corpus was
+    /// 378pt at the narrowest panel width against Late's 570pt, so it can
+    /// absorb this and every item keeps its recipe rather than only the BiS
+    /// one. `StageCompanionSnapshotTests` holds that.
+    ///
+    /// Components are 22pt against the item's 34pt: smaller than the detail
+    /// panel's 24pt, still large enough for the initials tile that is what
+    /// renders before any art loads.
     private func itemStrip(_ carry: CompCarry) -> some View {
         HStack(alignment: .top, spacing: 8) {
             ForEach(Array(carry.itemPriority.enumerated()), id: \.offset) { index, name in
                 VStack(spacing: 3) {
-                    ItemIconPlaceholder(name: name, size: 34)
+                    ItemWithRecipe(name: name, size: 34, componentSize: 22)
                     Text(index == 0 ? "BiS" : "Alt \(index)")
                         .font(.system(size: 9, weight: .heavy))
                         .foregroundStyle(index == 0 ? TFTTheme.accent : TFTTheme.textSecondary)

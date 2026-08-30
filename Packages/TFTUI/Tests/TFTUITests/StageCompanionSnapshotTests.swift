@@ -70,6 +70,72 @@ final class StageCompanionSnapshotTests: XCTestCase {
         }
     }
 
+    // MARK: - Item recipes cost the mid band only (#111)
+
+    /// The mid band's itemise card shows each item's components. That is
+    /// height, and this band is the one place in the companion where height
+    /// is budgeted, so the claim is made against the same view with recipes
+    /// switched off rather than against a number: a band that quietly went
+    /// back to bare item icons measures identically and fails here.
+    func testTheMidBandShowsRecipesUnderTheItemsToItemise() throws {
+        var checked = 0
+        for comp in try CompLoader.bundledFixtures() {
+            guard BuildStagePlan(comp: comp).sections.contains(where: {
+                $0.band == .mid && $0.itemisePriority != nil
+            }) else { continue }
+            checked += 1
+            for width in [expanded.width, narrowestWidth] {
+                let proposed = width - 2 * StageCompanionView.contentPadding
+                let withRecipes = try ViewSnapshot.measuredSize(
+                    of: companion(comp, band: .mid).glance,
+                    proposedWidth: proposed
+                ).height
+                let without = try ViewSnapshot.measuredSize(
+                    of: companion(comp, band: .mid).glance.tftItemRecipes(.empty),
+                    proposedWidth: proposed
+                ).height
+                XCTAssertGreaterThanOrEqual(
+                    withRecipes,
+                    without + 22,
+                    "\(comp.id) at mid, \(width)pt wide: \(withRecipes)pt with recipes against \(without)pt "
+                        + "without — no component row is being drawn"
+                )
+            }
+        }
+        XCTAssertGreaterThan(checked, 0, "no comp in the corpus itemises at mid — this test proved nothing")
+    }
+
+    /// The other half of that claim, and the one #110 makes load-bearing:
+    /// `elderwood-bloom` at Late measures exactly the 570pt budget, with zero
+    /// margin. Recipes are not wanted there — Late is the final board and the
+    /// pivots — and they must not have leaked in, so Early and Late have to
+    /// measure *identically* with recipes on and off, at both widths, for
+    /// every comp. An inline recipe anywhere in those bands breaks this.
+    func testItemRecipesAddNoHeightToTheEarlyOrLateBands() throws {
+        for comp in try CompLoader.bundledFixtures() {
+            for band in [StageBand.early, .late] {
+                for width in [expanded.width, narrowestWidth] {
+                    let proposed = width - 2 * StageCompanionView.contentPadding
+                    let withRecipes = try ViewSnapshot.measuredSize(
+                        of: companion(comp, band: band).glance,
+                        proposedWidth: proposed
+                    ).height
+                    let without = try ViewSnapshot.measuredSize(
+                        of: companion(comp, band: band).glance.tftItemRecipes(.empty),
+                        proposedWidth: proposed
+                    ).height
+                    XCTAssertEqual(
+                        withRecipes,
+                        without,
+                        accuracy: 0.5,
+                        "\(comp.id) at \(band), \(width)pt wide: recipes cost it \(withRecipes - without)pt, "
+                            + "and this band has none to give"
+                    )
+                }
+            }
+        }
+    }
+
     /// The panel must be visibly a different panel per band, not a header
     /// swap: if two bands measure identically the stage control is decorative.
     func testAdvancingTheBandChangesWhatTheGlanceShows() throws {
