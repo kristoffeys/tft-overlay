@@ -18,7 +18,9 @@ import SwiftUI
 /// Every unit names the comps it leads into, inline and never behind hover:
 /// the panel is only useful if it is a bridge into picking a build rather
 /// than a dead end, and hover does not fire at all while the overlay is
-/// locked for click-through (#83).
+/// locked for click-through (#83). How *many* names fit is measured per
+/// width rather than fixed — see `CompLeadLayout` — because a name shown
+/// truncated is not a name, and hover was the only way back from it.
 ///
 /// **Honesty.** `Comp.tier` is authored metadata copied from a scraped tier
 /// list (ADR 0004), not measured placement data — real statistics are #62.
