@@ -86,6 +86,12 @@ final class OverlayAppState: ObservableObject {
 
     @Published private(set) var panel: Panel = .compsList
     @Published private(set) var selectedComp: Comp?
+    /// The tab `compDetail` was drilled into from, so Back returns there
+    /// instead of always landing on the mode's primary tab (#91). Only ever
+    /// set to a destination panel — drilling from one detail into another
+    /// (were that possible) keeps the original origin rather than pointing
+    /// back at the drill-down itself.
+    private var drillOrigin: Panel = .compsList
     /// Whether the player explicitly asked to browse.
     ///
     /// `mode` is *derived*, never stored: the committed build lives in
@@ -169,6 +175,9 @@ final class OverlayAppState: ObservableObject {
     }
 
     func select(_ comp: Comp) {
+        if panel.isDestination {
+            drillOrigin = panel
+        }
         selectedComp = comp
         panel = .compDetail
     }
@@ -232,11 +241,14 @@ final class OverlayAppState: ObservableObject {
         }
     }
 
-    /// Leaves a drill-down for the panel the current mode leads with, so
-    /// backing out of a comp you were merely looking at does not also drop
-    /// you out of Focus on the build you committed to.
+    /// Leaves a drill-down for the tab it was entered from — Reference stays
+    /// Reference, the comps list stays the list — so backing out of a comp
+    /// you were merely comparing never silently drops you onto a different
+    /// section, and in particular never drops you out of Focus onto the
+    /// build you committed to. `show` already falls back safely if
+    /// `drillOrigin` ever named a tab the current mode no longer offers.
     func goBack() {
-        show(Panel.primary(in: mode))
+        show(drillOrigin)
     }
 
     func cycleForward() {
