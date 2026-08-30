@@ -150,21 +150,60 @@ final class BuildStagePlanTests: XCTestCase {
 
     // MARK: - Nothing from the corpus is lost
 
-    func testDuplicateStageRowsAreCollapsedKeepingTheFirst() throws {
-        // `riftbeast-summoners` ships two `5-2` rows, and LevelPlanEntry.id is
-        // the stage: handing both to a ForEach is a duplicate-identity bug.
+    func testRowsSharingAStageAreMergedRatherThanDropped() throws {
+        // `riftbeast-summoners` ships two `5-2` rows with *different* advice.
+        // LevelPlanEntry.id is the stage, so both cannot reach a ForEach — but
+        // keeping only the first loses "Alistar, Gnar" from the panel entirely.
         let comp = try CompFixture.make(
             id: "riftbeast-shaped",
             tier: .a,
             units: [CompFixture.unit("Karma", cost: 1)],
             levelPlan: [
-                LevelPlanEntry(stage: "5-2", level: 9, notes: "first"),
-                LevelPlanEntry(stage: "5-2", level: 9, notes: "second"),
+                LevelPlanEntry(stage: "5-2", level: 9, notes: "At level 9 you can add: Ashe, Ivern, Maokai."),
+                LevelPlanEntry(stage: "5-2", level: 9, notes: "At level 9 you can add: Alistar, Gnar."),
+            ]
+        )
+        let late = plan(comp).section(for: .late)
+        XCTAssertEqual(late.levelPlan.count, 1, "one identity per stage")
+        let notes = try XCTUnwrap(late.levelPlan.first?.notes)
+        XCTAssertTrue(notes.contains("Ashe, Ivern, Maokai"), notes)
+        XCTAssertTrue(notes.contains("Alistar, Gnar"), "the second row's advice survived the merge")
+    }
+
+    func testByteIdenticalRowsCollapseToOne() throws {
+        let comp = try CompFixture.make(
+            id: "true-duplicate",
+            tier: .a,
+            units: [CompFixture.unit("Karma", cost: 1)],
+            levelPlan: [
+                LevelPlanEntry(stage: "5-2", level: 9, notes: "Add Zyra."),
+                LevelPlanEntry(stage: "5-2", level: 9, notes: "Add Zyra."),
             ]
         )
         let late = plan(comp).section(for: .late)
         XCTAssertEqual(late.levelPlan.count, 1)
-        XCTAssertEqual(late.levelPlan.first?.notes, "first")
+        XCTAssertEqual(late.levelPlan.first?.notes, "Add Zyra.", "a real duplicate is not repeated at the player")
+    }
+
+    /// The merged row can only be keyed to one level, so a second row naming a
+    /// different one keeps its number inside its own text rather than losing it.
+    func testMergedRowsKeepALevelThatDisagrees() throws {
+        let comp = try CompFixture.make(
+            id: "disagreeing-levels",
+            tier: .a,
+            units: [CompFixture.unit("Karma", cost: 1)],
+            levelPlan: [
+                LevelPlanEntry(stage: "5-2", level: 9, notes: "Add Zyra."),
+                LevelPlanEntry(stage: "5-2", level: 10, notes: "Add Ashe."),
+                LevelPlanEntry(stage: "5-2", level: 8),
+            ]
+        )
+        let row = try XCTUnwrap(plan(comp).section(for: .late).levelPlan.first)
+        XCTAssertEqual(row.level, 9, "the first row keys the merged one")
+        let notes = try XCTUnwrap(row.notes)
+        XCTAssertTrue(notes.contains("Add Zyra."), notes)
+        XCTAssertTrue(notes.contains("Level 10: Add Ashe."), notes)
+        XCTAssertTrue(notes.contains("Level 8"), "a bare row with a different level is still a fact")
     }
 
     /// A trailing newline is scraper noise, not a data defect: the row belongs
@@ -198,14 +237,36 @@ final class BuildStagePlanTests: XCTestCase {
         XCTAssertEqual(plan.sections.flatMap(\.levelPlan).count, 1)
     }
 
-    func testNoRowIsLostAcrossTheRealCorpus() throws {
+    /// The contract in one assertion: every piece of advice the corpus wrote
+    /// down is still readable somewhere in the plan.
+    ///
+    /// Deliberately not a row count. Counting rows against *distinct stages* is
+    /// what the previous version of this test did, and it certified the very
+    /// bug it was meant to catch: `riftbeast-summoners`' second `5-2` row was
+    /// dropped, the count still matched, the test still passed, and "add
+    /// Alistar, Gnar" never reached the panel.
+    func testNoAdviceIsLostAcrossTheRealCorpus() throws {
         let comps = try CompLoader.bundledFixtures()
-        XCTAssertFalse(comps.isEmpty)
+        XCTAssertEqual(comps.count, 36, "the corpus this measures")
         for comp in comps {
             let plan = BuildStagePlan(comp: comp)
-            let placed = plan.sections.flatMap(\.levelPlan).count + plan.unscheduledEntries.count
-            let distinctStages = Set(comp.levelPlan.map(\.stage)).count
-            XCTAssertEqual(placed, distinctStages, "\(comp.id) lost a level-plan row")
+            let rendered = plan.sections.flatMap(\.levelPlan) + plan.unscheduledEntries
+            let renderedNotes = rendered.compactMap(\.notes)
+
+            for notes in Set(comp.levelPlan.compactMap(\.notes)) where !notes.isEmpty {
+                XCTAssertTrue(
+                    renderedNotes.contains { $0.contains(notes) },
+                    "\(comp.id) lost the advice \(notes.debugDescription)"
+                )
+            }
+
+            // Stages too: advice is optional in the schema, so a row with no
+            // notes at all still has to be somewhere.
+            let renderedStages = Set(rendered.map(\.stage))
+            for stage in Set(comp.levelPlan.map(\.stage)) {
+                let expected = GameStage(stage)?.label ?? stage
+                XCTAssertTrue(renderedStages.contains(expected), "\(comp.id) lost the stage \(expected)")
+            }
         }
     }
 
