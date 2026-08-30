@@ -81,6 +81,11 @@ public struct BuildStagePlan: Sendable {
         /// Cinderling/Gromp/Murkwolf/Scuttlecrab/Krug while the derived strip
         /// listed eight units of which five are never opened on (#107).
         public let openerUnits: [OpenerPick]
+        /// Everything in the final board that is not an opener, for
+        /// recognition rather than action: if a 4-cost you need rolls through
+        /// the shop in stage 2 you have to know it is yours, and nothing can be
+        /// left to hover on a locked panel (#83).
+        public let restOfBuild: [CompRosterEntry]
         /// Components worth holding, decomposed from the carries' best-in-slot
         /// items. Names, not `Item`s, so the view stays free to render an icon
         /// or a label without this type knowing which.
@@ -100,7 +105,7 @@ public struct BuildStagePlan: Sendable {
         /// hiding it, so a sparse comp reads as "no extra advice here" instead
         /// of as a band that does not exist.
         public var isEmpty: Bool {
-            levelPlan.isEmpty && opener == nil && openerUnits.isEmpty
+            levelPlan.isEmpty && opener == nil && openerUnits.isEmpty && restOfBuild.isEmpty
                 && componentsToHold.isEmpty && itemisePriority == nil && pivots == nil && !showsFinalBoard
         }
     }
@@ -267,6 +272,7 @@ public struct BuildStagePlan: Sendable {
             levelTarget: target,
             opener: isEarly ? nonEmpty(comp.earlyOpener) : nil,
             openerUnits: openers,
+            restOfBuild: isEarly ? restOfBuild(comp, openers: openers) : [],
             componentsToHold: isEarly ? componentsToHold(comp, recipeMatrix: recipeMatrix) : [],
             // The primary carry is the first one authored; item priority is
             // ordered BiS-first, so "itemise this one first" needs no scoring.
@@ -303,6 +309,16 @@ public struct BuildStagePlan: Sendable {
             .filter { $0.cost <= buyableEarlyCostLimit }
             .sorted { $0.cost != $1.cost ? $0.cost < $1.cost : $0.name < $1.name }
             .map { OpenerPick(name: $0.name, cost: $0.cost) }
+    }
+
+    /// The final board minus whatever the opener strip already shows, in
+    /// `CompRoster`'s reading order (itemised carries first, then descending
+    /// cost) so the units worth recognising in the shop land where the eye
+    /// starts.
+    private static func restOfBuild(_ comp: Comp, openers: [OpenerPick]) -> [CompRosterEntry] {
+        let opened = Set(openers.map { TFTNameKey.normalize($0.name) })
+        return CompRoster.entries(for: comp)
+            .filter { !opened.contains(TFTNameKey.normalize($0.unit.name)) }
     }
 
     /// The components behind every carry's best-in-slot item, most-wanted

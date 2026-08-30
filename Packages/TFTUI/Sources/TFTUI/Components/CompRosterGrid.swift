@@ -87,20 +87,34 @@ public struct CompRosterGrid: View {
     private let showsNames: Bool
     private let spacing: CGFloat
     private let layout: Layout
+    private let showsCosts: Bool
+    private let showsItems: Bool
 
+    /// - Parameters:
+    ///   - showsCosts: draws each unit's cost as a number on its portrait.
+    ///     Off by default: the cost-tinted border is enough between games, and
+    ///     the badge is for the callers whose question is "can I hit this in
+    ///     the shop right now" (#107). Costs nothing vertically.
+    ///   - showsItems: draws each itemised carry's items under its portrait.
+    ///     On by default — it is the reason this grid exists. Off for a caller
+    ///     that only needs recognition and is paying for every point of height.
     public init(
         comp: Comp,
         portraitSize: CGFloat = 44,
         showsNames: Bool = false,
         spacing: CGFloat = 6,
-        layout: Layout = .wrapping
+        layout: Layout = .wrapping,
+        showsCosts: Bool = false,
+        showsItems: Bool = true
     ) {
         self.init(
             entries: CompRoster.entries(for: comp),
             portraitSize: portraitSize,
             showsNames: showsNames,
             spacing: spacing,
-            layout: layout
+            layout: layout,
+            showsCosts: showsCosts,
+            showsItems: showsItems
         )
     }
 
@@ -109,13 +123,17 @@ public struct CompRosterGrid: View {
         portraitSize: CGFloat = 44,
         showsNames: Bool = false,
         spacing: CGFloat = 6,
-        layout: Layout = .wrapping
+        layout: Layout = .wrapping,
+        showsCosts: Bool = false,
+        showsItems: Bool = true
     ) {
         self.entries = entries
         metrics = CompRosterMetrics(portrait: portraitSize)
         self.showsNames = showsNames
         self.spacing = spacing
         self.layout = layout
+        self.showsCosts = showsCosts
+        self.showsItems = showsItems
     }
 
     public var body: some View {
@@ -139,7 +157,9 @@ public struct CompRosterGrid: View {
             entry: entry,
             metrics: metrics,
             showsNames: showsNames,
-            alignsNamesBelowItems: showsNames && hasAnyItems
+            alignsNamesBelowItems: showsNames && hasAnyItems,
+            showsCosts: showsCosts,
+            showsItems: showsItems
         )
     }
 
@@ -160,7 +180,7 @@ public struct CompRosterGrid: View {
     }
 
     private var hasAnyItems: Bool {
-        entries.contains(where: \.isCarry)
+        showsItems && entries.contains(where: \.isCarry)
     }
 }
 
@@ -169,11 +189,13 @@ private struct RosterCell: View {
     let metrics: CompRosterMetrics
     let showsNames: Bool
     let alignsNamesBelowItems: Bool
+    let showsCosts: Bool
+    let showsItems: Bool
 
     var body: some View {
         VStack(spacing: 3) {
             portrait
-            if entry.items.isEmpty == false {
+            if showsItems, entry.items.isEmpty == false {
                 itemRow
             } else if alignsNamesBelowItems {
                 // Empty space, not empty item slots: a non-carry has no
@@ -215,6 +237,12 @@ private struct RosterCell: View {
                         .background(TFTTheme.elevatedBackground.opacity(0.9), in: Capsule())
                         .padding(1)
                         .help("Flexible slot — swap this unit out freely")
+                }
+            }
+            .overlay(alignment: .bottomLeading) {
+                if showsCosts {
+                    UnitCostBadge(cost: entry.unit.cost, portraitSize: metrics.portrait)
+                        .padding(1)
                 }
             }
             .overlay(alignment: .bottomTrailing) {

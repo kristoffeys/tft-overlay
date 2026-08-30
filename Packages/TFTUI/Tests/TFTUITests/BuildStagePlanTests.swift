@@ -92,6 +92,7 @@ final class BuildStagePlanTests: XCTestCase {
         XCTAssertEqual(mid.itemisePriority?.itemPriority.first, "Jeweled Gauntlet")
         XCTAssertNil(mid.opener, "the opener is over by act 3")
         XCTAssertTrue(mid.openerUnits.isEmpty)
+        XCTAssertTrue(mid.restOfBuild.isEmpty, "the whole build is an early-band recognition aid, not a mid-band one")
     }
 
     func testLateBandCarriesPivotsAndTheFinalBoard() throws {
@@ -132,16 +133,25 @@ final class BuildStagePlanTests: XCTestCase {
         XCTAssertTrue(late.levelTarget?.isCarriedForward ?? false, "a skipped band inherits rather than going blank")
     }
 
+    /// Since #107 the early band always has the build itself to draw, so the
+    /// band that can come out empty is the middle one: no rows of its own and
+    /// no carry to itemise.
     func testBandWithNothingToSayIsStillPresentAndReportsItself() throws {
         let comp = try CompFixture.make(
             id: "bare",
             tier: .d,
             units: [CompFixture.unit("Ashe", cost: 5)],
-            levelPlan: [LevelPlanEntry(stage: "3-2", level: 6)]
+            levelPlan: [LevelPlanEntry(stage: "5-2", level: 9)]
         )
         let plan = plan(comp)
-        XCTAssertTrue(plan.section(for: .early).isEmpty, "no opener, nothing cheap to open on, no components, no rows")
-        XCTAssertFalse(plan.section(for: .mid).isEmpty)
+        let early = plan.section(for: .early)
+        XCTAssertTrue(early.openerUnits.isEmpty, "nothing in this board is cheap enough to open on")
+        XCTAssertEqual(
+            early.restOfBuild.map(\.unit.name),
+            ["Ashe"],
+            "the build is still worth recognising in the shop even when none of it is buyable yet"
+        )
+        XCTAssertTrue(plan.section(for: .mid).isEmpty, "no mid rows, no carry to itemise")
         XCTAssertFalse(plan.section(for: .late).isEmpty, "the final board always belongs to Late")
         XCTAssertEqual(plan.sections.count, StageBand.allCases.count, "an empty band is never dropped")
     }
