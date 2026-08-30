@@ -45,6 +45,59 @@ final class OpenersViewSnapshotTests: XCTestCase {
         )
     }
 
+    // MARK: - The authored opening plan
+
+    /// The plan is the one section of this panel that is not a derivation
+    /// over the corpus, and the panel's whole honesty contract (ADR 0004;
+    /// real statistics are #62) rests on a reader being able to tell. If the
+    /// attribution stopped rendering, the panel would be presenting authored
+    /// advice as computed.
+    func testTheOpeningPlanSaysItIsAuthoredAndInventsNoStatistics() {
+        XCTAssertTrue(
+            OpeningPlan.attribution.lowercased().contains("authored"),
+            "The plan's attribution no longer says it is authored: \(OpeningPlan.attribution)"
+        )
+        XCTAssertTrue(OpeningPlan.attribution.lowercased().contains("not derived"))
+
+        let everyWord = ([OpeningPlan.attribution, OpeningPlan.economyRule]
+            + OpeningPlan.steps.map(\.when)
+            + OpeningPlan.steps.map(\.action)).joined(separator: " ")
+        XCTAssertFalse(
+            everyWord.contains("%"),
+            "The authored plan quotes a percentage, which is a statistic nobody measured"
+        )
+    }
+
+    /// The four decisions #99 asked for, and the level timings the corpus's
+    /// own `levelPlan` agrees with. Asserted on the text rather than a
+    /// screenshot because a rewrite that quietly drops the stage-1
+    /// no-spending rule is the failure that matters, not a moved pixel.
+    func testTheOpeningPlanCoversTheStageOneRuleTheForkAndTheLevelTimings() {
+        let plan = OpeningPlan.steps.map { "\($0.when) \($0.action)" }.joined(separator: "\n")
+
+        for expected in ["Stage 1", "2-1", "level 4", "2-5", "level 5", "3-2", "level 6"] {
+            XCTAssertTrue(plan.contains(expected), "The plan no longer mentions \(expected)")
+        }
+        XCTAssertTrue(plan.contains("Spend nothing"), "The stage-1 do-not-spend rule is gone")
+        XCTAssertTrue(plan.lowercased().contains("scout"), "The 2-1 fork no longer says to scout first")
+        XCTAssertTrue(plan.lowercased().contains("interest"), "The loss-streak half of the fork is gone")
+        XCTAssertTrue(plan.lowercased().contains("slam"), "The item-slamming rule is gone")
+        XCTAssertTrue(OpeningPlan.economyRule.contains("50"), "The interest cap is gone")
+    }
+
+    func testTheOpeningPlanRendersAtBothPanelWidths() throws {
+        for width in [expanded.width, narrow.width] {
+            let section = OpeningPlanSection()
+            let natural = try ViewSnapshot.measuredSize(of: section, proposedWidth: width)
+            XCTAssertEqual(natural.width, width, accuracy: 1)
+            try assertRendersWithin(
+                section,
+                size: CGSize(width: width, height: natural.height),
+                rightMargin: 8
+            )
+        }
+    }
+
     // MARK: - Cost, which the panel used to hide entirely
 
     /// #99's diagnosis was only invisible because the panel showed no cost
