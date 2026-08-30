@@ -1,6 +1,23 @@
 import AppKit
 import SwiftUI
 
+/// Vertical space OverlayKit's own chrome takes from hosted content, so a
+/// package on the other side of the boundary can size itself against the
+/// real budget instead of guessing (#110).
+///
+/// `TFTUI` must not import `OverlayKit` (see `CLAUDE.md`), so it cannot read
+/// this constant directly; it keeps a documented literal instead, and
+/// `Tests/TFTOverlayTests` — the one place both packages meet — cross-checks
+/// that literal against this real value.
+public enum OverlayChromeMetrics {
+    /// Height of the drag-handle header row, shown only while the panel is
+    /// interactive (`OverlayPanelState.isInteractive`). Locked/click-through
+    /// panels get this space back, so a caller that wants the worst-case
+    /// (smallest) content area — the one a "fits without scrolling" budget
+    /// needs — should always subtract it.
+    public static let interactiveHeaderHeight: CGFloat = 24
+}
+
 /// Wraps arbitrary hosted content with the chrome OverlayKit itself owns
 /// (#14): a header drag handle, a resize grip, and the interactive-mode
 /// visual affordance (border + opacity bump). The content package (built
@@ -61,7 +78,7 @@ struct OverlayChromeView<Content: View>: View {
 
     private var header: some View {
         DragHandle(onActivity: onActivity)
-            .frame(height: 24)
+            .frame(height: OverlayChromeMetrics.interactiveHeaderHeight)
             .overlay(alignment: .leading) {
                 Image(systemName: "line.3.horizontal")
                     .font(.system(size: 10))
