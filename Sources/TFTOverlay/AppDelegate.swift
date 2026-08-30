@@ -119,6 +119,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         case .toggleVisibility: overlay.toggleVisibility()
         case .cycleForward: appState.cycleForward()
         case .cycleBackward: appState.cycleBackward()
+        case .advanceStage: appState.advanceStage()
         }
     }
 
@@ -144,6 +145,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let layoutKey = hotkeyManager.hotkey(for: AppHotkeyAction.toggleLayout.action) {
             overlay.setLayoutHintText("Compact (\(HotkeyFormatting.displayString(for: layoutKey)))")
         }
+        // The stage control names the advance hotkey inline (#84), and that
+        // binding is rebindable like the rest — so it is read back from the
+        // manager rather than hardcoded.
+        appState.stageAdvanceHint = hotkeyManager.hotkey(for: AppHotkeyAction.advanceStage.action)
+            .map { HotkeyFormatting.displayString(for: $0) }
     }
 
     // MARK: - Settings propagation (#4 — live, no restart)

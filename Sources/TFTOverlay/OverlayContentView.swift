@@ -78,9 +78,15 @@ struct OverlayContentView: View {
             // through `OverlayAppState`, but rendering the list beats an
             // empty panel if it ever does.
             if let build = appState.committedBuild {
-                CompDetailView(
+                // The committed build as a stage companion (#84), not the
+                // seven-section study document: in game there is one question,
+                // and the detail view is one tap down inside this.
+                StageCompanionView(
                     comp: build,
+                    band: appState.stageBand,
+                    advanceHint: appState.stageAdvanceHint,
                     pinnedStore: appState.pinnedComps,
+                    onSelectBand: { appState.setStageBand($0) },
                     onTogglePin: { appState.togglePin($0) }
                 )
             } else {

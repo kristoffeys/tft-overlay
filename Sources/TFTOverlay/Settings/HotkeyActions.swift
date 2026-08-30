@@ -10,6 +10,7 @@ enum AppHotkeyAction: String, CaseIterable, Codable {
     case toggleVisibility
     case cycleForward
     case cycleBackward
+    case advanceStage
 
     var action: HotkeyAction {
         HotkeyAction(id: rawValue)
@@ -22,6 +23,7 @@ enum AppHotkeyAction: String, CaseIterable, Codable {
         case .toggleVisibility: "Show / Hide Overlay"
         case .cycleForward: "Next Panel"
         case .cycleBackward: "Previous Panel"
+        case .advanceStage: "Advance Stage (Early → Mid → Late)"
         }
     }
 
@@ -32,6 +34,10 @@ enum AppHotkeyAction: String, CaseIterable, Codable {
         case .toggleVisibility: Hotkey(keyCode: 4, modifierFlags: .option) // Option+H
         case .cycleForward: Hotkey(keyCode: 8, modifierFlags: .option) // Option+C
         case .cycleBackward: Hotkey(keyCode: 8, modifierFlags: [.option, .shift]) // Option+Shift+C
+        // Option+S, one key from the Option the other overlay hotkeys already
+        // ask for: this is the one the player presses mid-game, so it has to
+        // be reachable without leaving the mouse or looking down.
+        case .advanceStage: Hotkey(keyCode: 1, modifierFlags: .option) // Option+S
         }
     }
 }
