@@ -56,10 +56,10 @@ struct DemoRootView: View {
             Group {
                 switch tab {
                 case .list:
-                    CompsListView(comps: comps, pinnedStore: pinnedStore) { comp in
+                    CompsListView(comps: comps, pinnedStore: pinnedStore, onSelect: { comp in
                         selectedComp = comp
                         tab = .detail
-                    }
+                    })
                 case .detail:
                     if let comp = selectedComp ?? comps.first {
                         CompDetailView(comp: comp, pinnedStore: pinnedStore)
