@@ -44,6 +44,7 @@ enum CompFixture {
         units: [CompUnit],
         carries: [CompCarry] = [],
         levelPlan: [LevelPlanEntry] = [],
+        earlyUnits: [String] = [],
         earlyOpener: String = "",
         pivotNotes: String = ""
     ) throws -> Comp {
@@ -81,6 +82,7 @@ enum CompFixture {
           "boardPositioning": {"grid": [[]]},
           "augmentPreferences": {"tier1": [], "tier2": [], "tier3": []},
           "levelPlan": [\(levelPlanJSON)],
+          "earlyUnits": [\(earlyUnits.map(quoted).joined(separator: ","))],
           "earlyOpener": "\(earlyOpener)",
           "pivotNotes": "\(pivotNotes)"
         }
