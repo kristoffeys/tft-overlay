@@ -117,4 +117,60 @@ final class CompLoaderTests: XCTestCase {
             }
         }
     }
+
+    /// Display text has to spell a champion the way the set spells it.
+    ///
+    /// The two checks above compare on letters only, deliberately: they guard
+    /// art resolution, which tolerates Community Dragon's punctuation drift.
+    /// That leniency is exactly why `rivals-khazix` could ship a title reading
+    /// "Rivals Khazix" one line above its own unit list reading "Kha'Zix" (#98)
+    /// — same champion, two spellings, and nothing failing. This is the
+    /// display-side counterpart: an exact-string comparison over the text the
+    /// user reads, so a title or a prose note cannot disagree with the roster.
+    ///
+    /// Scope is one word at a time against single-word champion names. A word
+    /// of prose cannot identify a multi-word champion ("Mama Beak") or a
+    /// parenthesised variant ("Lux (Inferno)"), so those are left out rather
+    /// than guessed at; the punctuation-stripping this catches ("Khazix",
+    /// "Kogmaw", "RekSai") only ever hits single-word names anyway.
+    func testCompDisplayTextSpellsChampionsTheWayTheSetDoes() throws {
+        let comps = try CompLoader.bundledFixtures()
+        let champions = BundledFallbackData().load()?.champions ?? []
+        XCTAssertFalse(champions.isEmpty, "bundled champion catalog failed to load; the check below would be vacuous")
+        let normalize = { (name: String) in name.lowercased().filter { $0.isLetter || $0.isNumber } }
+        var spelling: [String: String] = [:]
+        for champion in champions where !champion.name.contains(" ") {
+            spelling[normalize(champion.name)] = champion.name
+        }
+        XCTAssertEqual(spelling[normalize("Khazix")], "Kha'Zix", "the spelling table this asserts against is wrong")
+
+        for comp in comps {
+            var texts: [(field: String, text: String)] = [
+                ("name", comp.name),
+                ("earlyOpener", comp.earlyOpener),
+                ("pivotNotes", comp.pivotNotes),
+            ]
+            if let description = comp.compDescription {
+                texts.append(("description", description))
+            }
+            for entry in comp.levelPlan {
+                if let notes = entry.notes {
+                    texts.append(("levelPlan[\(entry.stage)].notes", notes))
+                }
+            }
+            for (field, text) in texts {
+                for word in text.split(separator: " ") {
+                    // Prose punctuates around names ("add: Zyra, Alune,
+                    // Ivern."); only what is inside the word is compared.
+                    let bare = word.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+                    guard let expected = spelling[normalize(bare)] else { continue }
+                    XCTAssertEqual(
+                        bare,
+                        expected,
+                        "\(comp.id): \(field) spells the champion \"\(bare)\", the set ships \"\(expected)\""
+                    )
+                }
+            }
+        }
+    }
 }

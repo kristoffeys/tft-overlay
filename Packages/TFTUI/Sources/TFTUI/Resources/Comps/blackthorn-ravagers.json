@@ -160,7 +160,7 @@
     {
       "stage": "3-2",
       "level": 6,
-      "notes": "Prioritize: RekSai, Veigar, Murkwolf, Warwick, Azir"
+      "notes": "Prioritize: Rek'Sai, Veigar, Murkwolf, Warwick, Azir"
     },
     {
       "stage": "5-2",
@@ -168,6 +168,6 @@
       "notes": "At level 9 you can add: Alune, Ivern, Taric."
     }
   ],
-  "earlyOpener": "Prioritize RekSai, Veigar, Murkwolf, Warwick, Azir early; these carry the comp online before its full identity is committed.",
+  "earlyOpener": "Prioritize Rek'Sai, Veigar, Murkwolf, Warwick, Azir early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Diana → Akali."
 }

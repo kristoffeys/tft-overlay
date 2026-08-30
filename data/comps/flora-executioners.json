@@ -158,7 +158,7 @@
     {
       "stage": "3-2",
       "level": 6,
-      "notes": "Prioritize: Akali, Varus, Leblanc, Shen, Fiddlesticks"
+      "notes": "Prioritize: Akali, Varus, LeBlanc, Shen, Fiddlesticks"
     },
     {
       "stage": "5-2",
@@ -166,6 +166,6 @@
       "notes": "At level 9 you can add: Azir, Lux (Inferno), Taric."
     }
   ],
-  "earlyOpener": "Prioritize Akali, Varus, Leblanc, Shen, Fiddlesticks early; these carry the comp online before its full identity is committed.",
+  "earlyOpener": "Prioritize Akali, Varus, LeBlanc, Shen, Fiddlesticks early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
 }

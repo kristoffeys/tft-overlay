@@ -164,7 +164,7 @@
     {
       "stage": "3-2",
       "level": 6,
-      "notes": "Prioritize: Rakan, Yorick, Karma, Leblanc, Yunara"
+      "notes": "Prioritize: Rakan, Yorick, Karma, LeBlanc, Yunara"
     },
     {
       "stage": "5-2",
@@ -172,6 +172,6 @@
       "notes": "At level 9 you can add: Amumu, Ivern."
     }
   ],
-  "earlyOpener": "Prioritize Rakan, Yorick, Karma, Leblanc, Yunara early; these carry the comp online before its full identity is committed.",
+  "earlyOpener": "Prioritize Rakan, Yorick, Karma, LeBlanc, Yunara early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Kennen → Azir."
 }

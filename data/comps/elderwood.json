@@ -160,7 +160,7 @@
     {
       "stage": "3-2",
       "level": 6,
-      "notes": "Prioritize: Ornn, Xayah, Alistar, Leblanc, Hecarim"
+      "notes": "Prioritize: Ornn, Xayah, Alistar, LeBlanc, Hecarim"
     },
     {
       "stage": "5-2",
@@ -168,6 +168,6 @@
       "notes": "At level 9 you can add: Lux (Elderwood), Taric."
     }
   ],
-  "earlyOpener": "Prioritize Ornn, Xayah, Alistar, Leblanc, Hecarim early; these carry the comp online before its full identity is committed.",
+  "earlyOpener": "Prioritize Ornn, Xayah, Alistar, LeBlanc, Hecarim early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Soraka → Kennen."
 }
