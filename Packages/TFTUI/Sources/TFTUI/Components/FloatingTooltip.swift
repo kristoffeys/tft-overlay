@@ -38,7 +38,11 @@ final class FloatingTooltip {
         ownerID = owner
         let panel = existingPanel()
         let hosting = NSHostingView(rootView: AnyView(content))
-        hosting.sizingOptions = []
+        // Deliberately leaving `sizingOptions` at its default (unlike the
+        // overlay panel's own hosting view): `fittingSize` below needs it to
+        // measure the card's actual content, and forcing it to `[]` collapses
+        // that measurement to zero, so the panel gets set to a 0x0 frame and
+        // the card never becomes visible (#83).
         let size = hosting.fittingSize
         hosting.frame = CGRect(origin: .zero, size: size)
         panel.contentView = hosting
