@@ -12,11 +12,28 @@ import XCTest
 @MainActor
 final class StageCompanionSnapshotTests: XCTestCase {
     private let expanded = CGSize(width: 460, height: 640)
+    private let narrowestWidth: CGFloat = 420
 
-    /// What the panel actually gets: the expanded height minus the persistent
-    /// tab bar and the panel's own bottom padding.
+    /// Height OverlayKit's own chrome takes above hosted content, worst case
+    /// (the panel is interactive, so the drag-handle header is on screen).
+    ///
+    /// `TFTUI` must not import `OverlayKit` (see `CLAUDE.md`), so this is a
+    /// documented literal rather than a read of
+    /// `OverlayChromeMetrics.interactiveHeaderHeight` — cross-checked against
+    /// that real value by `StageCompanionHeightBudgetTests` in
+    /// `Tests/TFTOverlayTests`, the one place both packages meet.
+    private let assumedOverlayChromeHeaderHeight: CGFloat = 24
+
+    /// What the panel actually gets above the fold: the expanded window
+    /// height, minus OverlayKit's own chrome, the persistent tab bar, and the
+    /// top padding `content` puts before `glance` — the space a player sees
+    /// with no scrolling at all. #110: the old budget only subtracted the tab
+    /// bar and padding, so it was permissive by exactly the chrome height.
     private var glanceBudget: CGFloat {
-        expanded.height - PanelTabBar<String>.height - 12
+        expanded.height
+            - assumedOverlayChromeHeaderHeight
+            - PanelTabBar<String>.height
+            - StageCompanionView.contentPadding
     }
 
     private func companion(_ comp: Comp, band: StageBand) -> StageCompanionView {
@@ -25,26 +42,32 @@ final class StageCompanionSnapshotTests: XCTestCase {
 
     // MARK: - The glance fits
 
+    /// Both widths the expanded panel can be: 460 by default, and 420 at the
+    /// resize floor (`AppDelegate`'s `minSize`) — a narrower panel can wrap
+    /// text taller, so a budget proven only at 460 could still clip after a
+    /// resize.
     func testEveryCompAndBandAnswersTheQuestionWithoutScrolling() throws {
-        var worstLabel = ""
-        var worstHeight: CGFloat = 0
-        for comp in try CompLoader.bundledFixtures() {
-            for band in StageBand.allCases {
-                let height = try ViewSnapshot.measuredSize(
-                    of: companion(comp, band: band).glance,
-                    proposedWidth: expanded.width - 24
-                ).height
-                if height > worstHeight {
-                    worstHeight = height
-                    worstLabel = "\(comp.id) at \(band)"
+        for width in [expanded.width, narrowestWidth] {
+            var worstLabel = ""
+            var worstHeight: CGFloat = 0
+            for comp in try CompLoader.bundledFixtures() {
+                for band in StageBand.allCases {
+                    let height = try ViewSnapshot.measuredSize(
+                        of: companion(comp, band: band).glance,
+                        proposedWidth: width - 2 * StageCompanionView.contentPadding
+                    ).height
+                    if height > worstHeight {
+                        worstHeight = height
+                        worstLabel = "\(comp.id) at \(band)"
+                    }
                 }
             }
+            XCTAssertLessThanOrEqual(
+                worstHeight,
+                glanceBudget,
+                "\(worstLabel) needs \(worstHeight)pt of the \(glanceBudget)pt above the fold at \(width)pt wide"
+            )
         }
-        XCTAssertLessThanOrEqual(
-            worstHeight,
-            glanceBudget,
-            "\(worstLabel) needs \(worstHeight)pt of the \(glanceBudget)pt above the fold"
-        )
     }
 
     /// The panel must be visibly a different panel per band, not a header

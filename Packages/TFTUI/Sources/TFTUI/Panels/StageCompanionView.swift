@@ -58,6 +58,12 @@ public struct StageCompanionView: View {
         .background(TFTTheme.background)
     }
 
+    /// Padding around `content`'s `VStack`. Named rather than a bare literal
+    /// because the top value is also the space between the scroll view's top
+    /// edge and `glance` — `StageCompanionSnapshotTests` reads it to compute
+    /// how much of the panel `glance` actually gets without scrolling (#110).
+    public static let contentPadding: CGFloat = 12
+
     /// The panel minus its scroll container, for the same reason
     /// `CompDetailView` splits one out: `ImageRenderer` renders a `ScrollView`
     /// as an empty bitmap, so a layout test that wraps one tests nothing.
@@ -68,7 +74,7 @@ public struct StageCompanionView: View {
             unscheduled
             fullDetailDisclosure
         }
-        .padding(12)
+        .padding(Self.contentPadding)
     }
 
     /// The part that has to answer "what do I do now" with no scrolling, so
