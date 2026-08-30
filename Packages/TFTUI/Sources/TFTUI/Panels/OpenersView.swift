@@ -3,16 +3,22 @@ import SwiftUI
 /// Early-game guidance panel (#85): what to hold and what to slam in stage 1
 /// and early stage 2, before a comp has been chosen.
 ///
-/// Three things, in the order a player needs them:
+/// Four things, in the order a player needs them:
 ///
-/// 1. **Meta pickups** — the openers ranking, from `OpenerIndex.topOpeners`.
-/// 2. **Keeps doors open** — the same pool ranked by how many comps it opens
+/// 1. **Opening plan** — the authored stage-1 → 2-5 rail (`OpeningPlan`).
+///    First because it is the only section that answers "what do I do *right
+///    now*": at stage 1 the correct action is to spend nothing, and no
+///    ranking of pickups can tell you that. Labelled as authored, and shaped
+///    unlike the sections below it, because it is the one part of this panel
+///    that is not a derivation over the corpus.
+/// 2. **Meta pickups** — the openers ranking, from `OpenerIndex.topOpeners`.
+/// 3. **Keeps doors open** — the same pool ranked by how many comps it opens
 ///    at all, any tier. Deliberately a *different* ranking, so the two
 ///    sections are drawn in two different visual forms: the first is a list
 ///    with a strength bar, the second a grid of tiles carrying a comp count.
 ///    Two identically-shaped lists side by side read as one list rendered
 ///    twice, and the whole point of showing both is that they disagree.
-/// 3. **Components** — what to slam versus what to hold.
+/// 4. **Components** — what to slam versus what to hold.
 ///
 /// The rankings come from `OpenerIndex`, which reads each comp's
 /// `earlyUnits` — the board it *opens* on — and never `units`, the final
@@ -95,6 +101,7 @@ public struct OpenersView: View {
     /// scrolling host (`ViewSnapshot`).
     var content: some View {
         VStack(alignment: .leading, spacing: 14) {
+            OpeningPlanSection()
             metaPickupsSection
             doorsOpenSection
             componentsSection
