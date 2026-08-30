@@ -264,7 +264,10 @@ public struct CompDetailView: View {
     }
 }
 
-private struct CarryCard: View {
+/// Internal rather than private so the layout tests can measure one card on
+/// its own — the recipes under the item icons (#111) are a claim about this
+/// card's height, and measuring the whole panel would drown it.
+struct CarryCard: View {
     let carry: CompCarry
     let unit: CompUnit
 
@@ -282,15 +285,20 @@ private struct CarryCard: View {
                 }
                 Spacer()
             }
-            HStack(spacing: 6) {
+            // Recipes are generous here on purpose: this card is behind the
+            // "Full build detail" disclosure and inside a `ScrollView`, so
+            // unlike the stage companion's bands it has no height budget to
+            // spend. #111.
+            HStack(alignment: .top, spacing: 10) {
                 ForEach(Array(carry.itemPriority.enumerated()), id: \.offset) { index, itemName in
                     VStack(spacing: 3) {
-                        ItemIconPlaceholder(name: itemName, size: 36)
+                        ItemWithRecipe(name: itemName, size: 36, componentSize: 24)
                         Text(rank(index))
                             .font(.system(size: 10, weight: .heavy))
                             .foregroundStyle(TFTTheme.textPrimary)
                     }
                 }
+                Spacer(minLength: 0)
             }
             if let notes = carry.itemNotes {
                 Text(notes)
