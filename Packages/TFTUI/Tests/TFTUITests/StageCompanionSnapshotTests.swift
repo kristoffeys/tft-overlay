@@ -92,6 +92,39 @@ final class StageCompanionSnapshotTests: XCTestCase {
         }
     }
 
+    // MARK: - Unplaced rows keep their own identity
+
+    /// Two rows the scraper mangled the same way share `LevelPlanEntry.id`, and
+    /// a `ForEach` over duplicate identities is undefined behaviour.
+    ///
+    /// Asserted on the identity, not on the render: today's macOS lays both
+    /// rows out anyway (measured 30pt for one, 66pt for two, with or without
+    /// this fix), so a height assertion here would pass in both directions and
+    /// guard nothing. The height claim below is the part measurement *can*
+    /// answer — that two rows occupy two rows' worth of space.
+    func testRowsWithTheSameStageStringGetDistinctIdentities() throws {
+        let first = LevelPlanEntry(stage: "bogus", level: 6, notes: "first")
+        let second = LevelPlanEntry(stage: "bogus", level: 8, notes: "second")
+        XCTAssertEqual(first.id, second.id, "the premise: the corpus can hand us two rows with one id")
+
+        let rows = LevelPlanRows(entries: [first, second]).identifiedRows
+        XCTAssertEqual(rows.count, 2)
+        XCTAssertEqual(Set(rows.map(\.id)).count, 2, "two rows must reach the ForEach as two identities")
+        XCTAssertEqual(rows.map(\.entry.notes), ["first", "second"], "in corpus order")
+
+        let width = expanded.width - 44
+        let one = try ViewSnapshot.measuredSize(
+            of: LevelPlanRows(entries: [first]),
+            proposedWidth: width
+        ).height
+        let two = try ViewSnapshot.measuredSize(
+            of: LevelPlanRows(entries: [first, second]),
+            proposedWidth: width
+        ).height
+        XCTAssertGreaterThan(one, 0)
+        XCTAssertGreaterThanOrEqual(two, one * 2, "two rows measured \(two)pt against \(one)pt for one")
+    }
+
     // MARK: - The player who never advances the stage
 
     /// The failure that matters: someone ignores the control for a whole game.
