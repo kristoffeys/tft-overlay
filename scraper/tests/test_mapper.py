@@ -23,6 +23,7 @@ def champion_data():
             "Ashe": ChampionInfo(name="Ashe", cost=5, traits=["Blossom", "Hunter"]),
             "Sivir": ChampionInfo(name="Sivir", cost=4, traits=["Primal", "Hunter"]),
             "Cinderling": ChampionInfo(name="Cinderling", cost=1, traits=["Riftbeast", "Hunter"]),
+            "Rek'Sai": ChampionInfo(name="Rek'Sai", cost=2, traits=["Riftbeast", "Ravager"]),
         },
     )
 
@@ -140,6 +141,62 @@ def test_swap_options_become_pivot_notes_not_fake_levels(champion_data, validato
     assert "Sivir → Cinderling" in comp["pivotNotes"]
     # Only the real level gate reaches the level plan.
     assert any("At level 9" in (e.get("notes") or "") for e in comp["levelPlan"])
+    assert not list(validator.iter_errors(comp))
+
+
+def test_early_units_carried_as_structure_and_canonicalized(champion_data, validator):
+    """The source's early-comp icons use plain-ASCII alt text ("RekSai"), and
+    the shipped name is the key champion art resolves by (#81). The prose
+    `earlyOpener` keeps saying what it always said."""
+    raw = RawComp(
+        tier="S", name="Early Comp", playstyle_text="Fast 8",
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=["RekSai", "Cinderling", "RekSai"],
+    )
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=lambda _m: None)
+    assert comp is not None
+    assert comp["earlyUnits"] == ["Rek'Sai", "Cinderling"]
+    assert comp["earlyOpener"].startswith("Prioritize RekSai, Cinderling, RekSai early;")
+    assert not list(validator.iter_errors(comp))
+
+
+def test_early_units_omitted_when_source_has_no_early_subset(champion_data, validator):
+    raw = RawComp(
+        tier="B", name="No Early Data", playstyle_text=None,
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=[],
+    )
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=lambda _m: None)
+    assert comp is not None
+    assert "earlyUnits" not in comp
+    assert not list(validator.iter_errors(comp))
+
+
+def test_unresolvable_early_unit_is_dropped_with_warning(champion_data, validator):
+    """A name that does not resolve must never be shipped: it would validate
+    fine and silently lose the champion's portrait in the app."""
+    raw = RawComp(
+        tier="A", name="Half Known Early", playstyle_text="Fast 8",
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=["Cinderling", "Totally Not A Real Champion"],
+    )
+    warnings = []
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=warnings.append)
+    assert comp is not None
+    assert comp["earlyUnits"] == ["Cinderling"]
+    assert any("Totally Not A Real Champion" in w and "earlyUnits" in w for w in warnings)
+    assert not list(validator.iter_errors(comp))
+
+
+def test_early_units_omitted_when_no_early_name_resolves(champion_data, validator):
+    raw = RawComp(
+        tier="B", name="All Junk Early", playstyle_text=None,
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=["Nobody At All"],
+    )
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=lambda _m: None)
+    assert comp is not None
+    assert "earlyUnits" not in comp
     assert not list(validator.iter_errors(comp))
 
 

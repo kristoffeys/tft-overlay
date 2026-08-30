@@ -198,6 +198,22 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
             "notes": "Level plan not available from source; play the comp's core units into your first real board.",
         })
 
+    # The source's "Early Comp" subset, resolved to canonical set-data names
+    # and carried as structure rather than only flattened into prose below.
+    # The alt text these come from is plain ASCII ("RekSai", "Kogmaw"), so
+    # the same normalization unit resolution uses is what keeps the shipped
+    # name the one champion art resolves by -- see #81. A name that does not
+    # resolve is dropped with a warning, not passed through: a wrong name
+    # silently loses a portrait, a missing one is merely a shorter roster.
+    early_units = []
+    for early_name in raw.early_units:
+        info = _resolve_champion(early_name, champion_data)
+        if info is None:
+            warn(f"{raw.name}: could not resolve early-comp champion {early_name!r} against live set data; dropping from earlyUnits")
+            continue
+        if info.name not in early_units:
+            early_units.append(info.name)
+
     top_traits = [t["name"] for t in raw.trait_counts if t.get("name")][:2]
     early_opener = (
         ("Prioritize " + ", ".join(raw.early_units) + " early; these carry the comp online before its "
@@ -244,6 +260,9 @@ def map_comp(raw, champion_data: ChampionData, *, set_number: int, patch: str, w
         "boardPositioning": {"grid": grid, **({"notes": positioning_notes} if positioning_notes else {})},
         "augmentPreferences": {"tier1": [], "tier2": [], "tier3": []},
         "levelPlan": level_plan,
+        # Omitted entirely when the source had no usable early subset: the
+        # schema makes it optional precisely so a thin scrape stays honest.
+        **({"earlyUnits": early_units} if early_units else {}),
         "earlyOpener": early_opener[:500],
         "pivotNotes": pivot_notes[:500],
     }
