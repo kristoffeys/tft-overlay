@@ -151,11 +151,33 @@ struct StageBandSummary: View {
 /// The stage-keyed rows themselves, shared by the expanded band and the
 /// de-emphasised ones so a row reads the same wherever it appears.
 struct LevelPlanRows: View {
+    /// A row paired with the identity the `ForEach` actually uses.
+    ///
+    /// Position, not `LevelPlanEntry.id`. Banded rows are one per stage and
+    /// would be safe either way, but this view also draws the *unplaced* rows —
+    /// the ones whose stage string did not parse — and two rows sharing a
+    /// mangled string share an id. Duplicate identity inside a `ForEach` is
+    /// undefined behaviour by SwiftUI's own documentation: today's macOS
+    /// happens to lay both rows out and log a warning, which is precisely why
+    /// this cannot be left to be caught by a screenshot later.
+    ///
+    /// Split out as a named type so the identity is a value a test can assert
+    /// on, rather than an expression buried in a view builder.
+    struct IdentifiedRow: Identifiable {
+        let id: Int
+        let entry: LevelPlanEntry
+    }
+
     let entries: [LevelPlanEntry]
+
+    var identifiedRows: [IdentifiedRow] {
+        entries.enumerated().map { IdentifiedRow(id: $0.offset, entry: $0.element) }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            ForEach(entries) { entry in
+            ForEach(identifiedRows) { row in
+                let entry = row.entry
                 HStack(alignment: .top, spacing: 8) {
                     Text(entry.stage)
                         .font(.system(size: 11, weight: .heavy, design: .rounded))

@@ -237,6 +237,27 @@ final class BuildStagePlanTests: XCTestCase {
         XCTAssertEqual(plan.sections.flatMap(\.levelPlan).count, 1)
     }
 
+    /// Two rows whose stage strings are equally unparseable are two rows.
+    ///
+    /// They share `LevelPlanEntry.id`, so this is where a naive `ForEach` drops
+    /// one — see `StageCompanionSnapshotTests`, which measures that they both
+    /// actually draw. Today's corpus has no unparseable row at all, but it is
+    /// scraper output and gets re-run.
+    func testTwoRowsWithTheSameUnparseableStageAreBothKept() throws {
+        let comp = try CompFixture.make(
+            id: "twice-mangled",
+            tier: .b,
+            units: [CompFixture.unit("Karma", cost: 1)],
+            levelPlan: [
+                LevelPlanEntry(stage: "bogus", level: 6, notes: "first"),
+                LevelPlanEntry(stage: "bogus", level: 8, notes: "second"),
+            ]
+        )
+        let plan = plan(comp)
+        XCTAssertEqual(plan.unscheduledEntries.map(\.notes), ["first", "second"])
+        XCTAssertTrue(plan.sections.allSatisfy(\.levelPlan.isEmpty), "an unparseable stage is not banded")
+    }
+
     /// The contract in one assertion: every piece of advice the corpus wrote
     /// down is still readable somewhere in the plan.
     ///
