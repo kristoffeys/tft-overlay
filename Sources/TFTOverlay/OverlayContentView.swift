@@ -36,16 +36,26 @@ struct OverlayContentView: View {
     /// The tab bar plus whichever panel is showing. The bar is persistent:
     /// it is the only thing on screen that says how many panels exist and
     /// which one you are on, which ⌥C cycling never did.
+    ///
+    /// Which tabs it offers depends on the mode: in Focus the committed build
+    /// leads and the way back to the list is the trailing accessory, not a
+    /// peer tab. That is what makes "no search field and no tier chips
+    /// reachable without an explicit trip to Browse" true — the browse chrome
+    /// is not one tab-tap away, it is behind a labelled decision.
     private var expandedContent: some View {
-        VStack(spacing: 0) {
+        let mode = appState.mode
+        return VStack(spacing: 0) {
             PanelTabBar(
-                tabs: OverlayAppState.Panel.destinations,
-                selection: appState.panel.destination,
+                tabs: OverlayAppState.Panel.destinations(in: mode),
+                selection: appState.panel.destination(in: mode),
                 title: \.title,
                 // The drill-down's Back lives *in* the bar rather than on a
                 // row of its own, so the detail panel costs no extra height
                 // than it did with its own back header.
-                onBack: appState.panel.isDestination ? nil : { appState.showList() },
+                onBack: appState.panel.isDestination ? nil : { appState.goBack() },
+                accessory: mode == .focus
+                    ? .init(title: "Browse", systemImage: "square.grid.2x2") { appState.browse() }
+                    : nil,
                 onSelect: { appState.show($0) }
             )
             panelContent
@@ -57,12 +67,37 @@ struct OverlayContentView: View {
     private var panelContent: some View {
         switch appState.panel {
         case .compsList:
-            CompsListView(comps: appState.comps, pinnedStore: appState.pinnedComps) { comp in
-                appState.select(comp)
+            CompsListView(
+                comps: appState.comps,
+                pinnedStore: appState.pinnedComps,
+                onTogglePin: { appState.togglePin($0) },
+                onSelect: { appState.select($0) }
+            )
+        case .focusBuild:
+            // A `focusBuild` panel with nothing committed cannot happen
+            // through `OverlayAppState`, but rendering the list beats an
+            // empty panel if it ever does.
+            if let build = appState.committedBuild {
+                CompDetailView(
+                    comp: build,
+                    pinnedStore: appState.pinnedComps,
+                    onTogglePin: { appState.togglePin($0) }
+                )
+            } else {
+                CompsListView(
+                    comps: appState.comps,
+                    pinnedStore: appState.pinnedComps,
+                    onTogglePin: { appState.togglePin($0) },
+                    onSelect: { appState.select($0) }
+                )
             }
         case .compDetail:
             if let comp = appState.selectedComp {
-                CompDetailView(comp: comp, pinnedStore: appState.pinnedComps)
+                CompDetailView(
+                    comp: comp,
+                    pinnedStore: appState.pinnedComps,
+                    onTogglePin: { appState.togglePin($0) }
+                )
             } else {
                 Spacer()
                 Text("No comp selected")
