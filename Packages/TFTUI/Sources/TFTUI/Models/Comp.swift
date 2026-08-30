@@ -25,6 +25,9 @@ public struct Comp: Identifiable, Hashable, Sendable, Codable {
         case handAuthored = "hand-authored"
         case matchDerived = "match-derived"
         case licensedFeed = "licensed-feed"
+        /// A maintainer-run scraper's output (ADR 0004), never fetched by
+        /// the app itself -- see scraper/README.md.
+        case scrapedFeed = "scraped-feed"
     }
 
     public enum Tier: String, Codable, Sendable, CaseIterable, Comparable {

@@ -50,9 +50,9 @@
     },
     "source": {
       "type": "string",
-      "enum": ["hand-authored", "match-derived", "licensed-feed"],
+      "enum": ["hand-authored", "match-derived", "licensed-feed", "scraped-feed"],
       "default": "hand-authored",
-      "description": "Provenance of this comp's data, per ADR 0002. Phase 1 ships hand-authored only; Phase 3 introduces match-derived without changing any other field."
+      "description": "Provenance of this comp's data. Phase 1 shipped hand-authored only; match-derived is Phase 3's planned Riot-match-clustering pipeline; licensed-feed is an explicit data-sharing agreement with a third party (neither implemented). scraped-feed (ADR 0004) is a maintainer-run scraper over a public tier-list site's page content, with no license from that site -- see ADR 0004 for why this was judged acceptable and what it does NOT cover (the scraper never runs from the shipped app)."
     },
     "tier": {
       "type": "string",
