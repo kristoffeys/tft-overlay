@@ -111,6 +111,28 @@ struct OverlayContentView: View {
                     .foregroundStyle(TFTTheme.textSecondary)
                 Spacer()
             }
+        case .openers:
+            // Tapping a comp an early unit leads into *drills in* rather than
+            // committing. Openers is a pre-commit surface by definition —
+            // stage 1, no build chosen — and "Kobuko is in these four comps"
+            // is an invitation to go read one, not a decision to lock into
+            // it. Committing straight from a capsule would also strand the
+            // player: it leaves Browse, so the ranking they were reading is
+            // gone, on a build they have not seen the roster of. The detail
+            // panel they land on carries the pin button, so committing is
+            // still one tap away — just an explicit one.
+            OpenersView(comps: appState.comps) { summary in
+                appState.select(compID: summary.id)
+            }
+        case .myChampions:
+            // Suggestions *do* commit (#87): by the time the player has
+            // marked a bench and read "7/9 — missing Ashe, Kindred", the
+            // decision is the whole point of the panel.
+            MyChampionsView(
+                comps: appState.comps,
+                ownedStore: appState.ownedChampions,
+                onCommitBuild: { appState.commit(to: $0) }
+            )
         case .itemCheatSheet:
             ItemCheatSheetView(comps: appState.comps)
         case .reference:

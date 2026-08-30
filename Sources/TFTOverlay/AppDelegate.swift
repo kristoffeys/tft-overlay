@@ -28,7 +28,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // icons under each carry, and no taller.
             expandedSize: CGSize(width: 460, height: 640),
             compactSize: CGSize(width: 420, height: 132),
-            minSize: CGSize(width: 300, height: 240),
+            // The resize floor for the expanded panel. 420 rather than 300 so
+            // the floor matches `compactSize`'s width — the narrowest layout
+            // the app actually ships — and so the primary tab bar always
+            // fits: five Browse tabs plus the drill-down chevron need 383pt
+            // (`PanelTabBarFitTests`). At 300 the bar overflowed and clipped
+            // its end tabs, which was already true on main for the three-tab
+            // Focus bar plus its Browse accessory (308pt).
+            minSize: CGSize(width: 420, height: 240),
             maxSize: CGSize(width: 900, height: 1200),
             defaultOpacity: settingsStore.settings.overlay.opacity,
             idleRevertInterval: settingsStore.settings.overlay.idleTimeoutSeconds,

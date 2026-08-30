@@ -66,19 +66,34 @@ final class OverlayAppState: ObservableObject {
     /// this is the app's notion of "selected build" — `selectedComp` is
     /// only which comp the detail panel happens to be looking at.
     let pinnedComps: PinnedCompsStore
+    /// Which champions the player has told us they have (#86), feeding the
+    /// comp suggestions (#87).
+    ///
+    /// Held here, as the single instance for the whole app, for the reason
+    /// `OwnedChampionsStore.clear()` documents: in-memory state is only a
+    /// snapshot taken at `init`, so a second store over the same defaults can
+    /// hold a stale roster and write it back. `MyChampionsView` takes this one
+    /// rather than creating its own.
+    let ownedChampions: OwnedChampionsStore
 
     private var pinObserver: AnyCancellable?
 
-    /// - Parameter pinnedComps: injectable so tests get an isolated
-    ///   `UserDefaults` suite. Reading the real one made every navigation
-    ///   test depend on whatever the developer last pinned in the app.
-    init(pinnedComps: PinnedCompsStore = PinnedCompsStore()) {
+    /// - Parameters:
+    ///   - pinnedComps: injectable so tests get an isolated `UserDefaults`
+    ///     suite. Reading the real one made every navigation test depend on
+    ///     whatever the developer last pinned in the app.
+    ///   - ownedChampions: injectable for the same reason.
+    init(
+        pinnedComps: PinnedCompsStore = PinnedCompsStore(),
+        ownedChampions: OwnedChampionsStore = OwnedChampionsStore()
+    ) {
         // `CompLoader.bundledFixtures()` reads from TFTUI's own SPM resource
         // bundle (byte-identical copies of `data/comps/*.json`), so this
         // works from a normal app launch regardless of working directory —
         // no path outside the package is touched at runtime.
         comps = (try? CompLoader.bundledFixtures()) ?? []
         self.pinnedComps = pinnedComps
+        self.ownedChampions = ownedChampions
 
         selectedComp = comps.first
 
@@ -136,6 +151,16 @@ final class OverlayAppState: ObservableObject {
         panel = .compDetail
     }
 
+    /// Drills into a comp named only by id — what the Openers panel hands
+    /// back, since `OpenerIndex` summarises comps rather than carrying them.
+    ///
+    /// A no-op when the id names nothing this corpus has, rather than
+    /// navigating to an empty detail panel.
+    func select(compID: String) {
+        guard let comp = comps.first(where: { $0.id == compID }) else { return }
+        select(comp)
+    }
+
     // MARK: - Committing to a build
 
     /// What a pin tap means. Pinning commits; unpinning un-commits.
@@ -187,13 +212,19 @@ final class OverlayAppState: ObservableObject {
         stageBand = next
     }
 
-    /// The escape hatch: back to the list, keeping the pin.
+    /// The escape hatch: out of Focus and onto a Browse panel, keeping the pin.
     ///
     /// "Change build" is not "unpin" — a player pivoting still wants their
     /// current line on screen until they have chosen the next one.
-    func browse() {
+    ///
+    /// - Parameter panel: which Browse panel to land on. The comps list by
+    ///   default, which is what the tab bar's Browse accessory means. Openers
+    ///   and My Champions come through here too: they are Browse surfaces, so
+    ///   arriving at one *is* browsing, and routing them through the same
+    ///   place is what keeps `mode` from contradicting the panel on screen.
+    func browse(to panel: Panel = .compsList) {
         isBrowsingByRequest = true
-        panel = .compsList
+        self.panel = panel
     }
 
     // MARK: - Navigation
@@ -201,12 +232,16 @@ final class OverlayAppState: ObservableObject {
     /// Switches to a panel directly — what the tab bar calls.
     ///
     /// The comps list *is* the browse view, so arriving at it by any route
-    /// means Browse; and `focusBuild` with nothing committed has nothing to
-    /// draw, so it redirects rather than showing an empty panel.
+    /// means Browse — and so do Openers and My Champions, which answer the
+    /// same question from other directions. `focusBuild` with nothing
+    /// committed has nothing to draw, so it redirects rather than showing an
+    /// empty panel.
     func show(_ panel: Panel) {
         switch panel {
         case .compsList:
             browse()
+        case _ where panel.isBrowseOnly:
+            browse(to: panel)
         case .focusBuild:
             guard let committedBuild else { return browse() }
             commit(to: committedBuild)
