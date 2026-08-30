@@ -3,17 +3,23 @@ import SwiftUI
 /// Early-game guidance panel (#85): what to hold and what to slam in stage 1
 /// and early stage 2, before a comp has been chosen.
 ///
-/// Renders `OpenerIndex`, which is a pure derivation over the loaded comp
-/// corpus. Three things, in the order a player needs them:
+/// Three things, in the order a player needs them:
 ///
-/// 1. **Meta pickups** — low-cost units weighted towards S/A comps.
-/// 2. **Keeps doors open** — the same pool ranked by how many comps use it at
-///    all, any tier. Deliberately a *different* ranking, so the two sections
-///    are drawn in two different visual forms: the first is a list with a
-///    strength bar, the second a grid of tiles carrying a comp count. Two
-///    identically-shaped lists side by side read as one list rendered twice,
-///    and the whole point of showing both is that they disagree.
+/// 1. **Meta pickups** — the openers ranking, from `OpenerIndex.topOpeners`.
+/// 2. **Keeps doors open** — the same pool ranked by how many comps it opens
+///    at all, any tier. Deliberately a *different* ranking, so the two
+///    sections are drawn in two different visual forms: the first is a list
+///    with a strength bar, the second a grid of tiles carrying a comp count.
+///    Two identically-shaped lists side by side read as one list rendered
+///    twice, and the whole point of showing both is that they disagree.
 /// 3. **Components** — what to slam versus what to hold.
+///
+/// The rankings come from `OpenerIndex`, which reads each comp's
+/// `earlyUnits` — the board it *opens* on — and never `units`, the final
+/// board (see that type's doc, and #99: ranking final boards surfaced six
+/// cost-3 units you cannot buy at level 4). Cost is on the face of every
+/// entry here for the same reason: the panel had no cost anywhere on it, so
+/// nothing about that failure was visible.
 ///
 /// Every unit names the comps it leads into, inline and never behind hover:
 /// the panel is only useful if it is a bridge into picking a build rather
@@ -36,12 +42,19 @@ public struct OpenersView: View {
     /// noise you would never act on.
     static let rankingLimit = 6
 
+    /// - Parameter championCosts: champion name -> cost from the live set
+    ///   catalog, threaded through to `OpenerIndex`. `Comp.earlyUnits` names
+    ///   units without their cost on purpose, and this panel now leads with
+    ///   cost, so the number has to come from the catalog that owns it.
+    ///   Defaults to empty, which falls back to the corpus's own boards — the
+    ///   panel stays correct before the data store has finished loading.
     public init(
         comps: [Comp],
+        championCosts: [String: Int] = [:],
         recipeMatrix: RecipeMatrix = RecipeMatrix(),
         onSelectComp: @escaping (OpenerIndex.CompSummary) -> Void = { _ in }
     ) {
-        index = OpenerIndex(comps: comps, recipeMatrix: recipeMatrix)
+        index = OpenerIndex(comps: comps, championCosts: championCosts, recipeMatrix: recipeMatrix)
         self.onSelectComp = onSelectComp
     }
 
@@ -93,22 +106,23 @@ public struct OpenersView: View {
     // MARK: - Most present in S/A comps
 
     var metaPickups: [OpenerIndex.UnitPresence] {
-        Array(index.mostPresent.prefix(Self.rankingLimit))
+        Array(index.topOpeners.prefix(Self.rankingLimit))
     }
 
     private var metaPickupsSection: some View {
         section(
             title: "Meta pickups",
-            subtitle: "Most present in S and A comps"
+            subtitle: "On the opening boards of S and A comps, weighted toward 1-costs. "
+                + "The number is how many of those comps open on it."
         ) {
             if metaPickups.isEmpty {
-                emptyNote("No S or A comp in this list, so there is nothing to weight.")
+                emptyNote("No S or A comp in this list names an opening board, so there is nothing to weight.")
             } else {
                 VStack(spacing: 6) {
                     ForEach(metaPickups) { unit in
                         MetaPickupRow(
                             unit: unit,
-                            maximumPresence: metaPickups.first?.weightedPresence ?? 1,
+                            maximumScore: metaPickups.first?.openerScore ?? 1,
                             leadsTo: index.comps(leadingFrom: unit.name),
                             onSelectComp: onSelectComp
                         )
@@ -121,16 +135,16 @@ public struct OpenersView: View {
     // MARK: - Keeps the most doors open
 
     var flexibleUnits: [OpenerIndex.UnitPresence] {
-        Array(index.mostShared.prefix(Self.rankingLimit))
+        Array(index.mostFlexible.prefix(Self.rankingLimit))
     }
 
     private var doorsOpenSection: some View {
         section(
             title: "Keeps doors open",
-            subtitle: "In the most comps, any tier — a different ranking on purpose"
+            subtitle: "Opens the most comps, any tier — a different ranking on purpose"
         ) {
             if flexibleUnits.isEmpty {
-                emptyNote("No low-cost unit appears in this comp list.")
+                emptyNote("No comp in this list names an opening board of cheap units.")
             } else {
                 LazyVGrid(
                     columns: [GridItem(.adaptive(minimum: FlexibleUnitTile.width), spacing: 6, alignment: .top)],

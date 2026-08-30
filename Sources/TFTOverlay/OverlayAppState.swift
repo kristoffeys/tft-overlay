@@ -60,6 +60,14 @@ final class OverlayAppState: ObservableObject {
     /// once loaded; nothing above this has to know the difference, since
     /// every icon view already treats "no art yet" as its normal fallback.
     @Published private(set) var assetCatalog: TFTAssetCatalog = .empty
+    /// Champion name -> cost, from the same loaded store as `assetCatalog`.
+    ///
+    /// The openers panel ranks and labels by cost (#99) and its input,
+    /// `Comp.earlyUnits`, is champion names only — cost is deliberately not
+    /// duplicated into the comp corpus, so it has to come from the set
+    /// catalog. Empty until the store loads, which `OpenerIndex` handles by
+    /// falling back to the corpus's own boards.
+    @Published private(set) var championCosts: [String: Int] = [:]
     let comps: [Comp]
     /// Which comps the player pinned, and which of them is the build they
     /// are currently going for. Compact mode shows that build's roster, so
@@ -113,8 +121,13 @@ final class OverlayAppState: ObservableObject {
 
         Task {
             let (store, _) = await TFTDataService().loadCurrentStore()
-            assetCatalog = TFTAssetCatalog(store: store)
+            adopt(store)
         }
+    }
+
+    private func adopt(_ store: TFTDataStore) {
+        assetCatalog = TFTAssetCatalog(store: store)
+        championCosts = Dictionary(store.champions.map { ($0.name, $0.cost) }, uniquingKeysWith: min)
     }
 
     /// The build the player has committed to: the current pin, resolved
@@ -160,7 +173,7 @@ final class OverlayAppState: ObservableObject {
         let service = TFTDataService()
         guard case .refreshed = await service.checkAndRefreshIfNeeded() else { return }
         let (store, _) = await service.loadCurrentStore()
-        assetCatalog = TFTAssetCatalog(store: store)
+        adopt(store)
     }
 
     func select(_ comp: Comp) {

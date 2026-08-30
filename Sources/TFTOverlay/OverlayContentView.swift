@@ -123,7 +123,7 @@ struct OverlayContentView: View {
             // gone, on a build they have not seen the roster of. The detail
             // panel they land on carries the pin button, so committing is
             // still one tap away — just an explicit one.
-            OpenersView(comps: appState.comps) { summary in
+            OpenersView(comps: appState.comps, championCosts: appState.championCosts) { summary in
                 appState.select(compID: summary.id)
             }
         case .myChampions:

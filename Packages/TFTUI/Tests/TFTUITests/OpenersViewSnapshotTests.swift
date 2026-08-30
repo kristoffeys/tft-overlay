@@ -2,20 +2,22 @@ import SwiftUI
 @testable import TFTUI
 import XCTest
 
-/// Layout regressions for the openers panel (#85) at the width the overlay
-/// actually ships at.
+/// Layout regressions for the openers panel (#85, #99) at the widths the
+/// overlay actually ships at.
 ///
-/// The panel is not reachable from a tab yet, so these renders and the
-/// SwiftUI preview are the only evidence its layout works — which makes the
-/// states that break layouts (an empty corpus, a corpus with no S/A comp, a
-/// very long comp or champion name) worth rendering explicitly rather than
-/// trusting the happy path.
+/// The states that break layouts (an empty corpus, a corpus with no S/A
+/// comp, a very long comp or champion name) are rendered explicitly rather
+/// than trusting the happy path — screenshotting the running app catches the
+/// rest, but only for the corpus that happens to be loaded.
 ///
 /// Scroll content is rendered as `OpenersView.content`, never wrapped in the
 /// `ScrollView`: see the note in `ViewSnapshot`.
 @MainActor
 final class OpenersViewSnapshotTests: XCTestCase {
     private let expanded = CGSize(width: 460, height: 640)
+    /// The narrower width the panel is also verified at by hand (#99), and
+    /// the one the cost badge has least room in.
+    private let narrow = CGSize(width: 420, height: 640)
 
     // MARK: - The real corpus
 
@@ -29,6 +31,33 @@ final class OpenersViewSnapshotTests: XCTestCase {
             size: CGSize(width: expanded.width, height: natural.height),
             rightMargin: 8
         )
+    }
+
+    func testOpenersContentRendersWithinTheNarrowPanelWidth() throws {
+        let view = try OpenersView(comps: CompLoader.bundledFixtures())
+        let natural = try ViewSnapshot.measuredSize(of: view.content, proposedWidth: narrow.width)
+
+        XCTAssertEqual(natural.width, narrow.width, accuracy: 1)
+        try assertRendersWithin(
+            view.content,
+            size: CGSize(width: narrow.width, height: natural.height),
+            rightMargin: 8
+        )
+    }
+
+    // MARK: - Cost, which the panel used to hide entirely
+
+    /// #99's diagnosis was only invisible because the panel showed no cost
+    /// anywhere. The badge has to draw something, and has to stay a badge
+    /// rather than a bar: measured intrinsically, since `render` clamps.
+    func testTheCostBadgeDrawsAtEveryOpenerCost() throws {
+        for cost in 1 ... OpenerIndex.maximumOpenerCost {
+            let badge = UnitCostBadge(cost: cost)
+            let size = try ViewSnapshot.measuredSize(of: badge, proposedWidth: 2000)
+            XCTAssertLessThan(size.width, 60, "A \(cost)-cost badge measures \(size.width)pt — that is a bar")
+            let raster = try ViewSnapshot.render(badge, size: size)
+            XCTAssertNotNil(raster.contentBounds(), "The \(cost)-cost badge rendered blank")
+        }
     }
 
     /// The disclaimer sits above the scroll view, so it is the one piece of
@@ -195,7 +224,8 @@ final class OpenersViewSnapshotTests: XCTestCase {
             let unit = OpenerIndex.UnitPresence(
                 name: name,
                 cost: 2,
-                weightedPresence: 9,
+                openerScore: 9,
+                topTierRosterCount: 7,
                 sharedCompCount: 12
             )
             let tile = FlexibleUnitTile(

@@ -13,8 +13,13 @@ import Foundation
 /// contract, `CompSuggestionTierBandTests` for the tier-band ordering
 /// contract) and both need the same shapes.
 enum CompFixture {
-    static func unit(_ name: String, cost: Int, role: CompUnit.Role = .frontline) -> CompUnit {
-        CompUnit(name: name, cost: cost, starTarget: 2, role: role, traits: [])
+    static func unit(
+        _ name: String,
+        cost: Int,
+        starTarget: Int = 2,
+        role: CompUnit.Role = .frontline
+    ) -> CompUnit {
+        CompUnit(name: name, cost: cost, starTarget: starTarget, role: role, traits: [])
     }
 
     /// A JSON string literal for `text`, escaped.
@@ -93,13 +98,30 @@ enum CompFixture {
     /// The shape 33 of the 36 real comps actually have: eight units, costs
     /// 5/4/4/3/2/2/1/1 with the 5-cost as the named carry. `names` must be
     /// eight names in that cost order.
-    static func dominantShape(id: String, tier: Comp.Tier, names: [String]) throws -> Comp {
+    ///
+    /// The early roster defaults to the cheap tail — the two 2-costs and two
+    /// 1-costs — which is the real corpus's shape too: an early board is
+    /// cheap units that the final board no longer contains, never the
+    /// 4-costs. Pass `earlyUnits` to model a comp whose opening roster is
+    /// something else, including a comp that names none.
+    static func dominantShape(
+        id: String,
+        tier: Comp.Tier,
+        names: [String],
+        earlyUnits: [String]? = nil
+    ) throws -> Comp {
         precondition(names.count == 8, "the dominant real-comp shape is eight units")
         let costs = [5, 4, 4, 3, 2, 2, 1, 1]
         let units = zip(names, costs).enumerated().map { index, pair in
             unit(pair.0, cost: pair.1, role: index == 0 ? .carry : .frontline)
         }
-        return try make(id: id, tier: tier, units: units, carries: [CompCarry(unit: names[0], itemPriority: [])])
+        return try make(
+            id: id,
+            tier: tier,
+            units: units,
+            carries: [CompCarry(unit: names[0], itemPriority: [])],
+            earlyUnits: earlyUnits ?? Array(names[4 ... 7])
+        )
     }
 
     /// Total cost/carry weight of `dominantShape`:
