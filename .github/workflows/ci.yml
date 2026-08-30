@@ -84,7 +84,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install jsonschema
-        run: pip3 install --quiet jsonschema
+        # --break-system-packages: the runner's python3 is Homebrew-managed and
+        # PEP 668 refuses a bare `pip install` into it. This is a throwaway
+        # runner with nothing else depending on its site-packages.
+        run: pip3 install --quiet --break-system-packages jsonschema
 
       - name: Validate comps
         run: python3 scripts/validate_comps.py
