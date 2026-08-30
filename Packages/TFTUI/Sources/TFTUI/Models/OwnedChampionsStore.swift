@@ -11,7 +11,7 @@ import Foundation
 /// champion name rather than any Riot id, matching how the rest of the app
 /// already identifies units (`CompUnit.name`,
 /// `TFTAssetCatalog.championImageURL(named:)`), and normalised through
-/// `ChampionNameKey` so punctuation or casing drift can never split one
+/// `TFTNameKey` so punctuation or casing drift can never split one
 /// champion into two entries in this store.
 ///
 /// `clear()` is not an afterthought. This roster goes stale every single
@@ -34,11 +34,11 @@ public final class OwnedChampionsStore: ObservableObject {
         self.defaults = defaults
         self.storageKey = storageKey
         let stored = defaults.stringArray(forKey: storageKey) ?? []
-        ownedKeys = Set(stored.map(ChampionNameKey.normalize))
+        ownedKeys = Set(stored.map(TFTNameKey.normalize))
     }
 
     public func isOwned(_ name: String) -> Bool {
-        ownedKeys.contains(ChampionNameKey.normalize(name))
+        ownedKeys.contains(TFTNameKey.normalize(name))
     }
 
     public func toggle(_ name: String) {
@@ -50,12 +50,12 @@ public final class OwnedChampionsStore: ObservableObject {
     }
 
     public func add(_ name: String) {
-        guard ownedKeys.insert(ChampionNameKey.normalize(name)).inserted else { return }
+        guard ownedKeys.insert(TFTNameKey.normalize(name)).inserted else { return }
         persist()
     }
 
     public func remove(_ name: String) {
-        guard ownedKeys.remove(ChampionNameKey.normalize(name)) != nil else { return }
+        guard ownedKeys.remove(TFTNameKey.normalize(name)) != nil else { return }
         persist()
     }
 
