@@ -16,7 +16,7 @@ import XCTest
 final class OpenersViewSnapshotTests: XCTestCase {
     private let expanded = CGSize(width: 460, height: 640)
     /// The narrower width the panel is also verified at by hand (#99), and
-    /// the one the cost badge has least room in.
+    /// the one the cost badge and tier letters have least room in.
     private let narrow = CGSize(width: 420, height: 640)
 
     // MARK: - The real corpus

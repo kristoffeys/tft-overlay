@@ -96,7 +96,7 @@ struct MetaPickupRow: View {
 }
 
 /// A flexible unit: portrait carrying its cost and its comp count, name
-/// below.
+/// below, and the tier spread of the comps it opens.
 ///
 /// A tile rather than a row so this ranking cannot be mistaken for the one
 /// above it at a glance.
@@ -133,23 +133,51 @@ struct FlexibleUnitTile: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
                 .frame(width: Self.width)
-            // The tier spread of the comps it opens, one dot each: three
-            // orange dots and one grey says something a bare count cannot.
-            tierDots
+            tierSpread
         }
         .frame(width: Self.width)
         .help("\(unit.name) — cost \(unit.cost), opens: \(leadsTo.map(\.name).joined(separator: ", "))")
     }
 
-    private var tierDots: some View {
-        HStack(spacing: 2) {
-            ForEach(Array(leadsTo.prefix(8).enumerated()), id: \.offset) { _, comp in
-                Circle()
-                    .fill(TFTTheme.tierColor(comp.tier))
-                    .frame(width: 4, height: 4)
+    /// The tier spread of the comps this unit opens, as counted tier
+    /// letters: `3S 1A`.
+    ///
+    /// This was a row of small coloured dots (#97). A dot row conveys
+    /// nothing without a legend the panel does not have room for, and it
+    /// spent one dot per comp on units that open a dozen — eight
+    /// indistinguishable pips. Letters carry the same fact in a form that
+    /// needs no legend at all, because the tier badges in the comps list and
+    /// on every capsule beside them already teach the S/A/B/C/D vocabulary;
+    /// counting them collapses twelve marks into two tokens that also say
+    /// *how many*, which the dots never did.
+    private var tierSpread: some View {
+        HStack(spacing: 4) {
+            ForEach(tierCounts, id: \.tier) { entry in
+                Text("\(entry.count)\(entry.tier.rawValue)")
+                    .font(.system(size: 9, weight: .heavy, design: .rounded))
+                    .foregroundStyle(TFTTheme.tierColor(entry.tier))
             }
         }
-        .frame(height: 4)
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+        .frame(height: 11)
+        .accessibilityLabel(
+            tierCounts.map { "\($0.count) \($0.tier.rawValue) tier" }.joined(separator: ", ")
+        )
+    }
+
+    private struct TierCount: Hashable {
+        let tier: Comp.Tier
+        let count: Int
+    }
+
+    /// Best tier first, and only tiers actually present — an empty column
+    /// for a tier nothing here uses would be four dead glyphs in a 62pt
+    /// tile.
+    private var tierCounts: [TierCount] {
+        Dictionary(grouping: leadsTo, by: \.tier)
+            .map { TierCount(tier: $0.key, count: $0.value.count) }
+            .sorted { $0.tier < $1.tier }
     }
 }
 
