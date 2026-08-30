@@ -120,8 +120,8 @@ public struct OpenersView: View {
     private var metaPickupsSection: some View {
         section(
             title: "Meta pickups",
-            subtitle: "On the opening boards of S and A comps, weighted toward 1-costs. "
-                + "The number is how many of those comps open on it."
+            subtitle: "Ranked by the bar — presence on S/A opening boards, weighted toward 1-costs. "
+                + "The small \"X of Y\" beside it is a separate count: S/A comps out of every comp it opens."
         ) {
             if metaPickups.isEmpty {
                 emptyNote("No S or A comp in this list names an opening board, so there is nothing to weight.")
