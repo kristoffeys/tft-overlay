@@ -23,7 +23,10 @@ final class OverlayModeTests: XCTestCase {
     }
 
     private func state() -> OverlayAppState {
-        OverlayAppState(pinnedComps: PinnedCompsStore(defaults: defaults))
+        OverlayAppState(
+            pinnedComps: PinnedCompsStore(defaults: defaults),
+            ownedChampions: OwnedChampionsStore(defaults: defaults)
+        )
     }
 
     private func twoComps(_ state: OverlayAppState) throws -> (Comp, Comp) {
@@ -105,6 +108,76 @@ final class OverlayModeTests: XCTestCase {
         XCTAssertEqual(state.committedBuild?.id, first.id)
         XCTAssertEqual(state.mode, .focus)
         XCTAssertEqual(state.panel, .focusBuild)
+    }
+
+    /// The #87 payoff: tapping a suggestion in My Champions is the same commit
+    /// gesture as pinning from the list, and it has to land the player in Focus
+    /// on that build rather than merely pinning it in the background.
+    ///
+    /// `MyChampionsView.onCommitBuild` is wired straight to `commit(to:)` in
+    /// `OverlayContentView`, so this covers the transition that wiring depends
+    /// on: from a Browse-only panel, which also has to stop being the panel on
+    /// screen.
+    func testCommittingFromMyChampionsLandsInFocusOnThatBuild() throws {
+        let state = state()
+        let (_, second) = try twoComps(state)
+        state.show(.myChampions)
+        XCTAssertEqual(state.panel, .myChampions)
+        XCTAssertEqual(state.mode, .browse)
+
+        state.commit(to: second)
+
+        XCTAssertEqual(state.committedBuild?.id, second.id)
+        XCTAssertEqual(state.mode, .focus)
+        XCTAssertEqual(state.panel, .focusBuild)
+        XCTAssertTrue(state.pinnedComps.isPinned(second.id))
+    }
+
+    /// Committing from a suggestion while already focused on something else is
+    /// the pivot case — mid-game, "what can I reach from here" is exactly the
+    /// question that produces a build switch — and it must reset the stage the
+    /// same way pinning does.
+    func testCommittingFromMyChampionsWhileFocusedSwitchesTheBuildAndResetsTheStage() throws {
+        let state = state()
+        let (first, second) = try twoComps(state)
+        state.commit(to: first)
+        state.advanceStage()
+        try XCTSkipIf(state.stageBand == .initial, "Needs a stage band past the first")
+        state.browse(to: .myChampions)
+
+        state.commit(to: second)
+
+        XCTAssertEqual(state.committedBuild?.id, second.id)
+        XCTAssertEqual(state.mode, .focus)
+        XCTAssertEqual(state.panel, .focusBuild)
+        XCTAssertEqual(state.stageBand, .initial, "A new build is the overlay's best proxy for a new game")
+    }
+
+    /// One store, held by the app state, for the reason
+    /// `OwnedChampionsStore.clear()` documents: in-memory state is a snapshot
+    /// taken at `init`, so a second store over the same defaults can hold a
+    /// stale roster and write it back over a fresh one. `MyChampionsView` is
+    /// handed this instance rather than creating its own.
+    func testTheOwnedChampionsStoreIsHeldByTheAppStateAndReadsThrough() {
+        let state = state()
+        XCTAssertTrue(state.ownedChampions.ownedKeys.isEmpty)
+
+        state.ownedChampions.toggle("Ashe")
+        XCTAssertTrue(state.ownedChampions.isOwned("Ashe"))
+
+        state.ownedChampions.clear()
+        XCTAssertTrue(state.ownedChampions.ownedKeys.isEmpty)
+    }
+
+    /// The roster is persisted, so it survives a panel toggle and a relaunch —
+    /// and the state that reads it on relaunch has to be the one that was
+    /// written to.
+    func testTheOwnedRosterSurvivesARelaunch() {
+        let seed = state()
+        seed.ownedChampions.add("Ashe")
+
+        let relaunched = state()
+        XCTAssertTrue(relaunched.ownedChampions.isOwned("Ashe"))
     }
 
     // MARK: - Getting back out
@@ -214,6 +287,12 @@ final class OverlayModeTests: XCTestCase {
             ("browse", { state.browse() }),
             ("pin second", { state.togglePin(second) }),
             ("items", { state.show(.itemCheatSheet) }),
+            ("openers", { state.show(.openers) }),
+            ("drill in from openers", { state.select(compID: second.id) }),
+            ("back to openers", { state.goBack() }),
+            ("my champions", { state.show(.myChampions) }),
+            ("commit from a suggestion", { state.commit(to: first) }),
+            ("my champions again", { state.show(.myChampions) }),
             ("drill into first", { state.select(first) }),
             ("back", { state.goBack() }),
             ("unpin second", { state.togglePin(second) }),

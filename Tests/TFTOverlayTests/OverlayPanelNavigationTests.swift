@@ -50,18 +50,55 @@ final class OverlayPanelNavigationTests: XCTestCase {
         }
     }
 
-    /// Three tabs per mode, each leading with the panel that answers the
-    /// mode's question. Focus deliberately does *not* offer the comps list as
-    /// a fourth tab: leaving Focus is the bar's trailing accessory, so the
+    /// Each mode's tab set, leading with the panel that answers the mode's
+    /// question. Focus deliberately does *not* offer the comps list as a
+    /// fourth tab: leaving Focus is the bar's trailing accessory, so the
     /// browse chrome stays behind an explicit decision.
-    func testEachModeOffersItsOwnThreeTabs() {
+    ///
+    /// Browse gained Openers and My Champions in #85/#86 — both answer "what
+    /// should I play?", so both live here and neither is in Focus.
+    func testEachModeOffersItsOwnTabs() {
         XCTAssertEqual(
             OverlayAppState.Panel.destinations(in: .browse),
-            [.compsList, .itemCheatSheet, .reference]
+            [.compsList, .openers, .myChampions, .itemCheatSheet, .reference]
         )
         XCTAssertEqual(
             OverlayAppState.Panel.destinations(in: .focus),
             [.focusBuild, .itemCheatSheet, .reference]
+        )
+    }
+
+    /// Focus stays at exactly three cycled tabs plus its Browse accessory.
+    ///
+    /// Pinned separately from the list above because it is the invariant, not
+    /// the arrangement: Focus is "one build, nothing else on screen", and every
+    /// new Browse panel is a chance to widen Focus by accident. The tab bar's
+    /// trailing accessory is not counted here — by design it is not a tab and
+    /// cycling never reaches it.
+    func testFocusKeepsExactlyThreeTabsNoMatterWhatBrowseGains() {
+        let focus = OverlayAppState.Panel.destinations(in: .focus)
+        XCTAssertEqual(focus.count, 3, "Focus offers \(focus.map(\.title))")
+        for panel in OverlayAppState.Panel.allCases where panel.isBrowseOnly {
+            XCTAssertFalse(
+                focus.contains(panel),
+                "\(panel.title) is a Browse surface and must not be a Focus tab"
+            )
+        }
+    }
+
+    /// The two new panels are top-level destinations, not drill-downs: you
+    /// pick them cold from the bar, and both open on something useful with no
+    /// prior selection (Openers ranks the corpus; My Champions opens on the
+    /// picker).
+    func testTheNewPanelsAreTabsAndAreBrowseOnly() {
+        for panel in [OverlayAppState.Panel.openers, .myChampions] {
+            XCTAssertTrue(panel.isDestination)
+            XCTAssertTrue(panel.isBrowseOnly)
+            XCTAssertTrue(OverlayAppState.Panel.destinations(in: .browse).contains(panel))
+        }
+        XCTAssertFalse(
+            OverlayAppState.Panel.compsList.isBrowseOnly,
+            "The list leads Browse, it is not browse-only chrome"
         )
     }
 
@@ -103,6 +140,10 @@ final class OverlayPanelNavigationTests: XCTestCase {
         XCTAssertEqual(state.panel, .compsList)
 
         state.cycleForward()
+        XCTAssertEqual(state.panel, .openers)
+        state.cycleForward()
+        XCTAssertEqual(state.panel, .myChampions)
+        state.cycleForward()
         XCTAssertEqual(state.panel, .itemCheatSheet)
         state.cycleForward()
         XCTAssertEqual(state.panel, .reference)
@@ -111,6 +152,22 @@ final class OverlayPanelNavigationTests: XCTestCase {
 
         state.cycleBackward()
         XCTAssertEqual(state.panel, .reference)
+    }
+
+    /// Cycling onto a Browse-only panel while a build is pinned has to *stay*
+    /// coherent: `mode` is derived, so a panel that only exists in Browse must
+    /// bring Browse with it rather than leaving the bar showing Focus's three
+    /// tabs with an Openers panel underneath.
+    func testCyclingOntoABrowseOnlyPanelKeepsTheModeAgreeingWithIt() throws {
+        let state = state()
+        _ = try focused(state)
+        state.browse()
+        XCTAssertEqual(state.mode, .browse)
+
+        state.cycleForward()
+        XCTAssertEqual(state.panel, .openers)
+        XCTAssertEqual(state.mode, .browse, "Openers is a Browse panel, so the mode has to be Browse")
+        XCTAssertNotNil(state.committedBuild, "Browsing does not throw the build away")
     }
 
     /// The invariant #82 has to preserve: ⌥C walks whatever the bar is
@@ -165,7 +222,7 @@ final class OverlayPanelNavigationTests: XCTestCase {
         XCTAssertEqual(state.panel, .compDetail)
 
         state.cycleForward()
-        XCTAssertEqual(state.panel, .itemCheatSheet, "Detail belongs to Comps, so forward is Items")
+        XCTAssertEqual(state.panel, .openers, "Detail belongs to Comps, so forward is the tab after Comps")
     }
 
     /// Cycling only ever lands on a panel the bar is currently offering — the
@@ -233,6 +290,96 @@ final class OverlayPanelNavigationTests: XCTestCase {
         state.goBack()
         XCTAssertEqual(state.panel, .reference, "Back should return to Reference, not the committed build")
         XCTAssertEqual(state.mode, .focus, "Back must not drop the player out of Focus")
+    }
+
+    /// Openers drills into a comp, so Back has to return to Openers — not to
+    /// the comps list, which is a different panel the player was not on.
+    func testBackFromDetailEnteredViaOpenersReturnsToOpeners() throws {
+        let state = state()
+        let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+
+        state.show(.openers)
+        state.select(comp)
+        XCTAssertEqual(state.panel, .compDetail)
+
+        state.goBack()
+        XCTAssertEqual(state.panel, .openers)
+        XCTAssertEqual(state.mode, .browse)
+    }
+
+    /// Same for My Champions. Its suggestions commit rather than drill, but the
+    /// panel is a destination and `select` can be reached from it, so the
+    /// origin still has to be recorded.
+    func testBackFromDetailEnteredViaMyChampionsReturnsToMyChampions() throws {
+        let state = state()
+        let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+
+        state.show(.myChampions)
+        state.select(comp)
+        XCTAssertEqual(state.panel, .compDetail)
+
+        state.goBack()
+        XCTAssertEqual(state.panel, .myChampions)
+        XCTAssertEqual(state.mode, .browse)
+    }
+
+    /// Back returns to where the drill-down was entered from, for *every*
+    /// destination — the #91 guarantee, restated over the widened tab set so a
+    /// future panel cannot be added without an origin.
+    func testBackReturnsToEveryDestinationItCanBeEnteredFrom() throws {
+        for origin in OverlayAppState.Panel.destinations(in: .browse) {
+            let state = state()
+            let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+
+            state.show(origin)
+            XCTAssertEqual(state.panel, origin)
+            state.select(comp)
+            XCTAssertEqual(state.panel, .compDetail)
+
+            state.goBack()
+            XCTAssertEqual(state.panel, origin, "Back from a detail entered via \(origin.title)")
+        }
+    }
+
+    // MARK: - Openers hands over by drilling in (#85)
+
+    /// Openers reports comps as `OpenerIndex.CompSummary`, which carries an id
+    /// and no units, so the app resolves it against the corpus.
+    func testSelectingAnOpenersCompByIDDrillsIntoIt() throws {
+        let state = state()
+        let comp = try XCTUnwrap(state.comps.dropFirst().first ?? state.comps.first)
+
+        state.show(.openers)
+        state.select(compID: comp.id)
+
+        XCTAssertEqual(state.panel, .compDetail)
+        XCTAssertEqual(state.selectedComp?.id, comp.id)
+    }
+
+    /// Drilling in is deliberately *not* committing: Openers is a pre-commit
+    /// surface, and a capsule tap there must not silently pin a build the
+    /// player has not looked at yet.
+    func testSelectingAnOpenersCompDoesNotCommitToIt() throws {
+        let state = state()
+        let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+
+        state.show(.openers)
+        state.select(compID: comp.id)
+
+        XCTAssertFalse(state.pinnedComps.isPinned(comp.id), "Reading a comp is not choosing it")
+        XCTAssertNil(state.committedBuild)
+        XCTAssertEqual(state.mode, .browse)
+    }
+
+    /// A summary naming a comp this corpus does not carry must not navigate to
+    /// an empty detail panel.
+    func testSelectingAnUnknownCompIDDoesNothing() {
+        let state = state()
+        state.show(.openers)
+
+        state.select(compID: "a-comp-that-does-not-exist")
+
+        XCTAssertEqual(state.panel, .openers)
     }
 
     // MARK: - Tab taps
