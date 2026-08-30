@@ -158,6 +158,59 @@ final class PanelSnapshotTests: XCTestCase {
         }
     }
 
+    /// The measured numbers from #82: the tab bar, search field, TIER row and
+    /// STYLE row took ~230 of the expanded panel's 640 points before a single
+    /// comp row was visible. Collapsing the two chip rows is where most of
+    /// that comes back, so the gap between the two states is the thing worth
+    /// pinning down — if the collapsed head ever creeps back up, the panel is
+    /// quietly back to fitting three and a half rows.
+    func testCollapsingTheFiltersReclaimsAtLeastFiftyPoints() throws {
+        let collapsed = try chromeHeight(showsFilters: false)
+        let expandedChrome = try chromeHeight(showsFilters: true)
+
+        XCTAssertGreaterThanOrEqual(
+            expandedChrome - collapsed,
+            50,
+            "Collapsed chrome is \(collapsed)pt vs \(expandedChrome)pt open — barely worth collapsing"
+        )
+        XCTAssertLessThanOrEqual(
+            collapsed,
+            56,
+            "The collapsed comps list head is \(collapsed)pt; search plus its disclosure should be one row"
+        )
+    }
+
+    private func chromeHeight(showsFilters: Bool) throws -> CGFloat {
+        let chrome = CompsListChrome(
+            searchText: .constant(""),
+            tierFilter: .constant(nil),
+            playstyleFilter: .constant(nil),
+            showsFilters: .constant(showsFilters)
+        )
+        return try ViewSnapshot.measuredSize(of: chrome, proposedWidth: expanded.width).height
+    }
+
+    /// Both states have to survive the narrow panel too, and neither may draw
+    /// past the right margin.
+    func testCompsListChromeRendersWithinBothPanelSizesInBothFilterStates() throws {
+        for size in [expanded, compact] {
+            for showsFilters in [false, true] {
+                let chrome = CompsListChrome(
+                    searchText: .constant(""),
+                    tierFilter: .constant(nil),
+                    playstyleFilter: .constant(nil),
+                    showsFilters: .constant(showsFilters)
+                )
+                let height = try ViewSnapshot.measuredSize(of: chrome, proposedWidth: size.width).height
+                try assertRendersWithin(
+                    chrome,
+                    size: CGSize(width: size.width, height: height),
+                    rightMargin: 4
+                )
+            }
+        }
+    }
+
     func testReferencePanelChromeRendersWithinBothPanelSizes() throws {
         let comps = try CompLoader.bundledFixtures()
         for size in [expanded, compact] {

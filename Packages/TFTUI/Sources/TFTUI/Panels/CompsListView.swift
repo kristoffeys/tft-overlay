@@ -11,6 +11,8 @@ public struct CompsListView: View {
     @State private var searchText = ""
     @State private var tierFilter: Comp.Tier?
     @State private var playstyleFilter: Comp.Playstyle?
+    /// Collapsed by default — see `CompsListChrome`.
+    @State private var showsFilters = false
 
     /// - Parameter onTogglePin: when non-nil, the pin button reports the tap
     ///   here instead of mutating the store itself. A host that treats
@@ -62,8 +64,12 @@ public struct CompsListView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            searchField
-            filterBar
+            CompsListChrome(
+                searchText: $searchText,
+                tierFilter: $tierFilter,
+                playstyleFilter: $playstyleFilter,
+                showsFilters: $showsFilters
+            )
             ScrollView {
                 LazyVStack(alignment: .leading, spacing: 8) {
                     // The committed build leads the list under its own
@@ -111,84 +117,12 @@ public struct CompsListView: View {
             .padding(.top, 2)
     }
 
-    private var searchField: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(TFTTheme.textTertiary)
-            TextField("Search unit, trait, or comp", text: $searchText)
-                .textFieldStyle(.plain)
-                .foregroundStyle(TFTTheme.textPrimary)
-        }
-        .font(.system(size: 13, weight: .medium))
-        .padding(9)
-        .background(
-            TFTTheme.panelBackground,
-            in: RoundedRectangle(cornerRadius: TFTTheme.smallCornerRadius, style: .continuous)
-        )
-        .padding(.horizontal, 12)
-        .padding(.top, 4)
-    }
-
-    private var filterBar: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            filterRow(title: "Tier") {
-                FilterChip(label: "All", isSelected: tierFilter == nil) { tierFilter = nil }
-                ForEach(Comp.Tier.allCases, id: \.self) { tier in
-                    FilterChip(label: tier.rawValue, isSelected: tierFilter == tier, color: TFTTheme.tierColor(tier)) {
-                        tierFilter = (tierFilter == tier) ? nil : tier
-                    }
-                }
-            }
-            filterRow(title: "Style") {
-                FilterChip(label: "All", isSelected: playstyleFilter == nil) { playstyleFilter = nil }
-                ForEach(Comp.Playstyle.allCases, id: \.self) { style in
-                    FilterChip(label: style.displayName, isSelected: playstyleFilter == style) {
-                        playstyleFilter = (playstyleFilter == style) ? nil : style
-                    }
-                }
-            }
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-    }
-
     private func togglePin(_ comp: Comp) {
         if let onTogglePin {
             onTogglePin(comp)
         } else {
             pinnedStore?.toggle(comp.id)
         }
-    }
-
-    private func filterRow(title: String, @ViewBuilder content: () -> some View) -> some View {
-        HStack(spacing: 6) {
-            Text(title.uppercased())
-                .font(.system(size: 10, weight: .heavy, design: .rounded))
-                .foregroundStyle(TFTTheme.textSecondary)
-                .frame(width: 34, alignment: .leading)
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) { content() }
-            }
-        }
-    }
-}
-
-private struct FilterChip: View {
-    let label: String
-    let isSelected: Bool
-    var color: Color = TFTTheme.accent
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(label)
-                .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundStyle(isSelected ? .black.opacity(0.85) : TFTTheme.textPrimary)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(isSelected ? color : TFTTheme.elevatedBackground, in: Capsule())
-        }
-        .buttonStyle(.plain)
     }
 }
 
