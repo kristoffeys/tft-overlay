@@ -56,7 +56,8 @@ public enum SetDataParser {
             Trait(
                 id: raw.apiName,
                 name: raw.name,
-                levels: raw.effects.map { Trait.Level(minUnits: $0.minUnits, maxUnits: $0.maxUnits, style: $0.style) }
+                levels: raw.effects.map { Trait.Level(minUnits: $0.minUnits, maxUnits: $0.maxUnits, style: $0.style) },
+                imageURL: CDragonAssetURL.imageURL(forGamePath: raw.icon)
             )
         }
     }
@@ -81,7 +82,8 @@ public enum SetDataParser {
                 id: raw.apiName,
                 name: raw.name,
                 cost: raw.cost,
-                traitIDs: raw.traitNames.compactMap { traitIDByName[$0] }
+                traitIDs: raw.traitNames.compactMap { traitIDByName[$0] },
+                imageURL: CDragonAssetURL.imageURL(forGamePath: raw.tileIcon)
             )
         }
         return (parsed, realChampions)
@@ -102,18 +104,38 @@ public enum SetDataParser {
         return items.filter { $0.apiName.hasPrefix(itemPrefix + "_") }
     }
 
-    /// Real equippable items (base components, completed items, artifacts,
-    /// radiants, trait emblems) all have an icon under an `.../items/...`
-    /// path in this feed. Per-set "mechanic" entries (encounter rewards,
-    /// hero-augment upgrades, portal effects) that also show up in this
-    /// flat array with `isAugment == false` use a different icon path
-    /// (verified against the live payload: this filter yields exactly the
-    /// 9 base components + 55 completed items + artifacts/radiants/emblems
-    /// for Set 18, none of the ~380 non-equippable "mechanic" entries).
+    /// Real equippable items are identified by their icon path. Most of
+    /// them (base components, completed items, artifacts, radiants) sit
+    /// under `.../icons/items/...`; trait emblems and the legacy Ornn
+    /// artifacts instead sit under `.../item_icons/...` (emblems under
+    /// `item_icons/traits/spatula/...`), so both paths count. Per-set
+    /// "mechanic" entries (encounter rewards, hero-augment upgrades,
+    /// portal effects) also show up in this flat array with
+    /// `isAugment == false`, but under `.../wands/...` and other unrelated
+    /// paths, so they're excluded.
+    ///
+    /// Verified against the live Set 18 payload
+    /// (`16.17.8104348+branch.releases-16-17.content.release`): 145 items —
+    /// 10 base components, 36 two-component completed items over the 8
+    /// standard components, 3 Tactician's/spatula combines, 21 trait
+    /// emblems, plus artifacts, radiants and consumables — and none of the
+    /// ~360 non-equippable "mechanic" entries.
     private static func parseItems(_ setItems: [RawItem]) -> [Item] {
         setItems
-            .filter { !$0.isAugment && ($0.icon?.lowercased().contains("/items/") ?? false) }
-            .map { Item(id: $0.apiName, name: $0.name, componentIDs: $0.composition) }
+            .filter { !$0.isAugment && isEquipmentIconPath($0.icon) }
+            .map {
+                Item(
+                    id: $0.apiName,
+                    name: $0.name,
+                    componentIDs: $0.composition,
+                    imageURL: CDragonAssetURL.imageURL(forGamePath: $0.icon)
+                )
+            }
+    }
+
+    private static func isEquipmentIconPath(_ icon: String?) -> Bool {
+        guard let icon = icon?.lowercased() else { return false }
+        return icon.contains("/items/") || icon.contains("/item_icons/")
     }
 
     private static func parseAugments(_ setItems: [RawItem]) -> [Augment] {
@@ -124,7 +146,8 @@ public enum SetDataParser {
                     id: raw.apiName,
                     name: raw.name,
                     tier: augmentTier(forName: raw.name),
-                    text: sanitizeAugmentText(raw.desc ?? "")
+                    text: sanitizeAugmentText(raw.desc ?? ""),
+                    imageURL: CDragonAssetURL.imageURL(forGamePath: raw.icon)
                 )
             }
     }

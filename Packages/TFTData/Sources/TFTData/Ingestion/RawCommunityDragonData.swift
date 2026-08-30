@@ -53,9 +53,26 @@ struct RawChampion: Decodable {
     /// this document. `SetDataParser` resolves these against the set's
     /// trait list to get IDs.
     let traitNames: [String]
+    /// The champion's *square portrait* texture path — the 128x128 tile the
+    /// game shows in the shop and on the board.
+    ///
+    /// It is `tileIcon`, despite this entry also carrying `icon` and
+    /// `squareIcon` whose names suggest otherwise. Verified against the
+    /// live Set 18 payload across all 74 playable champions:
+    /// - `tileIcon` is `..._square.tex` for 73/74 (the lone exception,
+    ///   Crimson Raptor, points at a wide teamplanner splash).
+    /// - `squareIcon` is a wide `..._splash_tile`/`teamplannersplash`
+    ///   image for all 74 — never a square portrait.
+    /// - `icon` is a full centered splash for 64/74 and absent for 10.
+    ///
+    /// So `tileIcon` is the only field that is the square portrait in the
+    /// general case. The UI center-crops to a square frame regardless,
+    /// which is what keeps the one wide outlier from shipping as squished
+    /// splash art.
+    let tileIcon: String?
 
     private enum CodingKeys: String, CodingKey {
-        case apiName, name, cost, traits
+        case apiName, name, cost, traits, tileIcon
     }
 
     init(from decoder: Decoder) throws {
@@ -64,6 +81,7 @@ struct RawChampion: Decodable {
         name = try container.decode(String.self, forKey: .name)
         cost = (try? container.decode(Int.self, forKey: .cost)) ?? 0
         traitNames = (try? container.decode([String].self, forKey: .traits)) ?? []
+        tileIcon = try? container.decode(String.self, forKey: .tileIcon)
     }
 }
 
@@ -71,9 +89,12 @@ struct RawTrait: Decodable {
     let apiName: String
     let name: String
     let effects: [RawTraitEffect]
+    /// Trait glyph texture path, e.g.
+    /// `assets/ux/traiticons/trait_icon_18_elderwood.tex`.
+    let icon: String?
 
     private enum CodingKeys: String, CodingKey {
-        case apiName, name, effects
+        case apiName, name, effects, icon
     }
 
     init(from decoder: Decoder) throws {
@@ -81,6 +102,7 @@ struct RawTrait: Decodable {
         apiName = try container.decode(String.self, forKey: .apiName)
         name = try container.decode(String.self, forKey: .name)
         effects = (try? container.decode(LenientArray<RawTraitEffect>.self, forKey: .effects))?.elements ?? []
+        icon = try? container.decode(String.self, forKey: .icon)
     }
 }
 
@@ -111,7 +133,8 @@ struct RawItem: Decodable {
     /// directory in this feed; augments, trait-emblem mechanics and unrelated
     /// per-set "mechanic" entries (encounter rewards, portal effects) don't.
     /// See `SetDataParser` for how this is used to filter the flat `items`
-    /// array down to real equipment.
+    /// array down to real equipment. It doubles as the art reference —
+    /// `CDragonAssetURL` turns it into a fetchable PNG URL.
     let icon: String?
 
     private enum CodingKeys: String, CodingKey {
