@@ -186,6 +186,55 @@ final class OverlayPanelNavigationTests: XCTestCase {
         }
     }
 
+    // MARK: - Back from a drill-down (#91)
+
+    /// The Browse comps list drilling into a comp and backing out lands back
+    /// on the list — the path this already worked for.
+    func testBackFromDetailEnteredViaCompsListReturnsToCompsList() throws {
+        let state = state()
+        let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+
+        state.select(comp)
+        XCTAssertEqual(state.panel, .compDetail)
+
+        state.goBack()
+        XCTAssertEqual(state.panel, .compsList)
+        XCTAssertEqual(state.mode, .browse)
+    }
+
+    /// Drilling into a comp from Reference while Browsing backs out to
+    /// Reference, not the list.
+    func testBackFromDetailEnteredViaReferenceInBrowseReturnsToReference() throws {
+        let state = state()
+        let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+
+        state.show(.reference)
+        state.select(comp)
+        XCTAssertEqual(state.panel, .compDetail)
+
+        state.goBack()
+        XCTAssertEqual(state.panel, .reference)
+        XCTAssertEqual(state.mode, .browse)
+    }
+
+    /// The reported bug: Reference → champion → comp → Back used to land on
+    /// the committed build instead of back on Reference. Back must return
+    /// where the drill-down was entered from and must not cross out of Focus.
+    func testBackFromDetailEnteredViaReferenceInFocusReturnsToReferenceNotTheBuild() throws {
+        let state = state()
+        _ = try focused(state)
+        XCTAssertEqual(state.panel, .focusBuild)
+
+        state.show(.reference)
+        let anotherComp = try XCTUnwrap(state.comps.dropFirst().first ?? state.comps.first)
+        state.select(anotherComp)
+        XCTAssertEqual(state.panel, .compDetail)
+
+        state.goBack()
+        XCTAssertEqual(state.panel, .reference, "Back should return to Reference, not the committed build")
+        XCTAssertEqual(state.mode, .focus, "Back must not drop the player out of Focus")
+    }
+
     // MARK: - Tab taps
 
     /// What a tab tap does.
