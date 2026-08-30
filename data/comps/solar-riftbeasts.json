@@ -167,6 +167,13 @@
       "notes": "At level 9 you can add: Nidalee, Ivern."
     }
   ],
+  "earlyUnits": [
+    "Cinderling",
+    "Gromp",
+    "Murkwolf",
+    "Scuttlecrab",
+    "Krug"
+  ],
   "earlyOpener": "Prioritize Cinderling, Gromp, Murkwolf, Scuttlecrab, Krug early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Shen → Varus."
 }

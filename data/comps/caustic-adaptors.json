@@ -169,6 +169,13 @@
       "notes": "At level 9 you can add: Gromp."
     }
   ],
+  "earlyUnits": [
+    "Yorick",
+    "Karma",
+    "Gromp",
+    "Master Yi",
+    "Vi"
+  ],
   "earlyOpener": "Prioritize Yorick, Karma, Gromp, Master Yi, Vi early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Sentinel → Gromp."
 }

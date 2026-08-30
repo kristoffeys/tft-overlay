@@ -169,6 +169,13 @@
       "notes": "At level 9 you can add: Ivern, Taric."
     }
   ],
+  "earlyUnits": [
+    "Kobuko",
+    "Veigar",
+    "Teemo",
+    "Rammus",
+    "Tristana"
+  ],
   "earlyOpener": "Prioritize Kobuko, Veigar, Teemo, Rammus, Tristana early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Ashe → Sivir; Sentinel, Ashe → Vi, Sivir."
 }

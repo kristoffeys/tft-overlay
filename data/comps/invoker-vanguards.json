@@ -175,6 +175,13 @@
       "notes": "At level 9 you can add: Teemo, Alune, Ivern."
     }
   ],
+  "earlyUnits": [
+    "Camille",
+    "Rakan",
+    "Caitlyn",
+    "Elise",
+    "Kog'Maw"
+  ],
   "earlyOpener": "Prioritize Camille, Rakan, Caitlyn, Elise, Kog'Maw early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Taric → Hecarim."
 }

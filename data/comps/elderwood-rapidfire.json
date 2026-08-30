@@ -169,6 +169,13 @@
       "notes": "At level 9 you can add: Diana, Ivern, Taric."
     }
   ],
+  "earlyUnits": [
+    "Ornn",
+    "Varus",
+    "Xayah",
+    "Alistar",
+    "Shen"
+  ],
   "earlyOpener": "Prioritize Ornn, Varus, Xayah, Alistar, Shen early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Alistar, Gnar → Hecarim."
 }
