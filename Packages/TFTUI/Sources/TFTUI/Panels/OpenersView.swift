@@ -15,9 +15,10 @@ import SwiftUI
 /// 3. **Keeps doors open** — the same pool ranked by how many comps it opens
 ///    at all, any tier. Deliberately a *different* ranking, so the two
 ///    sections are drawn in two different visual forms: the first is a list
-///    with a strength bar, the second a grid of tiles carrying a comp count.
-///    Two identically-shaped lists side by side read as one list rendered
-///    twice, and the whole point of showing both is that they disagree.
+///    with a strength bar, the second a grid of tiles carrying a comp count
+///    and a tier spread. Two identically-shaped lists side by side read as
+///    one list rendered twice, and the whole point of showing both is that
+///    they disagree.
 /// 4. **Components** — what to slam versus what to hold.
 ///
 /// The rankings come from `OpenerIndex`, which reads each comp's
@@ -148,7 +149,8 @@ public struct OpenersView: View {
     private var doorsOpenSection: some View {
         section(
             title: "Keeps doors open",
-            subtitle: "Opens the most comps, any tier — a different ranking on purpose"
+            subtitle: "Opens the most comps, any tier — a different ranking on purpose. "
+                + "Letters are the tiers it opens."
         ) {
             if flexibleUnits.isEmpty {
                 emptyNote("No comp in this list names an opening board of cheap units.")
