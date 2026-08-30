@@ -60,6 +60,26 @@ final class OwnedChampionsStoreTests: XCTestCase {
         XCTAssertTrue(second.ownedKeys.isEmpty, "clear must persist, not just clear in-memory state")
     }
 
+    /// Regression: `clear()` used to return early when its own in-memory set
+    /// was already empty, which is not the same thing as the defaults being
+    /// empty. Two stores can share one defaults suite — a re-created
+    /// `@StateObject`, or a preview running beside the app, since `init`
+    /// defaults to `.standard` — and the one that was constructed before the
+    /// other's write holds an empty snapshot. Clearing from that store has to
+    /// wipe the persisted roster anyway; a stale roster is worse than none.
+    func testClearWipesPersistedStateEvenWhenThisInstanceLooksEmpty() {
+        let writer = OwnedChampionsStore(defaults: defaults)
+        let observer = OwnedChampionsStore(defaults: defaults)
+
+        writer.add("Ashe")
+        XCTAssertTrue(observer.ownedKeys.isEmpty, "the second store snapshotted before the write")
+
+        observer.clear()
+
+        let fresh = OwnedChampionsStore(defaults: defaults)
+        XCTAssertTrue(fresh.ownedKeys.isEmpty, "clear must persist unconditionally, not only when it sees state")
+    }
+
     /// The store is a dumb key/value set: it never validates against a
     /// champion catalog, so a name that matches no known champion is just
     /// as storable as a real one, and querying an unrelated name never
