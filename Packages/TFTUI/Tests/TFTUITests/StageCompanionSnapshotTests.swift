@@ -58,6 +58,18 @@ final class StageCompanionSnapshotTests: XCTestCase {
             ).height
         }
         XCTAssertEqual(Set(heights).count, heights.count, "bands measured \(heights) — at least two are identical")
+
+        // Distinct heights alone would also be satisfied by three bands that
+        // each draw nothing but a differently-padded box, so each one has to
+        // put ink on the screen too.
+        for (band, height) in zip(StageBand.allCases, heights) {
+            try assertRendersWithin(
+                companion(comp, band: band).glance,
+                size: CGSize(width: expanded.width - 24, height: height),
+                rightMargin: 0,
+                minimumInk: 0.01
+            )
+        }
     }
 
     // MARK: - Nothing overflows
@@ -128,20 +140,80 @@ final class StageCompanionSnapshotTests: XCTestCase {
     // MARK: - The player who never advances the stage
 
     /// The failure that matters: someone ignores the control for a whole game.
-    /// The default band must still be a complete view of the plan, so the full
-    /// panel has to be taller than its own glance — that difference *is* the
-    /// other two bands still being on screen below the fold.
+    /// The default band must still be a complete view of the plan, with the
+    /// other bands scannable below the current one.
+    ///
+    /// Asserted structurally first, because the height delta this used to
+    /// assert on could not carry the claim: the page padding and the
+    /// "Full build detail" button contribute 71pt of chrome by themselves, so
+    /// `whole > glance + 60` passed with *every other band deleted from the
+    /// view* — verified by mutation. The height claim is still here, but its
+    /// threshold is now the measured height of the bands that are supposed to
+    /// be down there.
     func testTheDefaultBandStillShowsTheWholePlanBelowTheFold() throws {
-        let comp = try XCTUnwrap(CompLoader.bundledFixtures().first { $0.id == "blossom-spellweavers" })
-        let view = companion(comp, band: .initial)
-        let glance = try ViewSnapshot.measuredSize(of: view.glance, proposedWidth: expanded.width - 24).height
-        let whole = try ViewSnapshot.measuredSize(of: view.content, proposedWidth: expanded.width).height
+        for comp in try CompLoader.bundledFixtures() {
+            let view = companion(comp, band: .initial)
 
-        XCTAssertGreaterThan(whole, glance + 60, "the other bands are not being drawn below the current one")
-        try assertRendersWithin(
-            view.content,
-            size: CGSize(width: expanded.width, height: whole),
-            rightMargin: 6
-        )
+            // Expectation taken from the plan, not from the view, so that the
+            // height threshold below stays honest even if the view stops
+            // offering the sections at all.
+            let plan = BuildStagePlan(comp: comp)
+            let expected = plan.sections.filter { $0.band != .initial }
+            XCTAssertEqual(expected.count, plan.sections.count - 1)
+            XCTAssertEqual(
+                view.otherBandSections.map(\.band),
+                expected.map(\.band),
+                "\(comp.id): every band other than the current one has to be rendered"
+            )
+
+            let glance = try ViewSnapshot.measuredSize(of: view.glance, proposedWidth: expanded.width - 24).height
+            let whole = try ViewSnapshot.measuredSize(of: view.content, proposedWidth: expanded.width).height
+            // What the summaries for those bands actually need, measured at the
+            // width they get inside the panel's 12pt padding. `content` stacks
+            // them under the glance with spacing, so the whole panel cannot be
+            // shorter than the two added together.
+            let othersHeight = try expected.reduce(CGFloat.zero) { total, section in
+                try total + ViewSnapshot.measuredSize(
+                    of: StageBandSummary(section: section) {},
+                    proposedWidth: expanded.width - 24
+                ).height
+            }
+            XCTAssertGreaterThan(othersHeight, 0)
+            XCTAssertGreaterThanOrEqual(
+                whole,
+                glance + othersHeight,
+                """
+                \(comp.id): the panel is \(whole)pt, the glance \(glance)pt and the other bands \
+                \(othersHeight)pt — they are not being drawn below the current one
+                """
+            )
+
+            try assertRendersWithin(
+                view.content,
+                size: CGSize(width: expanded.width, height: whole),
+                rightMargin: 6
+            )
+        }
+    }
+
+    /// A summary row for a band the player is not in has to be a row with
+    /// something in it, not a labelled empty box: two thirds of the corpus
+    /// carries no row of its own for Early or Late, and the inherited level
+    /// target is the whole reason those bands are still worth reading.
+    func testEveryOtherBandSummaryDrawsSomething() throws {
+        for comp in try CompLoader.bundledFixtures() {
+            for section in companion(comp, band: .initial).otherBandSections {
+                let summary = StageBandSummary(section: section) {}
+                let height = try ViewSnapshot.measuredSize(
+                    of: summary,
+                    proposedWidth: expanded.width - 24
+                ).height
+                try assertRendersWithin(
+                    summary,
+                    size: CGSize(width: expanded.width - 24, height: height),
+                    rightMargin: 4
+                )
+            }
+        }
     }
 }

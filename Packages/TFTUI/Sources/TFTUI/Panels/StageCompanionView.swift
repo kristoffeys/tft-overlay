@@ -163,13 +163,26 @@ public struct StageCompanionView: View {
         }
     }
 
+    /// Every band the player is not currently in — all of them, always.
+    ///
+    /// This is the property the whole feature rests on: the stage is set by
+    /// hand, so the realistic worst case is a player who never touches the
+    /// control, and for that player these rows are the entire rest of the plan.
+    /// Exposed rather than inlined into `otherBands` so
+    /// `StageCompanionSnapshotTests` can assert on *which* bands get rendered
+    /// instead of only on how tall the result is — a height delta alone cannot
+    /// tell "the other bands are below the fold" from "nothing is".
+    var otherBandSections: [BuildStagePlan.Section] {
+        plan.sections.filter { $0.band != band }
+    }
+
     /// Kept in chronological order rather than "everything after the current
     /// one": a player checking what is coming reads down, and reordering the
     /// list under them every time the stage advances is exactly the kind of
     /// motion a glance layer must not have.
     private var otherBands: some View {
         VStack(alignment: .leading, spacing: 6) {
-            ForEach(plan.sections.filter { $0.band != band }) { section in
+            ForEach(otherBandSections) { section in
                 StageBandSummary(section: section) { onSelectBand(section.band) }
             }
         }
