@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "id": "rivals-khazix",
-  "name": "Rivals Khazix",
+  "name": "Rivals Kha'Zix",
   "set": 18,
   "patch": "18.1",
   "source": "scraped-feed",
@@ -160,7 +160,7 @@
     {
       "stage": "3-2",
       "level": 6,
-      "notes": "Prioritize: Akali, Gromp, Murkwolf, Scuttlecrab, Khazix"
+      "notes": "Prioritize: Akali, Gromp, Murkwolf, Scuttlecrab, Kha'Zix"
     },
     {
       "stage": "5-2",
@@ -168,6 +168,6 @@
       "notes": "At level 9 you can add: Zyra, Alune, Ivern."
     }
   ],
-  "earlyOpener": "Prioritize Akali, Gromp, Murkwolf, Scuttlecrab, Khazix early; these carry the comp online before its full identity is committed.",
+  "earlyOpener": "Prioritize Akali, Gromp, Murkwolf, Scuttlecrab, Kha'Zix early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Taric → Rakan, Elise."
 }
