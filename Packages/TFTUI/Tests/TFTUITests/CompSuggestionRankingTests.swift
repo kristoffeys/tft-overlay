@@ -90,9 +90,15 @@ final class CompSuggestionRankingTests: XCTestCase {
     /// far more than B does despite an identical count, so the weighted
     /// ranking must put A above B while a count-only ranking would tie them
     /// (or, depending on tie-break, could easily rank them the wrong way).
+    ///
+    /// The ids are deliberately reversed against the expected order: a
+    /// count-only implementation ties these two, falls through to the
+    /// `comp.id` tie-break, and returns `["alpha-comp", "zeta-comp"]` — the
+    /// wrong answer. So the order assertion below fails on a count-only
+    /// implementation instead of passing by luck.
     func testCarryWeightedOrderingDisagreesWithNaiveCountAndOursIsRight() throws {
         let compA = try makeComp(
-            id: "comp-a",
+            id: "zeta-comp",
             tier: .b,
             units: [
                 unit("Ashe", cost: 5, role: .carry),
@@ -102,7 +108,7 @@ final class CompSuggestionRankingTests: XCTestCase {
             carries: [CompCarry(unit: "Ashe", itemPriority: [])]
         )
         let compB = try makeComp(
-            id: "comp-b",
+            id: "alpha-comp",
             tier: .b,
             units: [
                 unit("Kindred", cost: 5, role: .carry),
@@ -122,7 +128,7 @@ final class CompSuggestionRankingTests: XCTestCase {
         XCTAssertEqual(naiveCount(compA), naiveCount(compB), "the naive metric must see these as tied")
 
         let ranked = CompSuggestionRanking.rank(owned: owned, comps: [compA, compB])
-        XCTAssertEqual(ranked.map(\.comp.id), ["comp-a", "comp-b"], "the carry-weighted score must prefer A")
+        XCTAssertEqual(ranked.map(\.comp.id), ["zeta-comp", "alpha-comp"], "the carry-weighted score must prefer A")
         XCTAssertGreaterThan(ranked[0].overlapScore, ranked[1].overlapScore)
     }
 
