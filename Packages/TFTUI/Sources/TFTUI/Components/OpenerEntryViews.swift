@@ -6,11 +6,35 @@ import SwiftUI
 // thousand-line view file nobody can navigate; they are internal rather
 // than private for that reason alone and have no other caller.
 
-/// A meta pickup: portrait, name, a bar for its S/A weight, and the comps it
-/// leads into.
+/// A cost label that says the number out loud.
+///
+/// The openers panel had no cost anywhere on it, which is how it came to
+/// surface six cost-3 units without anyone noticing (#99). The portrait's
+/// cost-coloured border is a cue for players who already know the colours;
+/// this is the same fact in a form that needs no prior knowledge, because
+/// "can I actually buy this at level 4" is the whole question the panel
+/// answers.
+struct UnitCostBadge: View {
+    let cost: Int
+
+    var body: some View {
+        Text("\(cost)-cost")
+            .font(.system(size: 9, weight: .heavy, design: .rounded))
+            .foregroundStyle(.black.opacity(0.85))
+            .padding(.horizontal, 5)
+            .padding(.vertical, 2)
+            .background(TFTTheme.costColor(cost), in: Capsule())
+            .lineLimit(1)
+            .fixedSize()
+            .accessibilityLabel("Cost \(cost)")
+    }
+}
+
+/// A meta pickup: portrait, name, its cost, a bar for its opener score, and
+/// the comps it leads into.
 struct MetaPickupRow: View {
     let unit: OpenerIndex.UnitPresence
-    let maximumPresence: Int
+    let maximumScore: Int
     let leadsTo: [OpenerIndex.CompSummary]
     let onSelectComp: (OpenerIndex.CompSummary) -> Void
 
@@ -24,8 +48,9 @@ struct MetaPickupRow: View {
                         .foregroundStyle(TFTTheme.textPrimary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
+                    UnitCostBadge(cost: unit.cost)
                     Spacer(minLength: 6)
-                    presenceBar
+                    scoreBar
                 }
                 CompLeadRow(leadsTo: leadsTo, onSelectComp: onSelectComp)
             }
@@ -37,10 +62,14 @@ struct MetaPickupRow: View {
         )
     }
 
-    /// A bar, not a percentage. The number it draws is a count of weighted
-    /// appearances in an authored list; rendering it as "62%" would invent a
-    /// precision the corpus does not have.
-    private var presenceBar: some View {
+    /// A bar and a roster count — never the score itself.
+    ///
+    /// `openerScore` is a weighted rank basis in arbitrary units (see
+    /// `OpenerIndex.UnitPresence`); printing "7560" beside a champion would
+    /// read as a measurement, and there is no measurement here. The bar
+    /// carries the ranking, and the number beside it is the one honest
+    /// integer in the neighbourhood: how many S/A comps open on this unit.
+    private var scoreBar: some View {
         HStack(spacing: 6) {
             GeometryReader { proxy in
                 ZStack(alignment: .leading) {
@@ -50,21 +79,24 @@ struct MetaPickupRow: View {
                         .frame(width: proxy.size.width * fraction)
                 }
             }
-            .frame(width: 56, height: 6)
-            Text("\(unit.weightedPresence)")
+            .frame(width: 44, height: 6)
+            Text("\(unit.topTierRosterCount)")
                 .font(.system(size: 11, weight: .heavy, design: .rounded))
                 .foregroundStyle(TFTTheme.accent)
                 .frame(minWidth: 14, alignment: .trailing)
         }
+        .help("\(unit.name) — cost \(unit.cost), opens \(unit.topTierRosterCount) S/A comps "
+            + "of \(unit.sharedCompCount) in this list")
     }
 
     private var fraction: CGFloat {
-        guard maximumPresence > 0 else { return 0 }
-        return CGFloat(unit.weightedPresence) / CGFloat(maximumPresence)
+        guard maximumScore > 0 else { return 0 }
+        return CGFloat(unit.openerScore) / CGFloat(maximumScore)
     }
 }
 
-/// A flexible unit: portrait with its comp count badged onto it, name below.
+/// A flexible unit: portrait carrying its cost and its comp count, name
+/// below.
 ///
 /// A tile rather than a row so this ranking cannot be mistaken for the one
 /// above it at a glance.
@@ -78,6 +110,15 @@ struct FlexibleUnitTile: View {
     var body: some View {
         VStack(spacing: 3) {
             UnitPortraitPlaceholder(name: unit.name, cost: unit.cost, size: 40)
+                .overlay(alignment: .topLeading) {
+                    Text("\(unit.cost)")
+                        .font(.system(size: 9, weight: .heavy, design: .rounded))
+                        .foregroundStyle(.black.opacity(0.85))
+                        .padding(.horizontal, 3)
+                        .background(TFTTheme.costColor(unit.cost), in: Capsule())
+                        .padding(1)
+                        .accessibilityLabel("Cost \(unit.cost)")
+                }
                 .overlay(alignment: .bottomTrailing) {
                     Text("\(unit.sharedCompCount)")
                         .font(.system(size: 10, weight: .heavy, design: .rounded))
@@ -97,7 +138,7 @@ struct FlexibleUnitTile: View {
             tierDots
         }
         .frame(width: Self.width)
-        .help(leadsTo.map(\.name).joined(separator: " · "))
+        .help("\(unit.name) — cost \(unit.cost), opens: \(leadsTo.map(\.name).joined(separator: ", "))")
     }
 
     private var tierDots: some View {
