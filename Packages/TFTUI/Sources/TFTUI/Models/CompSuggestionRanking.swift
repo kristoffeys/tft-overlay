@@ -67,7 +67,7 @@ public enum CompSuggestionRanking {
     /// always produce the same order, so a suggestions list never
     /// reshuffles between renders for no visible reason.
     public static func rank(owned: Set<String>, comps: [Comp]) -> [CompSuggestion] {
-        let ownedKeys = Set(owned.map(ChampionNameKey.normalize))
+        let ownedKeys = Set(owned.map(TFTNameKey.normalize))
         let suggestions = comps.map { suggestion(for: $0, ownedKeys: ownedKeys) }
         return suggestions.sorted { lhs, rhs in
             let lhsScore = adjustedScore(lhs)
@@ -82,11 +82,11 @@ public enum CompSuggestionRanking {
     }
 
     private static func suggestion(for comp: Comp, ownedKeys: Set<String>) -> CompSuggestion {
-        let carryKeys = Set(comp.carries.map { ChampionNameKey.normalize($0.unit) })
+        let carryKeys = Set(comp.carries.map { TFTNameKey.normalize($0.unit) })
 
         func weight(_ unit: CompUnit) -> Double {
             let base = Double(unit.cost)
-            return carryKeys.contains(ChampionNameKey.normalize(unit.name)) ? base * carryMultiplier : base
+            return carryKeys.contains(TFTNameKey.normalize(unit.name)) ? base * carryMultiplier : base
         }
 
         // Most valuable first, with name as a deterministic tie-break for
@@ -103,7 +103,7 @@ public enum CompSuggestionRanking {
         var matched: [CompUnit] = []
         var missing: [CompUnit] = []
         for unit in byValue {
-            if ownedKeys.contains(ChampionNameKey.normalize(unit.name)) {
+            if ownedKeys.contains(TFTNameKey.normalize(unit.name)) {
                 matched.append(unit)
             } else {
                 missing.append(unit)

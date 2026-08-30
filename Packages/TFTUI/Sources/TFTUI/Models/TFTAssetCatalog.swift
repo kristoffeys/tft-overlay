@@ -47,18 +47,18 @@ public struct TFTAssetCatalog: Sendable, Equatable {
     }
 
     public func championImageURL(named name: String) -> URL? {
-        championURLsByName[Self.key(name)]
+        championURLsByName[TFTNameKey.normalize(name)]
     }
 
     public func itemImageURL(named name: String) -> URL? {
-        itemURLsByName[Self.key(name)]
+        itemURLsByName[TFTNameKey.normalize(name)]
     }
 
     /// Not consumed by any view yet — `TraitTag` is still text-only — but
     /// resolved here so wiring a trait glyph in later is a one-liner rather
     /// than another pass through the data layer.
     public func traitImageURL(named name: String) -> URL? {
-        traitURLsByName[Self.key(name)]
+        traitURLsByName[TFTNameKey.normalize(name)]
     }
 
     private static func index(_ pairs: [(String, URL?)]) -> [String: URL] {
@@ -68,28 +68,16 @@ public struct TFTAssetCatalog: Sendable, Equatable {
         }
     }
 
-    /// Lowercases the keys. First entry wins on a collision, matching
-    /// `CompUnitIndex`: Set 18 ships several same-named champion variants
-    /// (Lux's nine trait forms), and any of their portraits beats none.
+    /// Normalises the keys via `TFTNameKey`. First entry wins on a
+    /// collision, matching `CompUnitIndex`: Set 18 ships several
+    /// same-named champion variants (Lux's nine trait forms), and any of
+    /// their portraits beats none.
     private static func keyed(_ urls: [String: URL]) -> [String: URL] {
         urls.sorted { $0.key < $1.key }.reduce(into: [:]) { result, pair in
-            let key = Self.key(pair.key)
+            let key = TFTNameKey.normalize(pair.key)
             if result[key] == nil {
                 result[key] = pair.value
             }
         }
-    }
-
-    /// Punctuation and casing are stripped, not just casing.
-    ///
-    /// Community Dragon punctuates inconsistently against the conventional
-    /// English names comps and `StandardItems` are written with — it ships
-    /// "Warmogs Armor" and "Hand Of Justice" where those say "Warmog's
-    /// Armor" and "Hand of Justice". Matching on casing alone meant a
-    /// single apostrophe silently cost an item its art and left a "WA" text
-    /// tile in the middle of the cheat sheet. Verified collision-free across
-    /// the live set: no two champions, items or traits normalise together.
-    private static func key(_ name: String) -> String {
-        name.lowercased().filter { $0.isLetter || $0.isNumber }
     }
 }
