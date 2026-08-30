@@ -151,7 +151,14 @@ public final class OverlayPanelController<Content: View> {
     }
 
     public func show() {
-        panel.orderFrontRegardless()
+        if state.isInteractive {
+            // A `.nonactivatingPanel` can become key without activating this
+            // app; key status is what SwiftUI's `.onHover` needs to fire at
+            // all (#83), so hover only works while the panel is key.
+            panel.makeKeyAndOrderFront(nil)
+        } else {
+            panel.orderFrontRegardless()
+        }
         state.isVisible = true
     }
 
@@ -186,6 +193,11 @@ public final class OverlayPanelController<Content: View> {
         state.isInteractive = interactive
         panel.ignoresMouseEvents = !interactive
         if interactive {
+            // See the comment on `show()`: key status is what lets hover
+            // (#83) fire, without activating this app.
+            if panel.isVisible {
+                panel.makeKey()
+            }
             noteActivity()
             startIdleTimerIfNeeded()
         } else {

@@ -18,6 +18,12 @@ final class OverlayPanel: NSPanel {
         hasShadow = false
         level = .floating
         ignoresMouseEvents = true
+        // Without this, AppKit never generates `mouseMoved` events for the
+        // panel, so SwiftUI's tracking-area-backed `.onHover` never sees the
+        // cursor enter a view and every hover affordance — including the
+        // unit/item tooltip — is silently dead (#83). Only matters while
+        // `ignoresMouseEvents` is false, so it is safe to set unconditionally.
+        acceptsMouseMovedEvents = true
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary]
         hidesOnDeactivate = false
         isMovableByWindowBackground = false
