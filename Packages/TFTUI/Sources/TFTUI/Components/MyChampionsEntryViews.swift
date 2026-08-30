@@ -19,9 +19,11 @@ struct ChampionPickerTile: View {
     let isOwned: Bool
     let onToggle: () -> Void
 
-    /// Seven columns across the 460pt panel's content width, and exactly
-    /// five across the 300pt compact panel — below five the picker stops
-    /// reading as a grid and becomes a list you scroll to find a 5-cost in.
+    /// Seven columns across the 460pt expanded panel's content width, and
+    /// exactly five at the 300pt window minimum (`AppDelegate`'s `minSize`) —
+    /// below five the picker stops reading as a grid and becomes a list you
+    /// scroll to find a 5-cost in. 300pt is the narrowest the panel can be
+    /// dragged to, not the compact layout, which is 420pt wide.
     static let width: CGFloat = 50
     private static let portrait: CGFloat = 42
 

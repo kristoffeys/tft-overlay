@@ -150,12 +150,46 @@ final class OpenersViewSnapshotTests: XCTestCase {
         )
     }
 
+    /// The widths the two opener tiles are designed around, as literals.
+    ///
+    /// Deliberately *not* `FlexibleUnitTile.width` / `ComponentDemandTile.width`.
+    /// A test that compares a constant to itself cannot fail when the constant
+    /// changes, which is the only regression it was there to catch — the same
+    /// flaw that let `ChampionPickerTile.width = 520` through the whole suite.
+    private let expectedFlexibleTileWidth: CGFloat = 62
+    private let expectedComponentTileWidth: CGFloat = 66
+
+    /// The tile constants themselves, against the literals the grid column
+    /// counts below are derived from.
+    ///
+    /// Separate from the intrinsic-width render on purpose: that one guards a
+    /// *different* bug (a tile that grows with its label rather than clamping
+    /// to `.frame(width:)`), and conflating the two left both unguarded.
+    func testTheOpenerTileWidthsAreTheOnesTheGridsWereSizedFor() {
+        XCTAssertEqual(
+            FlexibleUnitTile.width,
+            expectedFlexibleTileWidth,
+            "FlexibleUnitTile.width is \(FlexibleUnitTile.width)pt, not the "
+                + "\(expectedFlexibleTileWidth)pt the grid's column count was derived from"
+        )
+        XCTAssertEqual(
+            ComponentDemandTile.width,
+            expectedComponentTileWidth,
+            "ComponentDemandTile.width is \(ComponentDemandTile.width)pt, not the "
+                + "\(expectedComponentTileWidth)pt the grid's column count was derived from"
+        )
+    }
+
     /// A tile that grows with its label staggers every column after it.
     ///
     /// Measured against an effectively unbounded proposal on purpose:
     /// `ImageRenderer` clamps a raster to the width it was proposed, so a
     /// too-wide tile rendered at 460pt comes back looking 460pt wide and the
     /// overflow is invisible. Offering 2000pt reads the *intrinsic* width.
+    ///
+    /// Asserts the literals, not the constants: this test is load-bearing for
+    /// "the `.frame(width:)` calls are still there", and it should fail for a
+    /// changed constant too rather than silently following it.
     func testOpenerTilesKeepTheirDeclaredWidthWhateverTheLabel() throws {
         for name in ["Vi", "Bartholomew Featherstonehaugh III"] {
             let unit = OpenerIndex.UnitPresence(
@@ -171,9 +205,9 @@ final class OpenersViewSnapshotTests: XCTestCase {
             let size = try ViewSnapshot.measuredSize(of: tile, proposedWidth: 2000)
             XCTAssertEqual(
                 size.width,
-                FlexibleUnitTile.width,
+                expectedFlexibleTileWidth,
                 accuracy: 1,
-                "The tile for \"\(name)\" measures \(size.width)pt, not \(FlexibleUnitTile.width)pt"
+                "The tile for \"\(name)\" measures \(size.width)pt, not \(expectedFlexibleTileWidth)pt"
             )
         }
 
@@ -184,24 +218,34 @@ final class OpenersViewSnapshotTests: XCTestCase {
             let size = try ViewSnapshot.measuredSize(of: tile, proposedWidth: 2000)
             XCTAssertEqual(
                 size.width,
-                ComponentDemandTile.width,
+                expectedComponentTileWidth,
                 accuracy: 1,
-                "The tile for \"\(component)\" measures \(size.width)pt, not \(ComponentDemandTile.width)pt"
+                "The tile for \"\(component)\" measures \(size.width)pt, "
+                    + "not \(expectedComponentTileWidth)pt"
             )
         }
     }
 
     /// Six tiles a row is what makes the two grids read as grids rather than
     /// as another list; at five they start looking like the section above.
-    func testBothOpenerGridsFitSixTilesAcrossTheExpandedPanel() {
+    ///
+    /// Exact counts, not `<=`: asserting only that six tiles *fit* passes for
+    /// any tile narrower than the design too, so shrinking a tile to 20pt —
+    /// fourteen to a row — used to pass this.
+    func testBothOpenerGridsLayOutSixTilesAcrossTheExpandedPanel() {
         let contentWidth = expanded.width - 12 * 2
         let spacing: CGFloat = 6
-        let columns = 6.0
         for tileWidth in [FlexibleUnitTile.width, ComponentDemandTile.width] {
-            XCTAssertLessThanOrEqual(
-                tileWidth * columns + spacing * (columns - 1),
-                contentWidth,
-                "A \(tileWidth)pt tile does not fit six to a row in the \(expanded.width)pt panel"
+            let columns = GridColumns.count(
+                tileWidth: tileWidth,
+                contentWidth: contentWidth,
+                spacing: spacing
+            )
+            XCTAssertEqual(
+                columns,
+                6,
+                "A \(tileWidth)pt tile lays out \(columns) columns in the \(expanded.width)pt panel, "
+                    + "not the six the opener grids are designed around"
             )
         }
     }

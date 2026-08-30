@@ -138,6 +138,32 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
         }
     }
 
+    /// The width the picker tile is designed around, as a literal.
+    ///
+    /// Deliberately *not* written as `ChampionPickerTile.width`. A test that
+    /// compares the constant to itself cannot fail when the constant changes,
+    /// which is the only regression it was there to catch: setting
+    /// `ChampionPickerTile.width = 520` used to leave the whole suite green.
+    /// The column counts below are derived from this literal, so changing the
+    /// tile width without meaning to fails here first.
+    private let expectedTileWidth: CGFloat = 50
+
+    /// The tile constant itself, checked against the literal the rest of this
+    /// file reasons about.
+    ///
+    /// This is the assertion that guards the constant. It is separate from the
+    /// intrinsic-width render below on purpose: that one guards a *different*
+    /// bug (a tile that grows with its label), and conflating the two left
+    /// both unguarded.
+    func testThePickerTileWidthIsTheOneTheGridWasSizedFor() {
+        XCTAssertEqual(
+            ChampionPickerTile.width,
+            expectedTileWidth,
+            "ChampionPickerTile.width is \(ChampionPickerTile.width)pt, not the \(expectedTileWidth)pt "
+                + "the picker grid's column counts were derived from"
+        )
+    }
+
     /// A champion name several times longer than its tile must not widen the
     /// tile, or every column after it staggers.
     ///
@@ -146,30 +172,48 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
     /// too-wide tile rendered at 460pt comes back looking 460pt wide and the
     /// overflow is invisible. Offering it 2000pt and reading its *intrinsic*
     /// width is the only way to see the cell actually grow.
+    ///
+    /// Asserts the literal, not `ChampionPickerTile.width`: this test is
+    /// load-bearing for "the `.frame(width:)` calls are still there", and it
+    /// should fail for a changed constant too rather than silently following
+    /// it.
     func testAChampionTileKeepsItsDeclaredWidthWhateverTheName() throws {
         for name in ["Vi", "Bartholomew Featherstonehaugh III", ""] {
             let tile = ChampionPickerTile(name: name, cost: 3, isOwned: true, onToggle: {})
             let size = try ViewSnapshot.measuredSize(of: tile, proposedWidth: 2000)
             XCTAssertEqual(
                 size.width,
-                ChampionPickerTile.width,
+                expectedTileWidth,
                 accuracy: 1,
-                "A tile for \"\(name)\" measures \(size.width)pt, not \(ChampionPickerTile.width)pt"
+                "A tile for \"\(name)\" measures \(size.width)pt, not \(expectedTileWidth)pt"
             )
         }
     }
 
-    /// The grid has to give the compact panel at least five columns, or the
-    /// picker becomes a list you scroll for a minute to find a 5-cost in.
-    func testThePickerGridFitsFiveColumnsInTheCompactPanel() {
-        let contentWidth = compact.width - 12 * 2
+    /// The grid has to give the narrow panel exactly five columns, and the
+    /// expanded panel exactly seven.
+    ///
+    /// Exact counts, not `<=`: asserting only that five tiles *fit* passes for
+    /// any tile narrower than the design as well, so shrinking the tile to
+    /// 20pt — fourteen to a row, a completely different layout — used to pass.
+    /// Below five the picker stops reading as a grid and becomes a list you
+    /// scroll to find a 5-cost in; far above it the portraits are too small to
+    /// recognise.
+    func testThePickerGridColumnCountsAreTheDesignedOnes() {
         let spacing: CGFloat = 6
-        let columns = 5.0
-        XCTAssertLessThanOrEqual(
-            ChampionPickerTile.width * columns + spacing * (columns - 1),
-            contentWidth,
-            "A \(ChampionPickerTile.width)pt tile does not fit five to a row in the \(compact.width)pt panel"
-        )
+        for (panelWidth, expected) in [(compact.width, 5), (expanded.width, 7)] {
+            let columns = GridColumns.count(
+                tileWidth: ChampionPickerTile.width,
+                contentWidth: panelWidth - 12 * 2,
+                spacing: spacing
+            )
+            XCTAssertEqual(
+                columns,
+                expected,
+                "A \(ChampionPickerTile.width)pt tile lays out \(columns) columns in the "
+                    + "\(panelWidth)pt panel, not the \(expected) the picker is designed around"
+            )
+        }
     }
 
     /// The same name, rendered through the whole panel: the grid still lays
@@ -215,8 +259,57 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
         }
         let view = try panel(store: owned)
         XCTAssertFalse(view.suggestions.isEmpty)
-        XCTAssertLessThanOrEqual(view.suggestions.count, MyChampionsView.suggestionLimit)
         try assertContentFits(view.suggestionsContent, width: expanded.width)
+    }
+
+    /// The number of suggestions the panel is allowed to draw, as a literal.
+    ///
+    /// Deliberately not `MyChampionsView.suggestionLimit`: the old assertion
+    /// compared the constant to itself, so setting `suggestionLimit = 999` ran
+    /// the whole suite green and the 28-row list the cap exists to prevent
+    /// could come back silently.
+    private let expectedSuggestionLimit = 12
+
+    /// A full roster matches far more comps than the panel shows, and the cap
+    /// is the only thing standing between the player and a list of every comp
+    /// in the corpus.
+    ///
+    /// Marks every champion the corpus knows, which makes *every* comp match,
+    /// then asserts the rendered count is exactly the literal cap. Guards the
+    /// premise too — if the corpus ever shrank below the cap there would be
+    /// nothing to truncate and the assertion would be vacuous.
+    func testTheSuggestionListIsCappedWhateverTheRosterSize() throws {
+        let owned = store()
+        let view = try panel(store: owned)
+        for champion in view.filteredChampions {
+            owned.add(champion.name)
+        }
+
+        let corpus = try CompLoader.bundledFixtures()
+        let matching = CompSuggestionRanking
+            .rank(owned: owned.ownedKeys, comps: corpus)
+            .filter { $0.matchedCount > 0 }
+        XCTAssertGreaterThan(
+            matching.count,
+            expectedSuggestionLimit,
+            "Only \(matching.count) comps match a full roster, so this test cannot see the cap work"
+        )
+        XCTAssertEqual(
+            view.suggestions.count,
+            expectedSuggestionLimit,
+            "\(matching.count) comps match and the panel drew \(view.suggestions.count) of them; "
+                + "it should draw exactly \(expectedSuggestionLimit)"
+        )
+    }
+
+    /// The cap constant itself, against the literal the assertion above uses.
+    func testTheSuggestionLimitIsTheOneTheListWasSizedFor() {
+        XCTAssertEqual(
+            MyChampionsView.suggestionLimit,
+            expectedSuggestionLimit,
+            "MyChampionsView.suggestionLimit is \(MyChampionsView.suggestionLimit), not "
+                + "the \(expectedSuggestionLimit) the suggestions list is designed around"
+        )
     }
 
     /// The named missing list is the actionable half of a suggestion, so it
