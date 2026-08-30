@@ -2,7 +2,13 @@
 
 ## Status
 
-Accepted
+Accepted. Partially superseded by [ADR 0004](0004-comps-scraping.md): the
+maintainer decided against hand-authoring/re-authoring comps indefinitely,
+so most of `data/comps/` is now produced by a maintainer-run scraper rather
+than written by hand. The schema, the "swap the source behind a stable
+contract" design, and the rejection of *shipping the app itself* against a
+scraped/third-party feed all still hold — only the "who writes the JSON"
+answer changed.
 
 ## Context
 

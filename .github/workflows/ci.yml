@@ -76,3 +76,15 @@ jobs:
 
       - name: SwiftLint
         run: swiftlint lint --strict
+
+  comps:
+    name: Validate data/comps against comp.schema.json
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jsonschema
+        run: pip3 install --quiet jsonschema
+
+      - name: Validate comps
+        run: python3 scripts/validate_comps.py
