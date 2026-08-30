@@ -341,6 +341,74 @@ final class OverlayPanelNavigationTests: XCTestCase {
         }
     }
 
+    // MARK: - Which tab lights up
+
+    /// The bar must not contradict itself: the tab it lights up and the tab
+    /// Back returns to are the same tab, for every origin that can drill in.
+    ///
+    /// Found by looking at the running app — drilling into a comp from Openers
+    /// lit "Comps" while the Back chevron beside it went to Openers.
+    func testTheLitTabIsAlwaysWhereBackWouldReturnTo() throws {
+        for origin in OverlayAppState.Panel.destinations(in: .browse) {
+            let state = state()
+            let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+
+            state.show(origin)
+            XCTAssertEqual(state.selectedTab, origin, "\(origin.title) should light its own tab")
+
+            state.select(comp)
+            XCTAssertEqual(
+                state.selectedTab,
+                origin,
+                "A comp entered from \(origin.title) should keep \(origin.title) lit"
+            )
+
+            state.goBack()
+            XCTAssertEqual(state.panel, origin, "Back and the lit tab must agree")
+        }
+    }
+
+    /// Whatever the route, the lit tab is one the bar is currently offering —
+    /// otherwise the bar is left with nothing highlighted at all.
+    func testTheLitTabIsAlwaysOneOfTheCurrentTabs() throws {
+        let state = state()
+        let comp = try XCTUnwrap(state.comps.first, "Bundled comp fixtures failed to load")
+        let routes: [(String, () -> Void)] = [
+            ("openers", { state.show(.openers) }),
+            ("drill in", { state.select(comp) }),
+            ("commit", { state.commit(to: comp) }),
+            ("items", { state.show(.itemCheatSheet) }),
+            ("drill in while focused", { state.select(comp) }),
+            ("back", { state.goBack() }),
+            ("browse", { state.browse() }),
+            ("my champions", { state.show(.myChampions) }),
+            ("drill in from mine", { state.select(comp) }),
+            ("cycle", { state.cycleForward() }),
+        ]
+
+        for (label, step) in routes {
+            step()
+            XCTAssertTrue(
+                OverlayAppState.Panel.destinations(in: state.mode).contains(state.selectedTab),
+                "after \(label): \(state.selectedTab.title) is not a tab in \(state.mode)"
+            )
+        }
+    }
+
+    /// Drilling in while focused keeps Focus's own tab lit, so a comp the
+    /// player is merely comparing never reads as having replaced their build.
+    func testADrillDownWhileFocusedLightsTheTabItCameFrom() throws {
+        let state = state()
+        _ = try focused(state)
+
+        state.show(.reference)
+        let another = try XCTUnwrap(state.comps.dropFirst().first ?? state.comps.first)
+        state.select(another)
+
+        XCTAssertEqual(state.selectedTab, .reference)
+        XCTAssertEqual(state.mode, .focus)
+    }
+
     // MARK: - Openers hands over by drilling in (#85)
 
     /// Openers reports comps as `OpenerIndex.CompSummary`, which carries an id

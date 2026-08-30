@@ -99,6 +99,10 @@ extension OverlayAppState {
         /// the Focus branch is unreachable in practice — it exists so the
         /// "every panel highlights a current tab" invariant holds for every
         /// pair, not only the reachable ones.
+        ///
+        /// Note this is a function of the *panel*, so every `compDetail`
+        /// reports the mode's primary. Which tab the bar actually lights for a
+        /// drill-down is `OverlayAppState.selectedTab`, which knows the origin.
         func destination(in mode: Mode) -> Panel {
             switch self {
             case .compDetail, .compsList, .focusBuild: Panel.primary(in: mode)
