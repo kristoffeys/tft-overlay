@@ -63,6 +63,7 @@ final class PinnedCompsStoreTests: XCTestCase {
         store.pin("b")
         store.pin("c")
 
+        store.selectCycle(id: "a")
         XCTAssertEqual(store.currentPinnedID, "a")
         store.advance()
         XCTAssertEqual(store.currentPinnedID, "b")
@@ -87,8 +88,6 @@ final class PinnedCompsStoreTests: XCTestCase {
         store.pin("a")
         store.pin("b")
         store.pin("c")
-        store.advance()
-        store.advance()
         XCTAssertEqual(store.currentPinnedID, "c")
 
         store.unpin("c")
@@ -105,6 +104,37 @@ final class PinnedCompsStoreTests: XCTestCase {
         store.selectCycle(id: "c")
         XCTAssertEqual(store.currentPinnedID, "c")
         XCTAssertEqual(store.cyclePosition(of: "c"), 2)
+    }
+
+    /// Pinning is how a player says "this is the build I'm going for", and
+    /// the compact overlay shows the current pin's roster — so the pin the
+    /// player just made has to be the one they see.
+    func testPinningMakesTheCompCurrent() {
+        let store = PinnedCompsStore(defaults: defaults)
+        store.pin("a")
+        store.pin("b")
+        XCTAssertEqual(store.currentPinnedID, "b")
+
+        store.pin("c")
+        XCTAssertEqual(store.currentPinnedID, "c")
+    }
+
+    func testRepinningAnAlreadyPinnedCompReselectsItWithoutReordering() {
+        let store = PinnedCompsStore(defaults: defaults)
+        store.pin("a")
+        store.pin("b")
+        store.pin("c")
+
+        store.pin("a")
+        XCTAssertEqual(store.currentPinnedID, "a", "re-pinning is a usable 'switch to this build' gesture")
+        XCTAssertEqual(store.pinnedIDs, ["a", "b", "c"], "pin order must not churn")
+    }
+
+    func testTogglingOnMakesTheCompCurrent() {
+        let store = PinnedCompsStore(defaults: defaults)
+        store.pin("a")
+        store.toggle("b")
+        XCTAssertEqual(store.currentPinnedID, "b")
     }
 
     func testSelectCycleIgnoresUnknownID() {

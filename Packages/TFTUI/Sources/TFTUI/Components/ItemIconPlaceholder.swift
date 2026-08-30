@@ -1,27 +1,49 @@
 import SwiftUI
 import TFTData
 
-/// Stand-in for an item icon: initials on a bordered tile. Swap for real
-/// art without touching call sites.
+/// An item icon: the real art when it's available, initials on a bordered
+/// tile when it isn't.
+///
+/// See `UnitPortraitPlaceholder` for why the initials tile is a guaranteed
+/// rendering rather than a loading state, and why the art URL is resolved
+/// from the `tftAssetCatalog` environment by name.
 public struct ItemIconPlaceholder: View {
     let name: String
     let size: CGFloat
+    let explicitImageURL: URL?
 
-    public init(name: String, size: CGFloat = 32) {
+    @Environment(\.tftAssetCatalog) private var catalog
+
+    public init(name: String, size: CGFloat = 32, imageURL: URL? = nil) {
         self.name = name
         self.size = size
+        explicitImageURL = imageURL
     }
 
     public init(_ item: Item, size: CGFloat = 32) {
-        self.init(name: item.name, size: size)
+        self.init(name: item.name, size: size, imageURL: item.imageURL)
     }
 
     public var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: size * 0.16, style: .continuous)
-                .fill(TFTTheme.elevatedBackground)
-            RoundedRectangle(cornerRadius: size * 0.16, style: .continuous)
+            AssetImage(url: explicitImageURL ?? catalog.itemImageURL(named: name), cornerRadius: cornerRadius) {
+                abbreviationTile
+            }
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .strokeBorder(TFTTheme.accent.opacity(0.55), lineWidth: 1.5)
+        }
+        .frame(width: size, height: size)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+    }
+
+    private var cornerRadius: CGFloat {
+        size * 0.16
+    }
+
+    private var abbreviationTile: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(TFTTheme.elevatedBackground)
             Text(abbreviation)
                 .font(.system(size: size * 0.3, weight: .heavy, design: .rounded))
                 .foregroundStyle(TFTTheme.textPrimary)
@@ -29,7 +51,6 @@ public struct ItemIconPlaceholder: View {
                 .lineLimit(1)
                 .padding(2)
         }
-        .frame(width: size, height: size)
     }
 
     private var abbreviation: String {

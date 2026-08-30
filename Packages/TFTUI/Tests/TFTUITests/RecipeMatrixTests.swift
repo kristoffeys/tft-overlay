@@ -52,6 +52,9 @@ final class RecipeMatrixTests: XCTestCase {
     func testReverseLookupIsEmptyForUnwantedItem() throws {
         let comps = try CompLoader.bundledFixtures()
         let index = ItemDemandIndex(comps: comps)
-        XCTAssertTrue(index.entries(forItemNamed: "Warmog's Armor").isEmpty)
+        // A real Set 18 item that no bundled comp asks for by name — the
+        // fixtures used to be small enough for Warmog's Armor to serve here,
+        // but the scraped set (ADR 0004) wants it in a third of the comps.
+        XCTAssertTrue(index.entries(forItemNamed: "Thief's Gloves").isEmpty)
     }
 }

@@ -11,7 +11,25 @@ public enum TFTTheme {
     public static let accent = Color(red: 0.98, green: 0.78, blue: 0.25)
 
     public static let textPrimary = Color.white
-    public static let textSecondary = Color.white.opacity(0.68)
+
+    /// Supporting text that is still *content*: patch labels, item priority
+    /// ranks, level-plan notes, positioning notes.
+    ///
+    /// This was 0.68 and read as a grey mumble at 10–12pt. The panel is three
+    /// stacked translucent layers (`background` 0.94 over the game, then
+    /// `panelBackground` 0.92 over that), so a mid-brightness game background
+    /// still bleeds ~5% through and lifts the effective backing to roughly
+    /// sRGB 0.11. At 0.68 white that is ~8.6:1; at 0.82 it is ~11.9:1, which
+    /// holds up at 10pt over a moving, bright game UI while staying visibly
+    /// subordinate to `textPrimary`.
+    public static let textSecondary = Color.white.opacity(0.82)
+
+    /// Decorative chrome only — disclosure chevrons, the search glyph, unfilled
+    /// difficulty pips. Deliberately *below* the old secondary value: pushing
+    /// content up and ornament down is what restores the hierarchy that
+    /// flattening everything to one grey destroyed. Never put words a player
+    /// needs to read in this colour.
+    public static let textTertiary = Color.white.opacity(0.60)
 
     public static let cornerRadius: CGFloat = 10
     public static let smallCornerRadius: CGFloat = 6

@@ -118,9 +118,16 @@ private struct OverlaySettingsTab: View {
                     Text(anchor.displayName).tag(anchor)
                 }
             }
+            Toggle("Clickable on launch", isOn: $store.settings.overlay.startsUnlocked)
+                .help("Off means the overlay starts click-through and must be unlocked with the hotkey.")
+            Toggle("Lock again when idle", isOn: $store.settings.overlay.autoLockWhenIdle)
+                .help("Returns the overlay to click-through after a period of no interaction.")
+            // Only meaningful when something actually auto-locks, so it is
+            // disabled rather than left as a control that does nothing.
             Slider(value: $store.settings.overlay.idleTimeoutSeconds, in: 1 ... 60) {
                 Text("Idle timeout (seconds)")
             }
+            .disabled(!store.settings.overlay.autoLockWhenIdle)
         }
         .padding(.top, 8)
     }

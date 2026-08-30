@@ -85,3 +85,47 @@ final class AppSettingsTests: XCTestCase {
         XCTAssertEqual(once, twice)
     }
 }
+
+/// The overlay ships unlocked, and cannot quietly lock itself.
+///
+/// It used to start click-through with no on-screen explanation, so every
+/// affordance in the panel — search, filters, pins, tooltips — was
+/// unreachable until the user discovered a hotkey nothing mentioned. The
+/// two settings below are a pair: defaulting to unlocked is only coherent
+/// if the idle timer that used to flip it back is off by default too,
+/// otherwise the panel would re-lock itself seconds after every launch.
+extension AppSettingsTests {
+    func testOverlayStartsUnlockedAndDoesNotAutoLock() {
+        XCTAssertTrue(OverlaySettings.defaults.startsUnlocked)
+        XCTAssertFalse(OverlaySettings.defaults.autoLockWhenIdle)
+    }
+
+    /// Settings saved before these keys existed must adopt the new defaults
+    /// rather than decoding as `false` and locking the overlay for anyone
+    /// who had already run the app.
+    func testSettingsPredatingTheLockKeysAdoptTheUnlockedDefault() throws {
+        let json = """
+        { "overlay": { "opacity": 0.5, "scale": 1.0, "anchor": "topLeading", "idleTimeoutSeconds": 8 } }
+        """
+        let decoded = try JSONDecoder().decode(AppSettings.self, from: Data(json.utf8))
+
+        XCTAssertTrue(decoded.overlay.startsUnlocked, "an existing user must not silently get a locked overlay")
+        XCTAssertFalse(decoded.overlay.autoLockWhenIdle)
+        // The fields that were present still decode.
+        XCTAssertEqual(decoded.overlay.opacity, 0.5)
+        XCTAssertEqual(decoded.overlay.anchor, .topLeading)
+    }
+
+    /// An explicit choice to lock survives a round trip — the default must
+    /// not overwrite what the user actually set.
+    func testExplicitLockChoiceRoundTrips() throws {
+        var settings = AppSettings.defaults
+        settings.overlay.startsUnlocked = false
+        settings.overlay.autoLockWhenIdle = true
+
+        let decoded = try JSONDecoder().decode(AppSettings.self, from: JSONEncoder().encode(settings))
+
+        XCTAssertFalse(decoded.overlay.startsUnlocked)
+        XCTAssertTrue(decoded.overlay.autoLockWhenIdle)
+    }
+}

@@ -46,12 +46,15 @@ public struct CompsListView: View {
                             .padding(.top, 40)
                     }
                     ForEach(filtered) { comp in
-                        Button {
-                            onSelect(comp)
-                        } label: {
-                            CompRow(comp: comp, pinnedStore: pinnedStore)
-                        }
-                        .buttonStyle(.plain)
+                        // A tap gesture, not a Button: the row contains its
+                        // own pin Button, and a Button nested in another
+                        // Button's label never receives the click — the
+                        // outer one owns the whole label as its hit area,
+                        // so the pin toggle silently did nothing here while
+                        // working fine in the detail header.
+                        CompRow(comp: comp, pinnedStore: pinnedStore)
+                            .contentShape(Rectangle())
+                            .onTapGesture { onSelect(comp) }
                     }
                 }
                 .padding(12)
@@ -63,7 +66,7 @@ public struct CompsListView: View {
     private var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(TFTTheme.textSecondary)
+                .foregroundStyle(TFTTheme.textTertiary)
             TextField("Search unit, trait, or comp", text: $searchText)
                 .textFieldStyle(.plain)
                 .foregroundStyle(TFTTheme.textPrimary)
@@ -75,7 +78,7 @@ public struct CompsListView: View {
             in: RoundedRectangle(cornerRadius: TFTTheme.smallCornerRadius, style: .continuous)
         )
         .padding(.horizontal, 12)
-        .padding(.top, 12)
+        .padding(.top, 4)
     }
 
     private var filterBar: some View {
@@ -156,13 +159,17 @@ private struct CompRow: View {
                         }
                     }
                 }
-                HStack(spacing: 6) {
-                    ForEach(comp.carryUnits, id: \.unit.id) { pair in
-                        UnitPortraitPlaceholder(name: pair.unit.name, cost: pair.unit.cost, size: 34)
-                    }
-                    Spacer(minLength: 8)
-                    TraitTagRow(distinctTraits)
-                }
+                // The full roster, not just the carries: a row that shows
+                // two portraits can't answer "is this the comp holding the
+                // units I already have", which is the question a player
+                // scans this list with.
+                CompRosterGrid(comp: comp, portraitSize: 34, spacing: 4)
+                // Ranked by how many of this comp's units carry the trait, so
+                // the row always shows what the comp *is* ("Elderwood",
+                // "Executioner") and drops the one-unit strays — not the
+                // other way round, which is what plain alphabetical order
+                // gave us.
+                TraitTagRow(distinctTraits, priority: TraitRelevance.weights(in: comp))
             }
         }
         .padding(10)

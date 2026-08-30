@@ -1,4 +1,5 @@
 import SwiftUI
+import TFTData
 import TFTUI
 
 /// Lets the comps and item-sheet panels be seen and exercised without the
@@ -18,12 +19,19 @@ struct DemoRootView: View {
     @State private var selectedComp: Comp?
     @State private var tab: Tab = .list
     @StateObject private var pinnedStore = PinnedCompsStore(defaults: UserDefaults(suiteName: "TFTUIDemo") ?? .standard)
+    /// Champion/item art, resolved from whatever `TFTDataService` can load
+    /// without a network round trip (disk cache, else the bundled pack).
+    /// Starts `.empty` so the first frame is the text-placeholder rendering
+    /// the demo has always had, then fills in — which is also a live check
+    /// that the fallback path looks right on its own.
+    @State private var assetCatalog: TFTAssetCatalog = .empty
 
     enum Tab: String, CaseIterable, Identifiable {
         case list = "Comps"
         case detail = "Detail"
         case items = "Items"
         case compact = "Compact"
+        case recipes = "Recipes"
         case reference = "Reference"
         var id: String {
             rawValue
@@ -61,6 +69,15 @@ struct DemoRootView: View {
                 case .items:
                     ItemCheatSheetView(comps: comps)
                 case .compact:
+                    // Mirrors the real overlay's compact panel size, so the
+                    // demo shows what actually fits at 300x320.
+                    SelectedBuildRosterView(comps: comps, store: pinnedStore) { comp in
+                        selectedComp = comp
+                        tab = .detail
+                    }
+                    .frame(width: 300, height: 320)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                case .recipes:
                     ScrollView {
                         CompactItemCheatSheetView()
                             .padding(40)
@@ -75,5 +92,10 @@ struct DemoRootView: View {
         }
         .frame(minWidth: 480, idealWidth: 560, minHeight: 640, idealHeight: 780)
         .background(TFTTheme.background)
+        .tftAssetCatalog(assetCatalog)
+        .task {
+            let store = await TFTDataService().loadCurrentStore().store
+            assetCatalog = TFTAssetCatalog(store: store)
+        }
     }
 }
