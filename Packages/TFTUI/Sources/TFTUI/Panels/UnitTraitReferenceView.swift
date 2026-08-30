@@ -85,18 +85,9 @@ public struct UnitTraitReferenceView: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(TFTTheme.textTertiary)
-            TextField("Search \(mode == .units ? "unit" : "trait")", text: $searchText)
-                .textFieldStyle(.plain)
-                .foregroundStyle(TFTTheme.textPrimary)
-        }
-        .font(.system(size: 13, weight: .medium))
-        .padding(9)
-        .background(
-            TFTTheme.panelBackground,
-            in: RoundedRectangle(cornerRadius: TFTTheme.smallCornerRadius, style: .continuous)
+        SearchField(
+            placeholder: "Search \(mode == .units ? "unit" : "trait")",
+            text: $searchText
         )
         .padding(.horizontal, 12)
         .padding(.bottom, 8)
@@ -121,30 +112,39 @@ public struct UnitTraitReferenceView: View {
     }
 
     private var unitList: some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 10) {
-                ForEach(unitsByCost, id: \.cost) { group in
-                    Text("\(group.cost)-Cost".uppercased())
-                        .font(.system(size: 10, weight: .heavy, design: .rounded))
-                        .foregroundStyle(TFTTheme.textSecondary)
-                    ForEach(group.units) { unit in
-                        Button {
-                            selection = .unit(unit)
-                        } label: {
-                            UnitReferenceRow(unit: unit)
-                        }
-                        .buttonStyle(.plain)
+        ScrollView { unitListContent }
+    }
+
+    /// The scroll contents, split out from their `ScrollView`.
+    ///
+    /// `ScrollView` rasterises blank under `ImageRenderer`, so a snapshot of
+    /// the whole panel only ever saw its mode picker and search field — which
+    /// is how one assertion here certified a near-black panel (issue #95).
+    /// Tests render these instead, the way `CompDetailView.content` is split
+    /// out.
+    var unitListContent: some View {
+        LazyVStack(alignment: .leading, spacing: 10) {
+            ForEach(unitsByCost, id: \.cost) { group in
+                Text("\(group.cost)-Cost".uppercased())
+                    .font(.system(size: 10, weight: .heavy, design: .rounded))
+                    .foregroundStyle(TFTTheme.textSecondary)
+                ForEach(group.units) { unit in
+                    Button {
+                        selection = .unit(unit)
+                    } label: {
+                        UnitReferenceRow(unit: unit)
                     }
-                }
-                if filteredUnits.isEmpty {
-                    Text("No units match.")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(TFTTheme.textSecondary)
-                        .padding(.top, 40)
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(12)
+            if filteredUnits.isEmpty {
+                Text("No units match.")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(TFTTheme.textSecondary)
+                    .padding(.top, 40)
+            }
         }
+        .padding(12)
     }
 
     private var unitsByCost: [(cost: Int, units: [UnitReference])] {
@@ -153,25 +153,28 @@ public struct UnitTraitReferenceView: View {
     }
 
     private var traitList: some View {
-        ScrollView {
-            LazyVStack(spacing: 8) {
-                if filteredTraits.isEmpty {
-                    Text("No traits match.")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(TFTTheme.textSecondary)
-                        .padding(.top, 40)
-                }
-                ForEach(filteredTraits) { trait in
-                    Button {
-                        selection = .trait(trait)
-                    } label: {
-                        TraitReferenceRow(trait: trait)
-                    }
-                    .buttonStyle(.plain)
-                }
+        ScrollView { traitListContent }
+    }
+
+    /// See `unitListContent`.
+    var traitListContent: some View {
+        LazyVStack(spacing: 8) {
+            if filteredTraits.isEmpty {
+                Text("No traits match.")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(TFTTheme.textSecondary)
+                    .padding(.top, 40)
             }
-            .padding(12)
+            ForEach(filteredTraits) { trait in
+                Button {
+                    selection = .trait(trait)
+                } label: {
+                    TraitReferenceRow(trait: trait)
+                }
+                .buttonStyle(.plain)
+            }
         }
+        .padding(12)
     }
 }
 

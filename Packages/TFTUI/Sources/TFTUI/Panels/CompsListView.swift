@@ -70,33 +70,40 @@ public struct CompsListView: View {
                 playstyleFilter: $playstyleFilter,
                 showsFilters: $showsFilters
             )
-            ScrollView {
-                LazyVStack(alignment: .leading, spacing: 8) {
-                    // The committed build leads the list under its own
-                    // heading. A filled star at the far right of one row
-                    // among fifteen is not an answer to "which one is
-                    // mine" — you have to scan for it. Sorting it out of
-                    // the pack is.
-                    if let committedBuild {
-                        heading("Your build", color: TFTTheme.accent)
-                        row(committedBuild, isCommitted: true)
-                        heading("All comps", color: TFTTheme.textSecondary)
-                    }
-                    if filtered.isEmpty {
-                        Text("No comps match.")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(TFTTheme.textSecondary)
-                            .frame(maxWidth: .infinity)
-                            .padding(.top, 40)
-                    }
-                    ForEach(otherComps) { comp in
-                        row(comp, isCommitted: false)
-                    }
-                }
-                .padding(12)
-            }
+            ScrollView { listContent }
         }
         .background(TFTTheme.background)
+    }
+
+    /// The scrolling half of the panel, split out from its `ScrollView`.
+    ///
+    /// `ScrollView` rasterises blank under `ImageRenderer`, so a snapshot of
+    /// the whole panel is a snapshot of its chrome and nothing else — which is
+    /// how two assertions here certified a black panel (issue #95). Tests
+    /// render this instead, the way `CompDetailView.content` is split out.
+    var listContent: some View {
+        LazyVStack(alignment: .leading, spacing: 8) {
+            // The committed build leads the list under its own heading. A
+            // filled star at the far right of one row among fifteen is not an
+            // answer to "which one is mine" — you have to scan for it.
+            // Sorting it out of the pack is.
+            if let committedBuild {
+                heading("Your build", color: TFTTheme.accent)
+                row(committedBuild, isCommitted: true)
+                heading("All comps", color: TFTTheme.textSecondary)
+            }
+            if filtered.isEmpty {
+                Text("No comps match.")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(TFTTheme.textSecondary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.top, 40)
+            }
+            ForEach(otherComps) { comp in
+                row(comp, isCommitted: false)
+            }
+        }
+        .padding(12)
     }
 
     private func row(_ comp: Comp, isCommitted: Bool) -> some View {
