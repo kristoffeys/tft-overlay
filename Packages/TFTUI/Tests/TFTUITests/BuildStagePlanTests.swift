@@ -167,6 +167,25 @@ final class BuildStagePlanTests: XCTestCase {
         XCTAssertEqual(late.levelPlan.first?.notes, "first")
     }
 
+    /// A trailing newline is scraper noise, not a data defect: the row belongs
+    /// in its band, keyed to the stage's own notation rather than to the raw
+    /// string the badge would draw a line break inside.
+    func testRowsWithScraperNewlinesAreBandedNotUnplaced() throws {
+        let comp = try CompFixture.make(
+            id: "newline",
+            tier: .a,
+            units: [CompFixture.unit("Karma", cost: 1)],
+            levelPlan: [
+                LevelPlanEntry(stage: "1-2\n", level: 3, notes: "Open"),
+                LevelPlanEntry(stage: " 3-2 ", level: 6),
+            ]
+        )
+        let plan = plan(comp)
+        XCTAssertTrue(plan.unscheduledEntries.isEmpty, "a line break is not a data defect")
+        XCTAssertEqual(plan.section(for: .early).levelPlan.map(\.stage), ["1-2"])
+        XCTAssertEqual(plan.section(for: .mid).levelPlan.map(\.stage), ["3-2"])
+    }
+
     func testUnparseableStageRowsAreSurfacedRatherThanDropped() throws {
         let comp = try CompFixture.make(
             id: "typo",
