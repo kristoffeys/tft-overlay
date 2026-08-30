@@ -31,11 +31,32 @@ public struct PanelTabBar<Tab: Hashable>: View {
         case secondary
     }
 
+    /// A trailing button that is *not* one of the tabs.
+    ///
+    /// Some bars need an escape hatch: an action that leaves the set of tabs
+    /// the bar is showing rather than moving between them. Modelling that as
+    /// a fourth segment would be a lie — it would take a selected state it
+    /// can never hold, and hotkey cycling would walk into it and strand the
+    /// user outside the tab set. So it sits on the trailing edge in the
+    /// subordinate chip vocabulary, the same step down `.secondary` uses.
+    public struct Accessory {
+        let title: String
+        let systemImage: String
+        let action: () -> Void
+
+        public init(title: String, systemImage: String, action: @escaping () -> Void) {
+            self.title = title
+            self.systemImage = systemImage
+            self.action = action
+        }
+    }
+
     private let tabs: [Tab]
     private let selection: Tab
     private let title: (Tab) -> String
     private let style: Style
     private let onBack: (() -> Void)?
+    private let accessory: Accessory?
     private let onSelect: (Tab) -> Void
 
     /// Total height the primary bar occupies, padding included. Callers
@@ -54,12 +75,15 @@ public struct PanelTabBar<Tab: Hashable>: View {
     ///   - style: `.secondary` for a mode switch inside a panel.
     ///   - onBack: shown as a leading chevron when non-nil, i.e. while a
     ///     drill-down is on screen.
+    ///   - accessory: a trailing action that leaves this set of tabs rather
+    ///     than moving between them.
     public init(
         tabs: [Tab],
         selection: Tab,
         title: @escaping (Tab) -> String,
         style: Style = .primary,
         onBack: (() -> Void)? = nil,
+        accessory: Accessory? = nil,
         onSelect: @escaping (Tab) -> Void
     ) {
         self.tabs = tabs
@@ -67,6 +91,7 @@ public struct PanelTabBar<Tab: Hashable>: View {
         self.title = title
         self.style = style
         self.onBack = onBack
+        self.accessory = accessory
         self.onSelect = onSelect
     }
 
@@ -92,9 +117,33 @@ public struct PanelTabBar<Tab: Hashable>: View {
             .padding(2)
             .background(TFTTheme.panelBackground, in: Capsule())
             Spacer(minLength: 0)
+            if let accessory {
+                accessoryButton(accessory)
+            }
         }
         .frame(height: barHeight, alignment: .center)
         .padding(.horizontal, 12)
+    }
+
+    private func accessoryButton(_ accessory: Accessory) -> some View {
+        Button(action: accessory.action) {
+            HStack(spacing: 4) {
+                Image(systemName: accessory.systemImage)
+                    .font(.system(size: 9, weight: .heavy))
+                Text(accessory.title)
+                    .font(.system(size: 11, weight: .heavy, design: .rounded))
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .foregroundStyle(TFTTheme.accent)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(TFTTheme.elevatedBackground, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .focusable(false)
+        .accessibilityLabel(accessory.title)
+        .help(accessory.title)
     }
 
     private func segment(_ tab: Tab) -> some View {
@@ -147,8 +196,15 @@ public struct PanelTabBar<Tab: Hashable>: View {
             onBack: {},
             onSelect: { _ in }
         )
+        PanelTabBar(
+            tabs: ["Build", "Items", "Reference"],
+            selection: "Build",
+            title: { $0 },
+            accessory: .init(title: "Browse", systemImage: "square.grid.2x2", action: {}),
+            onSelect: { _ in }
+        )
         Spacer()
     }
-    .frame(width: 460, height: 120)
+    .frame(width: 460, height: 160)
     .background(TFTTheme.background)
 }

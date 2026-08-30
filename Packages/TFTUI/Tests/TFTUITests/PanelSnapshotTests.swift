@@ -37,6 +37,24 @@ final class PanelSnapshotTests: XCTestCase {
         }
     }
 
+    /// The escape-hatch accessory rides the same 34pt strip as the tabs; if it
+    /// pushed the bar taller or past the right margin it would cost the panel
+    /// content height it cannot spare.
+    func testTabBarWithAnAccessoryRendersWithinTheExpandedPanelWidth() throws {
+        let bar = tabBar(
+            selection: "Comps",
+            accessory: .init(title: "Browse", systemImage: "square.grid.2x2", action: {})
+        )
+        try assertRendersWithin(
+            bar,
+            size: CGSize(width: expanded.width, height: PanelTabBar<String>.height),
+            rightMargin: 4,
+            minimumInk: 0.002
+        )
+        let size = try ViewSnapshot.measuredSize(of: bar, proposedWidth: expanded.width)
+        XCTAssertEqual(size.height, PanelTabBar<String>.height, accuracy: 1)
+    }
+
     /// The bar is a fixed slice of a very tight panel; if it silently grows it
     /// eats the content it exists to navigate to.
     func testTabBarHeightIsStableAcrossWidthsAndBackAffordance() throws {
@@ -149,12 +167,17 @@ final class PanelSnapshotTests: XCTestCase {
 
     // MARK: - Helper
 
-    private func tabBar(selection: String, onBack: (() -> Void)? = nil) -> some View {
+    private func tabBar(
+        selection: String,
+        onBack: (() -> Void)? = nil,
+        accessory: PanelTabBar<String>.Accessory? = nil
+    ) -> some View {
         PanelTabBar(
             tabs: ["Comps", "Items", "Reference"],
             selection: selection,
             title: { $0 },
             onBack: onBack,
+            accessory: accessory,
             onSelect: { _ in }
         )
     }
