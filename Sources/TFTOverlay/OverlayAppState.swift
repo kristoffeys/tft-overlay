@@ -100,6 +100,18 @@ final class OverlayAppState: ObservableObject {
     /// "I have a build pinned but I want to look at the others right now" —
     /// and it is cleared by committing to a build.
     @Published private(set) var isBrowsingByRequest = false
+    /// Which part of the game the Build panel is answering for (#84).
+    ///
+    /// Session state, not a setting: it means "where I am in *this* game", so
+    /// persisting it would restore a stale act-5 stage into a fresh act-1
+    /// lobby, which is worse than the default. It resets when the player
+    /// commits to a different build, which is the closest thing the overlay
+    /// has to a "new game" signal until board vision lands (#45).
+    @Published private(set) var stageBand: StageBand = .initial
+    /// The advance hotkey as currently bound, for the stage control to name.
+    /// Set by `AppDelegate` once the binding is known — the hotkey is
+    /// rebindable, so hardcoding a combo here would eventually lie.
+    @Published var stageAdvanceHint: String?
     /// Champion/item/trait art URLs, resolved from whatever `TFTDataService`
     /// has on launch (disk cache or the bundled fallback pack — never a
     /// network call). Starts `.empty` (text placeholders only) and updates
@@ -208,9 +220,29 @@ final class OverlayAppState: ObservableObject {
     /// `PinnedCompsStore.pin` re-selects an already-pinned comp, so this
     /// doubles as "switch to this build" while already focused on another.
     func commit(to comp: Comp) {
+        // Committing to a *different* build is the overlay's best available
+        // proxy for "new game": nobody switches lines mid-act-5 and then wants
+        // the stage still reading Late from the previous game.
+        if pinnedComps.currentPinnedID != comp.id {
+            stageBand = .initial
+        }
         pinnedComps.pin(comp.id)
         isBrowsingByRequest = false
         panel = .focusBuild
+    }
+
+    // MARK: - Stage (#84)
+
+    func setStageBand(_ band: StageBand) {
+        stageBand = band
+    }
+
+    /// One gesture, bound to both the stage control and a hotkey. Stops at
+    /// `late` rather than wrapping: see `StageBand.next` — an extra keypress
+    /// must not drop a player in a top-four fight back onto opener advice.
+    func advanceStage() {
+        guard let next = stageBand.next else { return }
+        stageBand = next
     }
 
     /// The escape hatch: back to the list, keeping the pin.
