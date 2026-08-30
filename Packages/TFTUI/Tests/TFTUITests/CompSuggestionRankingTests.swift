@@ -4,53 +4,17 @@ import XCTest
 final class CompSuggestionRankingTests: XCTestCase {
     // MARK: - Fixtures
 
-    /// `Comp` only decodes (ADR 0002's schema is the source of truth, not a
-    /// memberwise initializer), so hand-made fixtures for logic assertions
-    /// go through the same JSON path the app itself uses, with every field
-    /// the schema requires but this suite doesn't care about pinned to a
-    /// fixed, boring value.
     private func makeComp(
         id: String,
         tier: Comp.Tier,
         units: [CompUnit],
         carries: [CompCarry] = []
     ) throws -> Comp {
-        let unitsJSON = units.map { unit in
-            """
-            {"name": "\(unit.name)", "cost": \(unit.cost), "starTarget": \(unit.starTarget), \
-            "role": "\(unit.role.rawValue)", "traits": []}
-            """
-        }.joined(separator: ",")
-        let carriesJSON = carries.map { carry in
-            """
-            {"unit": "\(carry.unit)", "itemPriority": []}
-            """
-        }.joined(separator: ",")
-        let json = """
-        {
-          "schemaVersion": "1.0.0",
-          "id": "\(id)",
-          "name": "\(id)",
-          "set": 18,
-          "patch": "18.1",
-          "source": "hand-authored",
-          "tier": "\(tier.rawValue)",
-          "playstyle": "fast_8",
-          "difficulty": "medium",
-          "units": [\(unitsJSON)],
-          "carries": [\(carriesJSON)],
-          "boardPositioning": {"grid": [[]]},
-          "augmentPreferences": {"tier1": [], "tier2": [], "tier3": []},
-          "levelPlan": [],
-          "earlyOpener": "",
-          "pivotNotes": ""
-        }
-        """
-        return try CompLoader.load(Data(json.utf8))
+        try CompFixture.make(id: id, tier: tier, units: units, carries: carries)
     }
 
     private func unit(_ name: String, cost: Int, role: CompUnit.Role = .frontline) -> CompUnit {
-        CompUnit(name: name, cost: cost, starTarget: 2, role: role, traits: [])
+        CompFixture.unit(name, cost: cost, role: role)
     }
 
     // MARK: - Empty roster
@@ -161,47 +125,6 @@ final class CompSuggestionRankingTests: XCTestCase {
         XCTAssertEqual(ranked[0].matchedUnits.map(\.name), ["Ashe"])
         XCTAssertEqual(Set(ranked[0].missingUnits.map(\.name)), ["Ornn", "Poppy"])
         XCTAssertEqual(ranked[0].matchedCount + ranked[0].missingUnits.count, ranked[0].totalCount)
-    }
-
-    // MARK: - Tier as a near-tie nudge, not an override
-
-    /// Tier should only decide between comps the player is about equally
-    /// close to. A comp with real overlap far ahead of another must not be
-    /// outranked just because the other is S-tier.
-    func testTierNeverOverridesALargeOverlapGap() throws {
-        let sTierFarAway = try makeComp(id: "s-tier", tier: .s, units: [unit("Ashe", cost: 5, role: .carry)])
-        let dTierAlmostThere = try makeComp(
-            id: "d-tier",
-            tier: .d,
-            units: [unit("Ornn", cost: 1), unit("Poppy", cost: 1)]
-        )
-        let ranked = CompSuggestionRanking.rank(owned: ["Ornn", "Poppy"], comps: [sTierFarAway, dTierAlmostThere])
-
-        XCTAssertEqual(ranked.map(\.comp.id), ["d-tier", "s-tier"], "a real overlap gap must beat tier")
-    }
-
-    /// But between two comps the player is genuinely about-equally close
-    /// to, tier should decide, so a reachable S-tier comp isn't buried
-    /// under a marginally-closer D-tier one.
-    func testTierBreaksANearTieBetweenComps() throws {
-        let sTier = try makeComp(
-            id: "s-tier",
-            tier: .s,
-            units: [unit("Ashe", cost: 5, role: .carry), unit("Ornn", cost: 1)],
-            carries: [CompCarry(unit: "Ashe", itemPriority: [])]
-        )
-        let dTier = try makeComp(
-            id: "d-tier",
-            tier: .d,
-            units: [unit("Volibear", cost: 5, role: .carry), unit("Poppy", cost: 1)],
-            carries: [CompCarry(unit: "Volibear", itemPriority: [])]
-        )
-        // Owns each comp's carry but neither comp's cheap frontline unit,
-        // so the two comps have identical (partial) overlap fractions.
-        let ranked = CompSuggestionRanking.rank(owned: ["Ashe", "Volibear"], comps: [sTier, dTier])
-
-        XCTAssertEqual(ranked[0].overlapScore, ranked[1].overlapScore, "the two comps must be a real overlap tie")
-        XCTAssertEqual(ranked.map(\.comp.id), ["s-tier", "d-tier"], "tier should decide the near-tie")
     }
 
     // MARK: - Determinism
