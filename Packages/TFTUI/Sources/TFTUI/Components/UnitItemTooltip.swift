@@ -35,7 +35,9 @@ public struct UnitItemTooltip: View {
                 HStack(alignment: .top, spacing: 6) {
                     ForEach(Array(summary.itemPriority.enumerated()), id: \.offset) { index, itemName in
                         VStack(spacing: 3) {
-                            ItemIconPlaceholder(name: itemName, size: 30)
+                            // The card is 200pt wide and grows downwards
+                            // freely, so recipes cost nothing here (#111).
+                            ItemWithRecipe(name: itemName, size: 30, componentSize: 20)
                             Text(UnitItemSummary.priorityLabel(index))
                                 .font(.system(size: 9, weight: .heavy))
                                 .foregroundStyle(TFTTheme.textSecondary)
@@ -80,6 +82,10 @@ private struct UnitItemTooltipOnHover: ViewModifier {
     /// — so the asset catalog has to be carried across by hand or every item
     /// in the card falls back to its text tile.
     @Environment(\.tftAssetCatalog) private var catalog
+    /// Same reason: the card's own window would otherwise fall back to the
+    /// bundled recipe index and quietly ignore whatever the live set data
+    /// resolved.
+    @Environment(\.tftItemRecipes) private var recipes
 
     func body(content: Content) -> some View {
         content
@@ -93,7 +99,9 @@ private struct UnitItemTooltipOnHover: ViewModifier {
                 }
                 guard let anchor = holder.screenFrame else { return }
                 FloatingTooltip.shared.show(
-                    UnitItemTooltip(summary: summary).tftAssetCatalog(catalog),
+                    UnitItemTooltip(summary: summary)
+                        .tftAssetCatalog(catalog)
+                        .tftItemRecipes(recipes),
                     anchor: anchor,
                     owner: id
                 )
