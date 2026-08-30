@@ -5,15 +5,20 @@ import SwiftUI
 /// plan, early opener, pivot notes, preferred augments.
 public struct CompDetailView: View {
     let comp: Comp
+    let onTogglePin: ((Comp) -> Void)?
     @ObservedObject private var pinnedStoreBox: PinnedCompsStoreBox
 
     /// Built once per comp so hovering a hex or a roster row is a dictionary
     /// hit rather than a scan of `units` and `carries`.
     private let unitIndex: CompUnitIndex
 
-    public init(comp: Comp, pinnedStore: PinnedCompsStore? = nil) {
+    /// - Parameter onTogglePin: see `CompsListView` — a host that treats
+    ///   pinning as a commit gesture owns the transition, so the header's pin
+    ///   button reports the tap instead of mutating the store itself.
+    public init(comp: Comp, pinnedStore: PinnedCompsStore? = nil, onTogglePin: ((Comp) -> Void)? = nil) {
         self.comp = comp
         pinnedStoreBox = PinnedCompsStoreBox(pinnedStore)
+        self.onTogglePin = onTogglePin
         unitIndex = CompUnitIndex(comp: comp)
     }
 
@@ -66,7 +71,11 @@ public struct CompDetailView: View {
                 DifficultyIndicator(comp.difficulty)
                 if let pinnedStore {
                     PinToggleButton(isPinned: pinnedStore.isPinned(comp.id)) {
-                        pinnedStore.toggle(comp.id)
+                        if let onTogglePin {
+                            onTogglePin(comp)
+                        } else {
+                            pinnedStore.toggle(comp.id)
+                        }
                     }
                 }
             }

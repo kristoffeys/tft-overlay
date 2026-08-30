@@ -5,15 +5,28 @@ import SwiftUI
 public struct CompsListView: View {
     let comps: [Comp]
     let onSelect: (Comp) -> Void
+    let onTogglePin: ((Comp) -> Void)?
     @ObservedObject private var pinnedStoreBox: PinnedCompsStoreBox
 
     @State private var searchText = ""
     @State private var tierFilter: Comp.Tier?
     @State private var playstyleFilter: Comp.Playstyle?
 
-    public init(comps: [Comp], pinnedStore: PinnedCompsStore? = nil, onSelect: @escaping (Comp) -> Void = { _ in }) {
+    /// - Parameter onTogglePin: when non-nil, the pin button reports the tap
+    ///   here instead of mutating the store itself. A host that treats
+    ///   pinning as a *commit* gesture — with consequences beyond the star,
+    ///   like switching the whole overlay onto that build — has to own the
+    ///   transition, and it cannot infer "pin" from "unpin" after the fact.
+    ///   Left nil, the row keeps toggling the store directly.
+    public init(
+        comps: [Comp],
+        pinnedStore: PinnedCompsStore? = nil,
+        onTogglePin: ((Comp) -> Void)? = nil,
+        onSelect: @escaping (Comp) -> Void = { _ in }
+    ) {
         self.comps = comps
         pinnedStoreBox = PinnedCompsStoreBox(pinnedStore)
+        self.onTogglePin = onTogglePin
         self.onSelect = onSelect
     }
 
@@ -52,7 +65,7 @@ public struct CompsListView: View {
                         // outer one owns the whole label as its hit area,
                         // so the pin toggle silently did nothing here while
                         // working fine in the detail header.
-                        CompRow(comp: comp, pinnedStore: pinnedStore)
+                        CompRow(comp: comp, pinnedStore: pinnedStore, onTogglePin: togglePin)
                             .contentShape(Rectangle())
                             .onTapGesture { onSelect(comp) }
                     }
@@ -104,6 +117,14 @@ public struct CompsListView: View {
         .padding(.vertical, 8)
     }
 
+    private func togglePin(_ comp: Comp) {
+        if let onTogglePin {
+            onTogglePin(comp)
+        } else {
+            pinnedStore?.toggle(comp.id)
+        }
+    }
+
     private func filterRow(title: String, @ViewBuilder content: () -> some View) -> some View {
         HStack(spacing: 6) {
             Text(title.uppercased())
@@ -139,6 +160,7 @@ private struct FilterChip: View {
 private struct CompRow: View {
     let comp: Comp
     let pinnedStore: PinnedCompsStore?
+    let onTogglePin: (Comp) -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
@@ -155,7 +177,7 @@ private struct CompRow: View {
                         .foregroundStyle(TFTTheme.textSecondary)
                     if let pinnedStore {
                         PinToggleButton(isPinned: pinnedStore.isPinned(comp.id)) {
-                            pinnedStore.toggle(comp.id)
+                            onTogglePin(comp)
                         }
                     }
                 }
