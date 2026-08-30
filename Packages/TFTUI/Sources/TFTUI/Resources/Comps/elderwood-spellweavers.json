@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "elderwood-spellweavers",
+  "name": "Elderwood Spellweavers",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "S",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "S-tier fast 8 comp built around Flora Fatalis and Executioner.",
+  "units": [
+    {
+      "name": "Ornn",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Yunara",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blossom",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Fiddlesticks",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Flora Fatalis",
+        "Defender",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Ahri",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blossom",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Ezreal",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Sett",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blossom",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Soraka",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Flora Fatalis",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Ahri",
+      "itemPriority": [
+        "Executioner Emblem",
+        "Jeweled Gauntlet",
+        "Spear of Shojin"
+      ]
+    },
+    {
+      "unit": "Sett",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        "Sett",
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "Ornn",
+        "Gnar",
+        "Fiddlesticks"
+      ],
+      [
+        "Yunara",
+        null,
+        null,
+        null,
+        "Ezreal",
+        "Soraka",
+        "Ahri"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Karma, Rakan, Yorick, Yunara, Azir"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Zyra, Lux (Blossom)."
+    }
+  ],
+  "earlyOpener": "Prioritize Karma, Rakan, Yorick, Yunara, Azir early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Gnar → Zyra, Lux (Blossom); Vi, Sivir → Yunara, Master Yi."
+}

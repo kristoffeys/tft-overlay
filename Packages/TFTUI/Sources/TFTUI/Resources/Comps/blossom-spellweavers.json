@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "blossom-spellweavers",
+  "name": "Blossom Spellweavers",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "S",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "S-tier fast 8 comp built around Blossom and Brawler.",
+  "units": [
+    {
+      "name": "Karma",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blossom",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Yorick",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blossom",
+        "Juggernaut",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Vi",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Primal",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Ahri",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blossom",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Sett",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blossom",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Sivir",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Primal",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Ashe",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Ahri",
+      "itemPriority": [
+        "Jeweled Gauntlet",
+        "Spear of Shojin",
+        "Striker's Flail"
+      ]
+    },
+    {
+      "unit": "Sett",
+      "itemPriority": [
+        "Ionic Spark",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        "Yorick",
+        "Vi",
+        "Gnar",
+        "Sett",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Ashe",
+        null,
+        "Sivir",
+        null,
+        "Karma",
+        null,
+        "Ahri"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Karma, Rakan, Yorick, Yunara, Azir"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Zyra, Lux (Blossom)."
+    }
+  ],
+  "earlyOpener": "Prioritize Karma, Rakan, Yorick, Yunara, Azir early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Gnar → Zyra, Lux (Blossom); Vi, Sivir → Yunara, Master Yi."
+}

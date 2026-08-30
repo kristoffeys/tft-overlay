@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "rivals-rengar",
+  "name": "Rivals Rengar",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "A-tier slow roll comp built around Emerald Aspect and Vanguard.",
+  "units": [
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Hecarim",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Mama Beak",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Summoner",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Rengar",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Rival"
+      ]
+    },
+    {
+      "name": "Aphelios",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Lunar",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Brambleback",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Hecarim",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Rengar",
+      "itemPriority": [
+        "Edge of Night",
+        "Guinsoo's Rageblade",
+        "Titan's Resolve"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Taric",
+        "Diana",
+        "Sentinel",
+        "Rengar",
+        "Hecarim",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Aphelios",
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Mama Beak"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Akali, Gromp, Murkwolf, Scuttlecrab, Rengar"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Zyra, Alune, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Akali, Gromp, Murkwolf, Scuttlecrab, Rengar early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Taric → Rakan, Elise."
+}

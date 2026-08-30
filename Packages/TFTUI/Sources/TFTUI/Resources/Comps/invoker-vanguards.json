@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "invoker-vanguards",
+  "name": "Invoker Vanguards",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "A-tier fast 8 comp built around Emerald Aspect and Caustic.",
+  "units": [
+    {
+      "name": "Rakan",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Juggernaut",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Kog'Maw",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Caustic",
+        "Adaptor",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Vi",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Primal",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Morgana",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Coven",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Nidalee",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Primal",
+        "Adaptor"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Morgana",
+      "itemPriority": [
+        "Morellonomicon",
+        "Void Staff"
+      ]
+    },
+    {
+      "unit": "Nidalee",
+      "itemPriority": [
+        "Guinsoo's Rageblade",
+        "Jeweled Gauntlet"
+      ]
+    },
+    {
+      "unit": "Sentinel",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Taric",
+        "Rakan",
+        "Vi",
+        "Diana",
+        "Sentinel",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "Morgana",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Kog'Maw",
+        "Nidalee"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Camille, Rakan, Caitlyn, Elise, Kogmaw"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Teemo, Alune, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Camille, Rakan, Caitlyn, Elise, Kogmaw early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Taric → Hecarim."
+}

@@ -27,10 +27,10 @@ public enum CompLoader {
         try decode(data, file: "<data>")
     }
 
-    /// The comps bundled with TFTUI itself as fixtures — copies of the two
-    /// comps shipped under `data/comps/` — so panels, previews, tests and
-    /// the demo app all render without depending on a path outside this
-    /// package.
+    /// The comps bundled with TFTUI itself as fixtures — copies of whatever
+    /// `data/comps/` currently holds (the two hand-authored comps plus the
+    /// scraper's output, per ADR 0004) — so panels, previews, tests and the
+    /// demo app all render without depending on a path outside this package.
     public static func bundledFixtures() throws -> [Comp] {
         let urls = Bundle.module.urls(forResourcesWithExtension: "json", subdirectory: "Comps") ?? []
         return try urls

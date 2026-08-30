@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "lunar-rapidfire",
+  "name": "Lunar Rapidfire",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "A-tier fast 8 comp built around Emerald Aspect and Thornmaiden.",
+  "units": [
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Hecarim",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Mama Beak",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Summoner",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Aphelios",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Lunar",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Brambleback",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Zyra",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Thornmaiden",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Aphelios",
+      "itemPriority": [
+        "Deathblade",
+        "Guinsoo's Rageblade",
+        "Infinity Edge"
+      ]
+    },
+    {
+      "unit": "Sentinel",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Taric",
+        "Diana",
+        "Hecarim",
+        "Brambleback",
+        "Sentinel",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Mama Beak",
+        null,
+        null,
+        null,
+        null,
+        "Zyra",
+        "Aphelios"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Ornn, Rakan, Varus, Xayah, Hecarim"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Alune, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Ornn, Rakan, Varus, Xayah, Hecarim early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Taric → Rakan, Elise."
+}

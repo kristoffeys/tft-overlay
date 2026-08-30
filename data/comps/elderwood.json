@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "elderwood",
+  "name": "Elderwood",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "B",
+  "playstyle": "reroll",
+  "difficulty": "medium",
+  "description": "B-tier reroll comp built around Elderwood and Emerald Aspect.",
+  "units": [
+    {
+      "name": "Ornn",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Xayah",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Fae",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Alistar",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "LeBlanc",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Hecarim",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Ezreal",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Soraka",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Flora Fatalis",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Hecarim",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Warmog's Armor",
+        "Sunfire Cape"
+      ]
+    },
+    {
+      "unit": "Ezreal",
+      "itemPriority": [
+        "Deathblade",
+        "Infinity Edge",
+        "Spear of Shojin"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        "Ornn",
+        "Alistar",
+        "Gnar",
+        "Hecarim",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "LeBlanc",
+        null,
+        "Xayah",
+        null,
+        "Soraka",
+        null,
+        "Ezreal"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Ornn, Xayah, Alistar, Leblanc, Hecarim"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Lux (Elderwood), Taric."
+    }
+  ],
+  "earlyOpener": "Prioritize Ornn, Xayah, Alistar, Leblanc, Hecarim early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Soraka → Kennen."
+}

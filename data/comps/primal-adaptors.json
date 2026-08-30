@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "primal-adaptors",
+  "name": "Primal Adaptors",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "A-tier fast 8 comp built around Adaptor and Caustic.",
+  "units": [
+    {
+      "name": "Akali",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Inferno",
+        "Adaptor",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Kog'Maw",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Caustic",
+        "Adaptor",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Master Yi",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blossom",
+        "Adaptor"
+      ]
+    },
+    {
+      "name": "Vi",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Primal",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Amumu",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Inferno",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Nidalee",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Primal",
+        "Adaptor"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Amumu",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Spirit Visage",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Nidalee",
+      "itemPriority": [
+        "Jeweled Gauntlet",
+        "Nashor's Tooth",
+        "Nashor's Tooth"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Diana",
+        "Vi",
+        "Sentinel",
+        "Master Yi",
+        "Amumu",
+        "Akali"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Kog'Maw",
+        "Nidalee"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Akali, Ornn, Varus, Shen, Master Yi"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Ivern, Lux (Blossom), Taric."
+    }
+  ],
+  "earlyOpener": "Prioritize Akali, Ornn, Varus, Shen, Master Yi early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Akali, Diana, Amumu → Gromp, Scuttlecrab, Taric."
+}

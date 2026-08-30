@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "riftbeast-ravagers",
+  "name": "Riftbeast Ravagers",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "A-tier fast 8 comp built around Riftbeast and Apex Predator.",
+  "units": [
+    {
+      "name": "Pebbles",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Murkwolf",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Krug",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Brambleback",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Elder Dragon",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Apex Predator",
+        "Riftbeast"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Sentinel",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Protector's Vow",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Brambleback",
+      "itemPriority": [
+        "Edge of Night",
+        "Giant Slayer",
+        "Quicksilver"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Krug",
+        "Pebbles",
+        "Taric",
+        "Brambleback",
+        "Sentinel",
+        "Murkwolf"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Elder Dragon",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Cinderling, Pebbles, Murkwolf, Scuttlecrab, Krug"
+    },
+    {
+      "stage": "4-5",
+      "level": 8,
+      "notes": "At level 8 you can add: Gnar, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Cinderling, Pebbles, Murkwolf, Scuttlecrab, Krug early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
+}

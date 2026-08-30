@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "spellweaver-defenders",
+  "name": "Spellweaver Defenders",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "S",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "S-tier slow roll comp built around Defender and Flora Fatalis.",
+  "units": [
+    {
+      "name": "Leona",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Ornn",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Shen",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Inferno",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Cassiopeia",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Coven",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Fiddlesticks",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Flora Fatalis",
+        "Defender",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Rammus",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Sprykin",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Lillia",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Fae",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Soraka",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Flora Fatalis",
+        "Executioner"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Cassiopeia",
+      "itemPriority": [
+        "Archangel's Staff",
+        "Blue Buff",
+        "Hextech Gunblade"
+      ]
+    },
+    {
+      "unit": "Fiddlesticks",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Spirit Visage",
+        "Sunfire Cape"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Ornn",
+        "Shen",
+        "Lillia",
+        "Fiddlesticks",
+        "Rammus",
+        "Leona"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Soraka",
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Cassiopeia"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Leona, Ornn, Shen, Cassiopeia, Fiddlesticks"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Ivern, Kennen."
+    }
+  ],
+  "earlyOpener": "Prioritize Leona, Ornn, Shen, Cassiopeia, Fiddlesticks early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
+}

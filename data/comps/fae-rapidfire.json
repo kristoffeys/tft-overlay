@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "fae-rapidfire",
+  "name": "Fae Rapidfire",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "B",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "B-tier slow roll comp built around Fae and Elderwood.",
+  "units": [
+    {
+      "name": "Ornn",
+      "cost": 1,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Rakan",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Juggernaut",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Varus",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Inferno",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Xayah",
+      "cost": 1,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Fae",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Hecarim",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Tristana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Sprykin",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Amumu",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Inferno",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Lillia",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Fae",
+        "Defender"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Ornn",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Spirit Visage",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Xayah",
+      "itemPriority": [
+        "Guinsoo's Rageblade",
+        "Infinity Edge",
+        "Kraken's Fury"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Hecarim",
+        "Rakan",
+        "Amumu",
+        "Lillia",
+        "Ornn",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Varus",
+        null,
+        null,
+        null,
+        null,
+        "Tristana",
+        "Xayah"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Ornn, Rakan, Varus, Xayah, Shen"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Aphelios, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Ornn, Rakan, Varus, Xayah, Shen early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
+}

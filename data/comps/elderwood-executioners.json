@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "elderwood-executioners",
+  "name": "Elderwood Executioners",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "A-tier fast 8 comp built around Bounty Seeker and Emerald Aspect.",
+  "units": [
+    {
+      "name": "Alistar",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Amumu",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Inferno",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Ezreal",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Draven",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Bounty Seeker"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Ivern",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Greenfather"
+      ]
+    },
+    {
+      "name": "Kennen",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Inferno",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Maokai",
+      "cost": 5,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Old Growth",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Ezreal",
+      "itemPriority": [
+        "Deathblade",
+        "Infinity Edge",
+        "Spear of Shojin"
+      ]
+    },
+    {
+      "unit": "Maokai",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Protector's Vow",
+        "Spirit Visage"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Taric",
+        "Alistar",
+        "Amumu",
+        "Gnar",
+        "Maokai",
+        "Kennen"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Ivern",
+        null,
+        null,
+        null,
+        null,
+        "Draven",
+        "Ezreal"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Ornn, Varus, Xayah, Alistar, Shen"
+    }
+  ],
+  "earlyOpener": "Prioritize Ornn, Varus, Xayah, Alistar, Shen early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Draven, Ivern → Sentinel, Lux (Elderwood)."
+}
