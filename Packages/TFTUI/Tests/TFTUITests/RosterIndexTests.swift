@@ -25,13 +25,22 @@ final class RosterIndexTests: XCTestCase {
 
         XCTAssertEqual(ashe.cost, 5)
         XCTAssertEqual(ashe.traits, ["Blossom", "Hunter"])
-        XCTAssertEqual(ashe.recommendedItems, ["Infinity Edge", "Giant Slayer", "Runaan's Hurricane"])
-        XCTAssertEqual(ashe.comps.map(\.id), ["hunters-ashe"])
+        XCTAssertEqual(ashe.recommendedItems, ["Infinity Edge", "Giant Slayer", "Last Whisper"])
+        // Ashe carries several of the scraped comps (ADR 0004), so this
+        // pins the hand-authored one rather than the whole list, which
+        // changes whenever the maintainer re-runs the scraper.
+        XCTAssertTrue(ashe.comps.contains { $0.id == "hunters-ashe" })
     }
 
     func testUnitWithNoCarryEntryHasNoRecommendedItems() throws {
-        let ornn = try XCTUnwrap(index.unit(named: "Ornn"))
-        XCTAssertTrue(ornn.recommendedItems.isEmpty)
+        // Which units are nobody's carry depends on the current fixture set,
+        // so pick one out of the loaded comps instead of naming it.
+        let carryNames = Set(comps.flatMap { $0.carries.map(\.unit) })
+        let bench = try XCTUnwrap(
+            index.units.first { !carryNames.contains($0.name) },
+            "every bundled unit is a carry somewhere; this test has nothing to assert on"
+        )
+        XCTAssertTrue(bench.recommendedItems.isEmpty)
     }
 
     func testUnitAppearingInMultipleCompsListsAllOfThem() throws {

@@ -14,12 +14,16 @@ struct UnitReferenceDetailView: View {
             VStack(alignment: .leading, spacing: 16) {
                 header
                 section("Traits") {
-                    TappableTraitTagRow(unit.traits, onSelect: onSelectTrait)
+                    TappableTraitTagRow(
+                        unit.traits,
+                        priority: TraitRelevance.weightsForUnitTraits(unit.traits),
+                        onSelect: onSelectTrait
+                    )
                 }
                 section("Recommended Items") {
                     if unit.recommendedItems.isEmpty {
                         Text("No item data for this unit yet.")
-                            .font(.system(size: 12))
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(TFTTheme.textSecondary)
                     } else {
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -28,8 +32,10 @@ struct UnitReferenceDetailView: View {
                                     VStack(spacing: 3) {
                                         ItemIconPlaceholder(name: name, size: 40)
                                         Text(name)
-                                            .font(.system(size: 9, weight: .semibold))
-                                            .foregroundStyle(TFTTheme.textSecondary)
+                                            // An item's name is the answer the
+                                            // player came for, not a caption.
+                                            .font(.system(size: 10, weight: .semibold))
+                                            .foregroundStyle(TFTTheme.textPrimary)
                                             .lineLimit(1)
                                             .frame(maxWidth: 52)
                                     }
@@ -41,7 +47,7 @@ struct UnitReferenceDetailView: View {
                 section("Used In") {
                     if unit.comps.isEmpty {
                         Text("No loaded comp uses this unit.")
-                            .font(.system(size: 12))
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(TFTTheme.textSecondary)
                     } else {
                         VStack(spacing: 6) {
@@ -56,7 +62,7 @@ struct UnitReferenceDetailView: View {
                                             .foregroundStyle(TFTTheme.textPrimary)
                                         Spacer()
                                         Image(systemName: "chevron.right")
-                                            .foregroundStyle(TFTTheme.textSecondary)
+                                            .foregroundStyle(TFTTheme.textTertiary)
                                     }
                                     .padding(8)
                                     .background(
@@ -126,7 +132,7 @@ struct TraitReferenceDetailView: View {
                 section("Units") {
                     if trait.units.isEmpty {
                         Text("No loaded comp uses this trait.")
-                            .font(.system(size: 12))
+                            .font(.system(size: 12, weight: .medium))
                             .foregroundStyle(TFTTheme.textSecondary)
                     } else {
                         VStack(spacing: 6) {
@@ -141,7 +147,7 @@ struct TraitReferenceDetailView: View {
                                             .foregroundStyle(TFTTheme.textPrimary)
                                         Spacer()
                                         Image(systemName: "chevron.right")
-                                            .foregroundStyle(TFTTheme.textSecondary)
+                                            .foregroundStyle(TFTTheme.textTertiary)
                                     }
                                     .padding(8)
                                     .background(

@@ -34,9 +34,20 @@ public final class PinnedCompsStore: ObservableObject {
         }
     }
 
+    /// Pinning also makes the comp the current one.
+    ///
+    /// Pinning is how a player says "this is the build I'm going for", and
+    /// the compact overlay shows the current pin's roster — so a pin that
+    /// left the cycle pointed at some earlier comp would answer a question
+    /// nobody asked. Pinning an already-pinned comp still re-selects it,
+    /// which is what makes it a usable "switch to this build" gesture.
     public func pin(_ id: String) {
-        guard !pinnedIDs.contains(id) else { return }
+        if let existing = pinnedIDs.firstIndex(of: id) {
+            cycleIndex = existing
+            return
+        }
         pinnedIDs.append(id)
+        cycleIndex = pinnedIDs.count - 1
         persist()
     }
 

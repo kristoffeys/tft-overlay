@@ -14,6 +14,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let settingsStore = SettingsStore()
     private let preferencesWindowController = PreferencesWindowController()
     private var settingsCancellable: AnyCancellable?
+    private var dataRefreshTimer: Timer?
 
     private(set) lazy var overlay = OverlayPanelController(
         content: OverlayContentView(appState: appState),
@@ -21,16 +22,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // Wide/tall enough that the comps list, detail scroller and
             // item grid all read comfortably — OverlayKit's own default
             // (420x560) is a fine floor, but these panels want a bit more
-            // room. Compact hosts CompactItemCheatSheetView, a squarish
-            // fixed grid (~262x262 for the standard component set), not a
-            // thin strip — OverlayKit's 480x48 default doesn't fit it.
+            // room. Compact hosts the pinned build's roster on a single
+            // line (SelectedBuildRosterView), so it is a wide, short strip:
+            // tall enough for a header, a row of portraits and the item
+            // icons under each carry, and no taller.
             expandedSize: CGSize(width: 460, height: 640),
-            compactSize: CGSize(width: 300, height: 320),
+            compactSize: CGSize(width: 420, height: 132),
             minSize: CGSize(width: 300, height: 240),
             maxSize: CGSize(width: 900, height: 1200),
             defaultOpacity: settingsStore.settings.overlay.opacity,
             idleRevertInterval: settingsStore.settings.overlay.idleTimeoutSeconds,
-            initialLayoutMode: .expanded
+            initialLayoutMode: .expanded,
+            startsInteractive: settingsStore.settings.overlay.startsUnlocked,
+            autoLockWhenIdle: settingsStore.settings.overlay.autoLockWhenIdle
         )
     )
 
@@ -45,7 +49,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         overlay.setScale(settingsStore.settings.overlay.scale)
         overlay.moveToAnchor(settingsStore.settings.overlay.anchor.overlayAnchor)
         registerHotkeys()
+        updateInteractiveHintText()
         observeSettings()
+        startDataRefreshTimer()
         overlay.show()
     }
 
@@ -54,10 +60,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // rather than relying on `deinit`, which process exit doesn't
         // reliably run for an app-lifetime object.
         settingsCancellable?.cancel()
+        dataRefreshTimer?.invalidate()
         preferencesWindowController.teardown()
         overlay.teardown()
         hotkeyManager.unregisterAll()
         SingleInstanceGuard.release()
+    }
+
+    // MARK: - Data refresh (#22)
+
+    /// Checks for a newer patch shortly after launch and again on an
+    /// interval, gated on Preferences' "Refresh automatically" — otherwise
+    /// the app only ever sees whatever was true at first launch until it's
+    /// force-quit and reopened. 30 minutes comfortably covers a patch going
+    /// live mid-session without polling Community Dragon meaningfully often;
+    /// `checkAndRefreshIfNeeded()` itself is a small version-check request
+    /// unless the content version actually moved.
+    private func startDataRefreshTimer() {
+        checkForDataRefreshIfEnabled()
+        let timer = Timer(timeInterval: 30 * 60, repeats: true) { [weak self] _ in
+            Task { @MainActor in self?.checkForDataRefreshIfEnabled() }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        dataRefreshTimer = timer
+    }
+
+    private func checkForDataRefreshIfEnabled() {
+        guard settingsStore.settings.data.autoRefreshEnabled else { return }
+        Task { [appState] in
+            await appState.refreshAssetDataIfNewer()
+        }
     }
 
     // MARK: - Hotkeys (#4)
@@ -95,6 +127,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func rebindHotkey(_ action: AppHotkeyAction, to hotkey: Hotkey) {
         registerHotkey(hotkey, for: action)
         settingsStore.settings.general.hotkeys[action.rawValue] = hotkey
+        updateInteractiveHintText()
+    }
+
+    /// The click-through badge (#2 — "the product's clearest dead end") has
+    /// to name whatever key is *actually* bound right now, not a hardcoded
+    /// default, since this hotkey is user-rebindable.
+    private func updateInteractiveHintText() {
+        guard let hotkey = hotkeyManager.hotkey(for: AppHotkeyAction.toggleInteractive.action) else {
+            overlay.setInteractiveHintText(nil)
+            return
+        }
+        let combo = HotkeyFormatting.displayString(for: hotkey)
+        overlay.setInteractiveHintText("\(combo) to interact")
+        overlay.setLockHintText("Lock (\(combo))")
+        if let layoutKey = hotkeyManager.hotkey(for: AppHotkeyAction.toggleLayout.action) {
+            overlay.setLayoutHintText("Compact (\(HotkeyFormatting.displayString(for: layoutKey)))")
+        }
     }
 
     // MARK: - Settings propagation (#4 — live, no restart)
@@ -112,6 +161,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         overlay.setOpacity(overlaySettings.opacity)
         overlay.setScale(overlaySettings.scale)
         overlay.setIdleRevertInterval(overlaySettings.idleTimeoutSeconds)
+        overlay.setAutoLockWhenIdle(overlaySettings.autoLockWhenIdle)
         overlay.moveToAnchor(overlaySettings.anchor.overlayAnchor)
     }
 

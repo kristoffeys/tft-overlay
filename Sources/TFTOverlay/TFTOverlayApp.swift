@@ -6,7 +6,7 @@ struct TFTOverlayApp: App {
 
     var body: some Scene {
         MenuBarExtra("TFT Overlay", systemImage: "square.stack.3d.up") {
-            MenuBarContentView(appDelegate: appDelegate)
+            MenuBarContentView(appDelegate: appDelegate, panelState: appDelegate.overlay.observableState)
         }
     }
 }

@@ -27,11 +27,14 @@ public struct ItemCheatSheetView: View {
 
     public var body: some View {
         VStack(spacing: 0) {
-            Picker("", selection: $mode) {
-                ForEach(Mode.allCases) { Text($0.rawValue).tag($0) }
-            }
-            .pickerStyle(.segmented)
-            .padding(10)
+            PanelTabBar(
+                tabs: Mode.allCases,
+                selection: mode,
+                title: \.rawValue,
+                style: .secondary
+            ) { mode = $0 }
+                .padding(.top, 4)
+                .padding(.bottom, 4)
 
             Group {
                 switch mode {
@@ -50,34 +53,50 @@ public struct ItemCheatSheetView: View {
     }
 
     private var gridView: some View {
-        ScrollView([.horizontal, .vertical]) {
-            VStack(spacing: 4) {
-                HStack(spacing: 4) {
-                    Color.clear.frame(width: 52, height: 52)
-                    ForEach(matrix.components) { component in
-                        ItemIconPlaceholder(component, size: 46)
+        // Sized from the width the panel actually gives it, so the whole
+        // matrix is on screen instead of trailing off into a horizontal
+        // scroll bar. Vertical scrolling stays, since a short panel can
+        // still run out of height.
+        GeometryReader { proxy in
+            let metrics = RecipeGridMetrics(
+                availableWidth: proxy.size.width - gridPadding * 2,
+                columns: matrix.components.count
+            )
+            ScrollView(.vertical) {
+                VStack(spacing: metrics.spacing) {
+                    HStack(spacing: metrics.spacing) {
+                        Color.clear.frame(width: metrics.cell, height: metrics.cell)
+                        ForEach(matrix.components) { component in
+                            ItemIconPlaceholder(component, size: metrics.cell)
+                        }
                     }
-                }
-                ForEach(matrix.components) { rowComponent in
-                    HStack(spacing: 4) {
-                        ItemIconPlaceholder(rowComponent, size: 52)
-                        ForEach(matrix.components) { colComponent in
-                            if let item = matrix.completedItem(rowComponent, colComponent) {
-                                Button {
-                                    selectedItem = item
-                                } label: {
-                                    ItemIconPlaceholder(item, size: 46)
+                    ForEach(matrix.components) { rowComponent in
+                        HStack(spacing: metrics.spacing) {
+                            ItemIconPlaceholder(rowComponent, size: metrics.cell)
+                            ForEach(matrix.components) { colComponent in
+                                if let item = matrix.completedItem(rowComponent, colComponent) {
+                                    Button {
+                                        selectedItem = item
+                                    } label: {
+                                        ItemIconPlaceholder(item, size: metrics.cell)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .help(item.name)
+                                } else {
+                                    Color.clear.frame(width: metrics.cell, height: metrics.cell)
                                 }
-                                .buttonStyle(.plain)
-                            } else {
-                                Color.clear.frame(width: 46, height: 46)
                             }
                         }
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(gridPadding)
             }
-            .padding(12)
         }
+    }
+
+    private var gridPadding: CGFloat {
+        12
     }
 
     private var lookupView: some View {

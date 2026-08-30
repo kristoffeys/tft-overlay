@@ -19,7 +19,7 @@ public struct DifficultyIndicator: View {
         HStack(spacing: 3) {
             ForEach(0 ..< 3, id: \.self) { index in
                 Circle()
-                    .fill(index < filled ? TFTTheme.accent : TFTTheme.textSecondary.opacity(0.25))
+                    .fill(index < filled ? TFTTheme.accent : TFTTheme.textTertiary.opacity(0.3))
                     .frame(width: 6, height: 6)
             }
         }

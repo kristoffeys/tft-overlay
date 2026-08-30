@@ -64,18 +64,42 @@ struct OverlaySettings: Codable, Equatable {
     var scale: Double
     var anchor: OverlayAnchorPreference
     var idleTimeoutSeconds: Double
+    /// Whether the overlay accepts clicks on launch. On by default — the
+    /// overlay is meant to be usable standalone, and a panel that ignores
+    /// every click until you discover a hotkey is a dead end.
+    var startsUnlocked: Bool
+    /// Whether an idle spell locks the overlay back to click-through.
+    /// Off by default, since with `startsUnlocked` it would otherwise undo
+    /// the user's default seconds after launch.
+    var autoLockWhenIdle: Bool
 
-    static let defaults = OverlaySettings(opacity: 0.9, scale: 1.0, anchor: .bottomTrailing, idleTimeoutSeconds: 8)
+    static let defaults = OverlaySettings(
+        opacity: 0.9,
+        scale: 1.0,
+        anchor: .bottomTrailing,
+        idleTimeoutSeconds: 8,
+        startsUnlocked: true,
+        autoLockWhenIdle: false
+    )
 
     private enum CodingKeys: String, CodingKey {
-        case opacity, scale, anchor, idleTimeoutSeconds
+        case opacity, scale, anchor, idleTimeoutSeconds, startsUnlocked, autoLockWhenIdle
     }
 
-    init(opacity: Double, scale: Double, anchor: OverlayAnchorPreference, idleTimeoutSeconds: Double) {
+    init(
+        opacity: Double,
+        scale: Double,
+        anchor: OverlayAnchorPreference,
+        idleTimeoutSeconds: Double,
+        startsUnlocked: Bool = true,
+        autoLockWhenIdle: Bool = false
+    ) {
         self.opacity = min(max(opacity, 0.1), 1.0)
         self.scale = min(max(scale, 0.5), 3.0)
         self.anchor = anchor
         self.idleTimeoutSeconds = max(idleTimeoutSeconds, 0)
+        self.startsUnlocked = startsUnlocked
+        self.autoLockWhenIdle = autoLockWhenIdle
     }
 
     init(from decoder: Decoder) throws {
@@ -86,7 +110,18 @@ struct OverlaySettings: Codable, Equatable {
             ?? OverlaySettings.defaults.anchor
         let idleTimeoutSeconds = try container.decodeIfPresent(Double.self, forKey: .idleTimeoutSeconds)
             ?? OverlaySettings.defaults.idleTimeoutSeconds
-        self.init(opacity: opacity, scale: scale, anchor: anchor, idleTimeoutSeconds: idleTimeoutSeconds)
+        let startsUnlocked = try container.decodeIfPresent(Bool.self, forKey: .startsUnlocked)
+            ?? OverlaySettings.defaults.startsUnlocked
+        let autoLockWhenIdle = try container.decodeIfPresent(Bool.self, forKey: .autoLockWhenIdle)
+            ?? OverlaySettings.defaults.autoLockWhenIdle
+        self.init(
+            opacity: opacity,
+            scale: scale,
+            anchor: anchor,
+            idleTimeoutSeconds: idleTimeoutSeconds,
+            startsUnlocked: startsUnlocked,
+            autoLockWhenIdle: autoLockWhenIdle
+        )
     }
 }
 

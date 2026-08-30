@@ -74,17 +74,20 @@ public struct UnitTraitReferenceView: View {
     }
 
     private var modePicker: some View {
-        Picker("", selection: $mode) {
-            ForEach(Mode.allCases) { Text($0.rawValue).tag($0) }
-        }
-        .pickerStyle(.segmented)
-        .padding(10)
+        PanelTabBar(
+            tabs: Mode.allCases,
+            selection: mode,
+            title: \.rawValue,
+            style: .secondary
+        ) { mode = $0 }
+            .padding(.top, 4)
+            .padding(.bottom, 4)
     }
 
     private var searchField: some View {
         HStack(spacing: 8) {
             Image(systemName: "magnifyingglass")
-                .foregroundStyle(TFTTheme.textSecondary)
+                .foregroundStyle(TFTTheme.textTertiary)
             TextField("Search \(mode == .units ? "unit" : "trait")", text: $searchText)
                 .textFieldStyle(.plain)
                 .foregroundStyle(TFTTheme.textPrimary)
@@ -182,7 +185,7 @@ private struct UnitReferenceRow: View {
                 Text(unit.name)
                     .font(.system(size: 13, weight: .bold, design: .rounded))
                     .foregroundStyle(TFTTheme.textPrimary)
-                TraitTagRow(unit.traits)
+                TraitTagRow(unit.traits, priority: TraitRelevance.weightsForUnitTraits(unit.traits))
             }
             Spacer(minLength: 8)
             if !unit.comps.isEmpty {

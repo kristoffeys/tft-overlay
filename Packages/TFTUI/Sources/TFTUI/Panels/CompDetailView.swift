@@ -7,9 +7,14 @@ public struct CompDetailView: View {
     let comp: Comp
     @ObservedObject private var pinnedStoreBox: PinnedCompsStoreBox
 
+    /// Built once per comp so hovering a hex or a roster row is a dictionary
+    /// hit rather than a scan of `units` and `carries`.
+    private let unitIndex: CompUnitIndex
+
     public init(comp: Comp, pinnedStore: PinnedCompsStore? = nil) {
         self.comp = comp
         pinnedStoreBox = PinnedCompsStoreBox(pinnedStore)
+        unitIndex = CompUnitIndex(comp: comp)
     }
 
     private var pinnedStore: PinnedCompsStore? {
@@ -18,18 +23,36 @@ public struct CompDetailView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                header
-                boardSection
-                carriesSection
-                levelPlanSection
-                openerPivotSection
-                augmentsSection
-                rosterSection
-            }
-            .padding(16)
+            content
         }
         .background(TFTTheme.background)
+    }
+
+    /// The panel minus its scroll container.
+    ///
+    /// Split out so the off-screen snapshot tests can rasterise it:
+    /// `ImageRenderer` renders a `ScrollView` as an empty bitmap, so a layout
+    /// test that wraps one is silently testing nothing. Everything that can
+    /// clip or overflow lives in here anyway.
+    var content: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            header
+            // A hex tooltip can reach past the board's own card; without
+            // this the sections below it are painted over the tooltip.
+            boardSection
+                .zIndex(1)
+            carriesSection
+            levelPlanSection
+            openerPivotSection
+            // Scraped comps carry no augment picks, which is most of them —
+            // rendering the section anyway spent a whole card on three
+            // em-dashes and pushed the roster below the fold for nothing.
+            if hasAugmentPreferences {
+                augmentsSection
+            }
+            rosterSection
+        }
+        .padding(16)
     }
 
     private var header: some View {
@@ -55,8 +78,8 @@ public struct CompDetailView: View {
             .foregroundStyle(TFTTheme.textSecondary)
             if let description = comp.compDescription {
                 Text(description)
-                    .font(.system(size: 13))
-                    .foregroundStyle(TFTTheme.textPrimary.opacity(0.9))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(TFTTheme.textPrimary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -70,11 +93,11 @@ public struct CompDetailView: View {
     private var boardSection: some View {
         section("Final Board") {
             VStack(alignment: .leading, spacing: 8) {
-                BoardGridView(grid: comp.boardPositioning.grid)
+                BoardGridView(grid: comp.boardPositioning.grid, unitIndex: unitIndex)
                     .frame(maxWidth: .infinity, alignment: .center)
                 if let notes = comp.boardPositioning.notes {
                     Text(notes)
-                        .font(.system(size: 12))
+                        .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(TFTTheme.textSecondary)
                 }
             }
@@ -107,7 +130,7 @@ public struct CompDetailView: View {
                                 .foregroundStyle(TFTTheme.textPrimary)
                             if let notes = entry.notes {
                                 Text(notes)
-                                    .font(.system(size: 12))
+                                    .font(.system(size: 12, weight: .medium))
                                     .foregroundStyle(TFTTheme.textSecondary)
                             }
                         }
@@ -121,15 +144,20 @@ public struct CompDetailView: View {
         VStack(spacing: 10) {
             section("Early Opener") {
                 Text(comp.earlyOpener)
-                    .font(.system(size: 13))
-                    .foregroundStyle(TFTTheme.textPrimary.opacity(0.92))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(TFTTheme.textPrimary)
             }
             section("Pivot Notes") {
                 Text(comp.pivotNotes)
-                    .font(.system(size: 13))
-                    .foregroundStyle(TFTTheme.textPrimary.opacity(0.92))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(TFTTheme.textPrimary)
             }
         }
+    }
+
+    private var hasAugmentPreferences: Bool {
+        let preferences = comp.augmentPreferences
+        return !(preferences.tier1.isEmpty && preferences.tier2.isEmpty && preferences.tier3.isEmpty)
     }
 
     private var augmentsSection: some View {
@@ -148,7 +176,7 @@ public struct CompDetailView: View {
                 .font(.system(size: 10, weight: .heavy, design: .rounded))
                 .foregroundStyle(TFTTheme.textSecondary)
             if names.isEmpty {
-                Text("—").font(.system(size: 12)).foregroundStyle(TFTTheme.textSecondary)
+                Text("—").font(.system(size: 12, weight: .medium)).foregroundStyle(TFTTheme.textSecondary)
             }
             ForEach(names, id: \.self) { name in
                 Text(name)
@@ -159,38 +187,56 @@ public struct CompDetailView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    /// Champion art carrying its own items, rather than the text list this
+    /// used to be: the roster is the part of a comp a player recognises
+    /// visually, and reading eight rows of names to find out what to buy is
+    /// slower than looking at eight portraits.
+    ///
+    /// Per-unit trait tags moved to the aggregate breakdown below the grid —
+    /// repeating "Elderwood" on six rows never said as much as "Elderwood
+    /// 6" does, and the per-unit list is still one hover away on any cell.
     private var rosterSection: some View {
         section("Full Roster") {
-            VStack(spacing: 6) {
-                ForEach(comp.units) { unit in
-                    HStack(spacing: 10) {
-                        UnitPortraitPlaceholder(name: unit.name, cost: unit.cost, size: 32)
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(spacing: 6) {
-                                Text(unit.name)
-                                    .font(.system(size: 13, weight: .bold, design: .rounded))
-                                    .foregroundStyle(TFTTheme.textPrimary)
-                                Text(String(repeating: "★", count: unit.starTarget))
-                                    .font(.system(size: 11, weight: .bold))
-                                    .foregroundStyle(TFTTheme.accent)
-                                if unit.flex {
-                                    Text("FLEX")
-                                        .font(.system(size: 9, weight: .heavy))
-                                        .foregroundStyle(TFTTheme.textSecondary)
-                                }
-                            }
-                            HStack(spacing: 4) {
-                                ForEach(unit.traits, id: \.self) { TraitTag($0) }
-                            }
-                        }
-                        Spacer()
-                        Text(unit.role.rawValue.capitalized)
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundStyle(TFTTheme.textSecondary)
-                    }
+            VStack(alignment: .leading, spacing: 12) {
+                CompRosterGrid(comp: comp, portraitSize: 56, showsNames: true)
+                traitBreakdown
+            }
+        }
+    }
+
+    private var traitBreakdown: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("TRAITS AT FULL BOARD")
+                .font(.system(size: 10, weight: .heavy, design: .rounded))
+                .foregroundStyle(TFTTheme.textSecondary)
+            // An adaptive grid rather than TraitTagRow: this breakdown is
+            // the one place every trait must be visible, so it wraps to as
+            // many rows as it needs instead of collapsing into "+3".
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 96), spacing: 6, alignment: .leading)],
+                alignment: .leading,
+                spacing: 6
+            ) {
+                ForEach(traitCounts, id: \.name) { entry in
+                    TraitTag("\(entry.name) \(entry.count)")
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
         }
+    }
+
+    /// Highest-count traits first: those are the ones the comp is actually
+    /// built around, and a trait held by one unit is usually incidental.
+    private var traitCounts: [(name: String, count: Int)] {
+        var counts: [String: Int] = [:]
+        for unit in comp.units {
+            for trait in unit.traits {
+                counts[trait, default: 0] += 1
+            }
+        }
+        return counts
+            .map { (name: $0.key, count: $0.value) }
+            .sorted { $0.count == $1.count ? $0.name < $1.name : $0.count > $1.count }
     }
 
     private func section(_ title: String, @ViewBuilder content: () -> some View) -> some View {
@@ -232,14 +278,14 @@ private struct CarryCard: View {
                     VStack(spacing: 3) {
                         ItemIconPlaceholder(name: itemName, size: 36)
                         Text(rank(index))
-                            .font(.system(size: 9, weight: .heavy))
-                            .foregroundStyle(TFTTheme.textSecondary)
+                            .font(.system(size: 10, weight: .heavy))
+                            .foregroundStyle(TFTTheme.textPrimary)
                     }
                 }
             }
             if let notes = carry.itemNotes {
                 Text(notes)
-                    .font(.system(size: 12))
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(TFTTheme.textSecondary)
             }
         }
