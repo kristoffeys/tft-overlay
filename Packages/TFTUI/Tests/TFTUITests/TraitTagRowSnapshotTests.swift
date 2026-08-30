@@ -66,7 +66,10 @@ final class TraitTagRowSnapshotTests: XCTestCase {
         try assertRendersWithin(
             TraitTagRow(elderwoodTraits),
             size: CGSize(width: overlayRowWidth, height: TraitTagLayout.lineHeight),
-            rightMargin: 0
+            rightMargin: 0,
+            // One line: 8pt of 10pt glyph in a 20pt tag row (measured 0.40),
+            // the capsule fill itself reading below the ink threshold.
+            minimumVerticalFill: 0.3
         )
     }
 

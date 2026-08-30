@@ -149,12 +149,24 @@ final class PanelSnapshotTests: XCTestCase {
 
     // MARK: - Panel chrome above the scroll area
 
-    /// The comps list's search field and filter bar are the part that is not
-    /// scrollable, and the part that has to survive the 300pt compact width.
-    func testCompsListChromeRendersWithinBothPanelSizes() throws {
+    /// The comp rows themselves, at both panel widths.
+    ///
+    /// This replaces an assertion that rendered the whole `CompsListView` into
+    /// 460x640 and 300x320. Its raster was a 16pt strip in a 640pt frame — the
+    /// search field's `TextField` bar, and nothing else, because the list is a
+    /// `ScrollView` — and it passed (issue #95). `listContent` is the scroll
+    /// content split out of that `ScrollView`, so this renders the rows.
+    func testCompsListRowsRenderWithinBothPanelWidths() throws {
         let comps = try CompLoader.bundledFixtures()
         for size in [expanded, compact] {
-            try assertRendersWithin(CompsListView(comps: comps), size: size, rightMargin: 4)
+            let content = CompsListView(comps: comps).listContent
+            let natural = try ViewSnapshot.measuredSize(of: content, proposedWidth: size.width)
+            XCTAssertGreaterThan(natural.height, size.height, "The comp list is expected to scroll")
+            try assertRendersWithin(
+                content,
+                size: CGSize(width: size.width, height: natural.height),
+                rightMargin: 4
+            )
         }
     }
 
@@ -205,16 +217,36 @@ final class PanelSnapshotTests: XCTestCase {
                 try assertRendersWithin(
                     chrome,
                     size: CGSize(width: size.width, height: height),
-                    rightMargin: 4
+                    rightMargin: 4,
+                    // Collapsed, the head is a 48pt row whose only glyphs are
+                    // the search placeholder and the disclosure icon: 14pt of
+                    // ink, measured, because the field's own fill sits below
+                    // the ink threshold. Open, it measures 0.77.
+                    minimumVerticalFill: showsFilters ? 0.5 : 0.25
                 )
             }
         }
     }
 
-    func testReferencePanelChromeRendersWithinBothPanelSizes() throws {
+    /// The reference panel's unit and trait lists, at both panel widths.
+    ///
+    /// This replaces an assertion that rendered the whole
+    /// `UnitTraitReferenceView` into 460x640: its raster was the mode picker
+    /// and the search field's `TextField` bar over a black panel, 47pt of ink
+    /// in a 640pt frame, and it passed (issue #95). Both lists are
+    /// `ScrollView`s, so nothing below the head ever rasterised.
+    func testReferencePanelListsRenderWithinBothPanelWidths() throws {
         let comps = try CompLoader.bundledFixtures()
         for size in [expanded, compact] {
-            try assertRendersWithin(UnitTraitReferenceView(comps: comps), size: size, rightMargin: 4)
+            let view = UnitTraitReferenceView(comps: comps)
+            for content in [AnyView(view.unitListContent), AnyView(view.traitListContent)] {
+                let natural = try ViewSnapshot.measuredSize(of: content, proposedWidth: size.width)
+                try assertRendersWithin(
+                    content,
+                    size: CGSize(width: size.width, height: natural.height),
+                    rightMargin: 4
+                )
+            }
         }
     }
 

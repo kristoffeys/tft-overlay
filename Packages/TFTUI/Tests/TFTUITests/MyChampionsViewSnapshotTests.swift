@@ -51,6 +51,7 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
         width: CGFloat,
         rightMargin: CGFloat = 8,
         minimumInk: Double = 0.005,
+        minimumVerticalFill: Double = 0.5,
         file: StaticString = #filePath,
         line: UInt = #line
     ) throws {
@@ -60,6 +61,7 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
             size: CGSize(width: width, height: natural.height),
             rightMargin: rightMargin,
             minimumInk: minimumInk,
+            minimumVerticalFill: minimumVerticalFill,
             file: file,
             line: line
         )
@@ -238,7 +240,15 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
     func testSuggestionsWithNothingMarkedRenderTheirEmptyState() throws {
         let view = try panel(store: store())
         XCTAssertTrue(view.suggestions.isEmpty)
-        try assertContentFits(view.suggestionsContent, width: expanded.width, minimumInk: 0.002)
+        try assertContentFits(
+            view.suggestionsContent,
+            width: expanded.width,
+            minimumInk: 0.002,
+            // An empty state: a heading and two lines of copy, 27pt of ink in
+            // the 78pt the view asks for (measured 0.35). The slack is the
+            // view's own padding, not a failure to draw.
+            minimumVerticalFill: 0.3
+        )
     }
 
     /// A champion no comp uses: the ranking is empty even though the roster
@@ -249,7 +259,14 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
         let view = try panel(store: owned)
         XCTAssertEqual(view.ownedCount, 1)
         XCTAssertTrue(view.suggestions.isEmpty)
-        try assertContentFits(view.suggestionsContent, width: expanded.width, minimumInk: 0.002)
+        try assertContentFits(
+            view.suggestionsContent,
+            width: expanded.width,
+            minimumInk: 0.002,
+            // One line of no-match copy, 12pt of ink in the 63pt the view asks
+            // for (measured 0.19) — the rest is its own padding.
+            minimumVerticalFill: 0.15
+        )
     }
 
     func testSuggestionsFromARealRosterRenderInsideThePanel() throws {
