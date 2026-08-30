@@ -46,34 +46,69 @@ public struct CompsListView: View {
             }
     }
 
+    /// The build the player has committed to, i.e. the current pin — and only
+    /// when it survives the active filters, since a player who is searching
+    /// for something else is not asking about their own build.
+    var committedBuild: Comp? {
+        guard let id = pinnedStore?.currentPinnedID else { return nil }
+        return filtered.first { $0.id == id }
+    }
+
+    /// Everything else, in the usual tier-then-name order.
+    var otherComps: [Comp] {
+        guard let committedBuild else { return filtered }
+        return filtered.filter { $0.id != committedBuild.id }
+    }
+
     public var body: some View {
         VStack(spacing: 0) {
             searchField
             filterBar
             ScrollView {
-                LazyVStack(spacing: 8) {
+                LazyVStack(alignment: .leading, spacing: 8) {
+                    // The committed build leads the list under its own
+                    // heading. A filled star at the far right of one row
+                    // among fifteen is not an answer to "which one is
+                    // mine" — you have to scan for it. Sorting it out of
+                    // the pack is.
+                    if let committedBuild {
+                        heading("Your build", color: TFTTheme.accent)
+                        row(committedBuild, isCommitted: true)
+                        heading("All comps", color: TFTTheme.textSecondary)
+                    }
                     if filtered.isEmpty {
                         Text("No comps match.")
                             .font(.system(size: 13, weight: .semibold))
                             .foregroundStyle(TFTTheme.textSecondary)
+                            .frame(maxWidth: .infinity)
                             .padding(.top, 40)
                     }
-                    ForEach(filtered) { comp in
-                        // A tap gesture, not a Button: the row contains its
-                        // own pin Button, and a Button nested in another
-                        // Button's label never receives the click — the
-                        // outer one owns the whole label as its hit area,
-                        // so the pin toggle silently did nothing here while
-                        // working fine in the detail header.
-                        CompRow(comp: comp, pinnedStore: pinnedStore, onTogglePin: togglePin)
-                            .contentShape(Rectangle())
-                            .onTapGesture { onSelect(comp) }
+                    ForEach(otherComps) { comp in
+                        row(comp, isCommitted: false)
                     }
                 }
                 .padding(12)
             }
         }
         .background(TFTTheme.background)
+    }
+
+    private func row(_ comp: Comp, isCommitted: Bool) -> some View {
+        // A tap gesture, not a Button: the row contains its own pin Button,
+        // and a Button nested in another Button's label never receives the
+        // click — the outer one owns the whole label as its hit area, so the
+        // pin toggle silently did nothing here while working fine in the
+        // detail header.
+        CompRow(comp: comp, pinnedStore: pinnedStore, isCommitted: isCommitted, onTogglePin: togglePin)
+            .contentShape(Rectangle())
+            .onTapGesture { onSelect(comp) }
+    }
+
+    private func heading(_ text: String, color: Color) -> some View {
+        Text(text.uppercased())
+            .font(.system(size: 10, weight: .heavy, design: .rounded))
+            .foregroundStyle(color)
+            .padding(.top, 2)
     }
 
     private var searchField: some View {
@@ -160,6 +195,7 @@ private struct FilterChip: View {
 private struct CompRow: View {
     let comp: Comp
     let pinnedStore: PinnedCompsStore?
+    let isCommitted: Bool
     let onTogglePin: (Comp) -> Void
 
     var body: some View {
@@ -194,11 +230,21 @@ private struct CompRow: View {
                 TraitTagRow(distinctTraits, priority: TraitRelevance.weights(in: comp))
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(10)
         .background(
-            TFTTheme.panelBackground,
+            isCommitted ? TFTTheme.elevatedBackground : TFTTheme.panelBackground,
             in: RoundedRectangle(cornerRadius: TFTTheme.cornerRadius, style: .continuous)
         )
+        // A lit border, not a heavier fill alone: the row has to read as
+        // "yours" from peripheral vision, and the accent is the one colour
+        // this palette reserves for that.
+        .overlay {
+            if isCommitted {
+                RoundedRectangle(cornerRadius: TFTTheme.cornerRadius, style: .continuous)
+                    .strokeBorder(TFTTheme.accent, lineWidth: 1.5)
+            }
+        }
     }
 
     private var distinctTraits: [String] {
