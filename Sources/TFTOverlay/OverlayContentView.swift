@@ -47,7 +47,9 @@ struct OverlayContentView: View {
         return VStack(spacing: 0) {
             PanelTabBar(
                 tabs: OverlayAppState.Panel.destinations(in: mode),
-                selection: appState.panel.destination(in: mode),
+                // Not `panel.destination(in:)`: a drill-down has to light up
+                // the tab it was entered from, which only `appState` knows.
+                selection: appState.selectedTab,
                 title: \.title,
                 // The drill-down's Back lives *in* the bar rather than on a
                 // row of its own, so the detail panel costs no extra height

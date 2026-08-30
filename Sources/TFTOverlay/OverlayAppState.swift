@@ -131,6 +131,26 @@ final class OverlayAppState: ObservableObject {
         (committedBuild == nil || isBrowsingByRequest) ? .browse : .focus
     }
 
+    /// Which tab the bar should light up right now.
+    ///
+    /// For a destination this is just the panel itself. For a drill-down it is
+    /// the tab it was *entered from*, which is the same answer `goBack()`
+    /// gives — and that is the point. `Panel.destination(in:)` cannot know
+    /// this: it is a pure function of the panel, so every `compDetail` reports
+    /// the mode's primary tab, which is right only when the player drilled in
+    /// from the comps list.
+    ///
+    /// Observably wrong once more than one tab can drill in: entering a comp
+    /// from Openers lit "Comps" while the Back chevron immediately to its left
+    /// returned to Openers, so the bar contradicted itself about which section
+    /// the player was in. Found by looking at the running app, not inferred.
+    /// Browse has three tabs that drill in, so this cannot stay a special case
+    /// for one of them.
+    var selectedTab: Panel {
+        let origin = panel.isDestination ? panel : drillOrigin
+        return origin.destination(in: mode)
+    }
+
     /// Re-checks Community Dragon for a newer patch and, if one exists,
     /// re-fetches and rebuilds the asset catalog. Called by `AppDelegate` on
     /// a timer, gated on Preferences' "Refresh automatically" — a no-op
