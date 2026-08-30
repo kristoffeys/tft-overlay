@@ -82,22 +82,36 @@ final class MyChampionsBasisNoteTests: XCTestCase {
     /// a member rendered by `body` above the `ScrollView`, exactly like the
     /// openers panel's, and it has to stay a footnote rather than grow into a
     /// banner that eats the rankings.
+    /// Measured for the *longest* copy the note can produce, not a
+    /// comfortable one.
+    ///
+    /// A full roster puts the note into both its wordiest branches at once —
+    /// the remainder clause and the everything-tied clause — so that, at the
+    /// narrowest width, is the worst case. Bounding a shorter roster instead
+    /// would leave the branch most likely to become a banner unmeasured.
+    /// 80pt is five lines of 10pt text plus padding, which is what it takes
+    /// at 300pt today; it must not quietly grow past that.
     func testTheSuggestionsBasisNoteIsAFootnoteAtBothPanelWidths() throws {
         let owned = store()
-        for name in ["Diana", "Hecarim", "Tristana"] {
-            owned.add(name)
+        let probe = try panel(store: owned)
+        for champion in probe.filteredChampions {
+            owned.add(champion.name)
         }
         let view = try panel(store: owned)
         XCTAssertTrue(view.showsBasisNote)
+        XCTAssertTrue(
+            view.suggestionsAreTiedOnOverlap && view.matchingCount > view.suggestions.count,
+            "This roster is meant to produce the note's longest copy"
+        )
 
         for width in [expanded.width, compact.width] {
             let height = try ViewSnapshot.measuredSize(of: view.basisNote, proposedWidth: width).height
             XCTAssertGreaterThan(height, 0)
             XCTAssertLessThanOrEqual(
                 height,
-                72,
-                "The always-on suggestions basis note is \(height)pt at \(width)pt; "
-                    + "it should be a footnote, not a banner"
+                80,
+                "The always-on suggestions basis note is \(height)pt at \(width)pt in its longest "
+                    + "form; it should be a footnote, not a banner"
             )
             try assertRendersWithin(
                 view.basisNote,
