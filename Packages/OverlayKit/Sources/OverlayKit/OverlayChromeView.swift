@@ -11,6 +11,8 @@ struct OverlayChromeView<Content: View>: View {
     let onResizeDrag: (CGSize) -> Void
     let onResizeEnd: () -> Void
     let onActivity: () -> Void
+    let onLockRequested: () -> Void
+    let onToggleLayoutMode: () -> Void
 
     private var effectiveOpacity: Double {
         state.isInteractive ? max(state.opacity, 0.98) : state.opacity
@@ -33,6 +35,18 @@ struct OverlayChromeView<Content: View>: View {
                     .padding(2)
             }
         }
+        .overlay(alignment: .bottomLeading) {
+            // Only the locked state needs a floating badge, because locked
+            // means there is no header bar to put it in — and no way to
+            // click anything anyway, so it is a label, not a control. The
+            // unlocked controls live in the header instead, where they
+            // cannot sit on top of the roster they are meant to sit beside.
+            if !state.isInteractive, let hint = state.interactiveHintText {
+                InteractiveHintBadge(text: hint)
+                    .padding(6)
+                    .allowsHitTesting(false)
+            }
+        }
         .overlay(
             RoundedRectangle(cornerRadius: 6)
                 .stroke(
@@ -47,18 +61,85 @@ struct OverlayChromeView<Content: View>: View {
 
     private var header: some View {
         DragHandle(onActivity: onActivity)
-            .frame(height: 22)
-            .overlay(
+            .frame(height: 24)
+            .overlay(alignment: .leading) {
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 10))
+                    .foregroundStyle(.white.opacity(0.8))
+                    .padding(.leading, 8)
+                    .allowsHitTesting(false)
+            }
+            .overlay(alignment: .trailing) {
+                // Hit-testable, unlike the drag affordance beside it: these
+                // are the only on-screen way to reach click-through and
+                // compact mode, both of which used to be hotkey-only.
                 HStack(spacing: 4) {
-                    Image(systemName: "line.3.horizontal")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.white.opacity(0.8))
-                    Spacer()
+                    if let hint = state.lockHintText {
+                        ChromeButton(icon: "lock.open", text: hint, action: onLockRequested)
+                    }
+                    if let hint = state.layoutHintText {
+                        ChromeButton(
+                            icon: state.layoutMode == .compact
+                                ? "arrow.up.left.and.arrow.down.right"
+                                : "arrow.down.right.and.arrow.up.left",
+                            text: hint,
+                            action: onToggleLayoutMode
+                        )
+                    }
                 }
-                .padding(.horizontal, 8)
-                .allowsHitTesting(false)
-            )
+                .padding(.trailing, 6)
+            }
             .background(Color.black.opacity(0.28))
+    }
+}
+
+/// A chrome control shown only while interactive, where it can actually be
+/// clicked. These exist because the modes they reach — click-through, and
+/// compact layout — were previously reachable only by a hotkey nothing on
+/// screen named.
+private struct ChromeButton: View {
+    let icon: String
+    let text: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 9, weight: .bold))
+                Text(text)
+                    .font(.system(size: 10, weight: .bold))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
+            .background(Color.black.opacity(0.7), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .focusable(false)
+        .help(text)
+        .accessibilityLabel(text)
+    }
+}
+
+/// Small persistent badge telling the user how to make a click-through
+/// panel clickable. Deliberately high-contrast, not a faint hint: its only
+/// job is being read in the same half-second glance the rest of this
+/// package's chrome is designed for, not discovered by squinting.
+private struct InteractiveHintBadge: View {
+    let text: String
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: "cursorarrow.slash")
+                .font(.system(size: 9, weight: .bold))
+            Text(text)
+                .font(.system(size: 10, weight: .bold))
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 7)
+        .padding(.vertical, 4)
+        .background(Color.black.opacity(0.7), in: Capsule())
     }
 }
 
