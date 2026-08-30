@@ -39,6 +39,17 @@
       "icon": "assets/maps/tft/icons/items/hexcore/tft_item_spearofshojin.tex"
     },
     {
+      "apiName": "DA_18_EmblemExecutioner",
+      "name": "Executioner Emblem",
+      "composition": [
+        "DA_Component_FryingPan",
+        "DA_Component_SparringGloves"
+      ],
+      "isAugment": false,
+      "desc": null,
+      "icon": "assets/maps/particles/tft/item_icons/traits/spatula/set18/tft18_emblem_executioner.tex"
+    },
+    {
       "apiName": "DA_MoonlightRitual18",
       "name": "Moonlight Ritual",
       "composition": [],
@@ -83,7 +94,8 @@
             "Elderwood",
             "Fae",
             "Rapidfire"
-          ]
+          ],
+          "tileIcon": "assets/characters/tft18_xayah/tft18_xayah_square.tex"
         },
         {
           "apiName": "DA_18_Ahri",
@@ -92,7 +104,8 @@
           "traits": [
             "Blossom",
             "Spellweaver"
-          ]
+          ],
+          "tileIcon": "assets/characters/tft18_ahri/tft18_ahri_square.tex"
         },
         {
           "apiName": "DA_Gromp18_AP",
@@ -101,13 +114,15 @@
           "traits": [
             "Riftbeast",
             "Adaptor"
-          ]
+          ],
+          "tileIcon": "assets/characters/tft18_gromp/tft18_gromp_square.tex"
         },
         {
           "apiName": "TFT_BlueGolem",
           "name": "Golem",
           "cost": 1,
-          "traits": []
+          "traits": [],
+          "tileIcon": "assets/characters/tft_bluegolem/hud/tft_bluegolem_spell.tex"
         },
         {
           "apiName": "DA_Draven18",
@@ -115,7 +130,8 @@
           "cost": 5,
           "traits": [
             "Bounty Seeker"
-          ]
+          ],
+          "tileIcon": "assets/characters/tft18_draven/tft18_draven_square.tex"
         },
         {
           "apiName": "DA_Lux18_Base",
@@ -123,7 +139,8 @@
           "cost": 5,
           "traits": [
             "Avatar"
-          ]
+          ],
+          "tileIcon": "assets/characters/tft18_lux/tft18_lux_square.tex"
         }
       ],
       "traits": [
@@ -156,7 +173,8 @@
               "maxUnits": 25000,
               "style": 6
             }
-          ]
+          ],
+          "icon": "assets/ux/traiticons/trait_icon_18_elderwood.tex"
         },
         {
           "apiName": "DA_18_LuxUniqueTrait",
@@ -167,7 +185,8 @@
               "maxUnits": 25000,
               "style": 4
             }
-          ]
+          ],
+          "icon": "assets/ux/traiticons/trait_icon_18_avatar.tex"
         },
         {
           "apiName": "DA_Riftbeast18",
@@ -193,7 +212,8 @@
               "maxUnits": 25000,
               "style": 5
             }
-          ]
+          ],
+          "icon": "assets/ux/traiticons/trait_icon_18_riftbeast.tex"
         },
         {
           "apiName": "DA_DravenUniqueTrait18",
@@ -204,7 +224,8 @@
               "maxUnits": 25000,
               "style": 4
             }
-          ]
+          ],
+          "icon": "assets/ux/traiticons/trait_icon_18_bountyseeker.tex"
         }
       ]
     }
