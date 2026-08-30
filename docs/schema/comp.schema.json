@@ -201,6 +201,13 @@
         }
       }
     },
+    "earlyUnits": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "The early-game board this comp opens on (roughly stages 1-1 through 2-5), as champion names: the structured companion to earlyOpener's prose, not a replacement for it. Needed as its own field because units[] is the FINAL board, and final-board presence rises with cost -- cheap openers get replaced by the late game -- so units[] can never answer \"what do I open with\" no matter how it is weighted (issue #99). Names only, deliberately: cost and traits are looked up from the set catalog the app already loads, so there is no second copy of them here to drift out of date. Each name must match the live set data exactly, same rule as units[].name, because the name is the key champion art resolves by and a mispunctuated one silently loses a portrait. Optional, so a scrape that cannot find the source's \"Early Comp\" subset (ADR 0004) or a comp whose notes name no specific early units omits the field rather than inventing one -- an absent field is honest, a guessed roster is a silent bug."
+    },
     "earlyOpener": {
       "type": "string",
       "minLength": 1,
