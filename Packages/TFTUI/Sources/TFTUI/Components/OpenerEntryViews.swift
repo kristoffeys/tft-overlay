@@ -62,13 +62,26 @@ struct MetaPickupRow: View {
         )
     }
 
-    /// A bar and a roster count — never the score itself.
+    /// The bar is the ranking. The text beside it is a different, plain fact
+    /// — never the other way round (issue #108 review).
     ///
-    /// `openerScore` is a weighted rank basis in arbitrary units (see
-    /// `OpenerIndex.UnitPresence`); printing "7560" beside a champion would
-    /// read as a measurement, and there is no measurement here. The bar
-    /// carries the ranking, and the number beside it is the one honest
-    /// integer in the neighbourhood: how many S/A comps open on this unit.
+    /// Before this, the bar drew from `openerScore` while the adjacent digit
+    /// was `topTierRosterCount`, bold and the same accent colour as the bar
+    /// fill. The two numbers order differently — `openerScore` also weights
+    /// how much of a comp's early roster a unit *is*, so a unit that is one
+    /// comp's entire opening board can outscore one that merely appears on
+    /// more boards — and drawing them with equal visual weight, immediately
+    /// adjacent, read as "the digit is what the bar measures". It is not,
+    /// and a reader has no way to tell that from the two side by side.
+    ///
+    /// The fix is the pairing, not the ranking: the bar keeps drawing from
+    /// `openerScore` (so it falls monotonically down the list — see
+    /// `fraction`, pinned by `OpenerEntryViewsTests`), and the text beside it
+    /// is now the *share* itself — how many of the comps this unit opens are
+    /// S/A tier, out of every comp, any tier, it opens — in small, muted
+    /// type that cannot be mistaken for the bar's own value. Shown plainly
+    /// rather than behind hover (#83); `.help()` below is a bonus for a
+    /// mouse, not the only copy of this fact.
     private var scoreBar: some View {
         HStack(spacing: 6) {
             GeometryReader { proxy in
@@ -80,16 +93,29 @@ struct MetaPickupRow: View {
                 }
             }
             .frame(width: 44, height: 6)
-            Text("\(unit.topTierRosterCount)")
-                .font(.system(size: 11, weight: .heavy, design: .rounded))
-                .foregroundStyle(TFTTheme.accent)
-                .frame(minWidth: 14, alignment: .trailing)
+            Text("\(unit.topTierRosterCount) of \(unit.sharedCompCount)")
+                .font(.system(size: 9, weight: .semibold, design: .rounded))
+                .foregroundStyle(TFTTheme.textTertiary)
+                .lineLimit(1)
+                .fixedSize()
         }
         .help("\(unit.name) — cost \(unit.cost), opens \(unit.topTierRosterCount) S/A comps "
-            + "of \(unit.sharedCompCount) in this list")
+            + "of \(unit.sharedCompCount) it opens at any tier")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(
+            "Rank bar. Opens \(unit.topTierRosterCount) of \(unit.sharedCompCount) comps "
+                + "it opens as an S or A tier pick"
+        )
     }
 
-    private var fraction: CGFloat {
+    /// Fraction of the top opener's own score this bar draws.
+    ///
+    /// Driven by `openerScore` — the same value `OpenerIndex.topOpeners` is
+    /// sorted by — and by nothing else, so a bar in this row can never be
+    /// longer than the bar above it. Internal rather than private so
+    /// `OpenerEntryViewsTests` can assert that property across a real ranked
+    /// list without rendering a single pixel.
+    var fraction: CGFloat {
         guard maximumScore > 0 else { return 0 }
         return CGFloat(unit.openerScore) / CGFloat(maximumScore)
     }
