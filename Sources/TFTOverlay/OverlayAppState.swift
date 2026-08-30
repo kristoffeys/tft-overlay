@@ -60,6 +60,13 @@ final class OverlayAppState: ObservableObject {
     /// once loaded; nothing above this has to know the difference, since
     /// every icon view already treats "no art yet" as its normal fallback.
     @Published private(set) var assetCatalog: TFTAssetCatalog = .empty
+    /// Item name -> the two components it is built from (#111).
+    ///
+    /// Unlike `assetCatalog` this does *not* start empty: the bundled set
+    /// snapshot already carries every recipe, so a build shows what to make
+    /// from the first frame, and this only swaps in a fresher pack once the
+    /// store loads. See `ItemRecipeIndex.bundled`.
+    @Published private(set) var itemRecipes: ItemRecipeIndex = .bundled
     /// Champion name -> cost, from the same loaded store as `assetCatalog`.
     ///
     /// The openers panel ranks and labels by cost (#99) and its input,
@@ -127,6 +134,12 @@ final class OverlayAppState: ObservableObject {
 
     private func adopt(_ store: TFTDataStore) {
         assetCatalog = TFTAssetCatalog(store: store)
+        // Only when the store actually has items: `loadCurrentStore` can hand
+        // back an empty store, and an empty index would replace working
+        // recipes with nothing at all.
+        if !store.items.isEmpty {
+            itemRecipes = ItemRecipeIndex(store: store)
+        }
         championCosts = Dictionary(store.champions.map { ($0.name, $0.cost) }, uniquingKeysWith: min)
     }
 
