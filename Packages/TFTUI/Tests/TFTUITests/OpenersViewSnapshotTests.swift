@@ -105,7 +105,7 @@ final class OpenersViewSnapshotTests: XCTestCase {
     /// rather than a bar: measured intrinsically, since `render` clamps.
     func testTheCostBadgeDrawsAtEveryOpenerCost() throws {
         for cost in 1 ... OpenerIndex.maximumOpenerCost {
-            let badge = UnitCostBadge(cost: cost)
+            let badge = UnitCostPill(cost: cost)
             let size = try ViewSnapshot.measuredSize(of: badge, proposedWidth: 2000)
             XCTAssertLessThan(size.width, 60, "A \(cost)-cost badge measures \(size.width)pt — that is a bar")
             let raster = try ViewSnapshot.render(badge, size: size)

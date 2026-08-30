@@ -6,7 +6,7 @@ import SwiftUI
 // thousand-line view file nobody can navigate; they are internal rather
 // than private for that reason alone and have no other caller.
 
-/// A cost label that says the number out loud.
+/// A cost label that says the number out loud, as a pill beside a name.
 ///
 /// The openers panel had no cost anywhere on it, which is how it came to
 /// surface six cost-3 units without anyone noticing (#99). The portrait's
@@ -14,7 +14,13 @@ import SwiftUI
 /// this is the same fact in a form that needs no prior knowledge, because
 /// "can I actually buy this at level 4" is the whole question the panel
 /// answers.
-struct UnitCostBadge: View {
+///
+/// Distinct from `UnitCostBadge`, which draws the bare number as an overlay
+/// on a portrait for the Stage Companion's roster (#107). That one is a cue
+/// next to art the reader is already looking at; this one sits inline in a
+/// text row, so it spells out "1-cost" rather than leaving a lone digit to
+/// be mistaken for one of the counts elsewhere on the row.
+struct UnitCostPill: View {
     let cost: Int
 
     var body: some View {
@@ -48,7 +54,7 @@ struct MetaPickupRow: View {
                         .foregroundStyle(TFTTheme.textPrimary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                    UnitCostBadge(cost: unit.cost)
+                    UnitCostPill(cost: unit.cost)
                     Spacer(minLength: 6)
                     scoreBar
                 }
