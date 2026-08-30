@@ -262,6 +262,34 @@ public struct MyChampionsView: View {
         ownedCount > 0 && !suggestions.isEmpty
     }
 
+    /// How many comps the roster matches at all, before `suggestionLimit`
+    /// truncates the list.
+    ///
+    /// The count the player cannot otherwise see. With a full roster 36 comps
+    /// match and 12 are drawn, and nothing in the panel used to hint that the
+    /// other 24 existed — so the cap read as "these are the only reachable
+    /// comps" rather than "these are the top of a longer list".
+    var matchingCount: Int {
+        CompSuggestionRanking.rank(owned: store.ownedKeys, comps: comps)
+            .filter { $0.matchedCount > 0 }
+            .count
+    }
+
+    /// Whether every drawn suggestion sits in the same overlap band, i.e.
+    /// whether overlap decided any of this order at all.
+    ///
+    /// This is the full-roster case: mark all 63 champions and all 12 rows
+    /// read "8/8 — You have every unit", every entry ties, and the order is
+    /// then 100% authored tier list. Saying "near-ties fall back to the tier
+    /// list" there understates it to the point of being wrong — *nothing* but
+    /// the tier list is ordering the list. Uses the ranking's own band
+    /// function so this cannot drift from the rule that actually sorted them.
+    var suggestionsAreTiedOnOverlap: Bool {
+        guard suggestions.count > 1 else { return false }
+        let bands = Set(suggestions.map { CompSuggestionRanking.overlapBand($0.overlapScore) })
+        return bands.count == 1
+    }
+
     /// The basis note's copy, as a string so a test can read it.
     ///
     /// Pluralised, because exactly one match is a real state — mark a single
@@ -269,13 +297,28 @@ public struct MyChampionsView: View {
     /// closest to" is the panel visibly not proofreading itself, in the one
     /// place whose whole job is to be believed. `head` above already gets
     /// this right for its champion count; this follows it.
+    ///
+    /// States the total whenever the cap hides anything, and says so plainly
+    /// when overlap did not order the list. The honesty framing everywhere
+    /// else in this panel is the reason to believe it here.
     var basisNoteText: String {
-        let lead = suggestions.count == 1
-            ? "The comp you are closest to"
-            : "The \(suggestions.count) comps you are closest to"
+        let shown = suggestions.count
+        let lead = if matchingCount > shown {
+            "The \(shown) closest of \(matchingCount) matching comps"
+        } else if shown == 1 {
+            "The comp you are closest to"
+        } else {
+            "The \(shown) comps you are closest to"
+        }
+
+        let ordering = suggestionsAreTiedOnOverlap
+            ? "These all match what you have equally well, so the order here is nothing but "
+            + "this app's authored tier list — not win rates."
+            : "Near-ties fall back to this app's authored tier list, not to win rates."
+
         return lead
             + ", by the units you have — weighted towards carries and expensive units. "
-            + "Near-ties fall back to this app's authored tier list, not to win rates."
+            + ordering
     }
 
     /// Says what the order is, in the panel, where a player can see it.
