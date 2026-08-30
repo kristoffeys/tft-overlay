@@ -153,13 +153,30 @@ struct ComponentDemandTile: View {
 ///
 /// Inline and always drawn — this is the bridge out of the panel, and a
 /// bridge you have to hover to find is not one (#83).
+///
+/// How many names are shown is **measured, not fixed**. A fixed three did not
+/// fit: on the real corpus at the 460pt panel the widest three leads want
+/// 384pt of a 376pt column, so `Coven Spellweavers` rendered as
+/// `Coven Spellweav…`, and at the 300pt window minimum `Coven Invokers` and
+/// `Coven Spellweavers` both collapsed to `Cove…`. The only recovery was the
+/// per-capsule `.help()`, and hover never fires while the overlay is locked
+/// for click-through (#83) — so the truncation was, in the mode this panel is
+/// actually used in, unrecoverable.
+///
+/// `CompLeadLayout` now fits whole names to the real available width and the
+/// remainder becomes a drawn `+N`. Fewer names at narrower widths, but every
+/// name shown is readable without a mouse, which is the only version of this
+/// row that does the job it exists for.
 struct CompLeadRow: View {
     let leadsTo: [OpenerIndex.CompSummary]
     let onSelectComp: (OpenerIndex.CompSummary) -> Void
 
-    /// Three names is what fits the 460pt panel's right column without
-    /// truncating any of them; the rest become a count.
-    private static let shownLimit = 3
+    /// One line. The row sits in a list beside a 34pt portrait and a presence
+    /// bar; flowing onto a second line fits four to six capsules at 460pt,
+    /// which stops reading as "a few builds this leads into" and starts
+    /// reading as a wall. Width, not a count, decides how many of those fit.
+    private static let maxLines = 1
+    private static let spacing: CGFloat = 4
 
     var body: some View {
         if leadsTo.isEmpty {
@@ -167,35 +184,89 @@ struct CompLeadRow: View {
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(TFTTheme.textTertiary)
         } else {
-            HStack(spacing: 4) {
-                ForEach(leadsTo.prefix(Self.shownLimit), id: \.id) { comp in
-                    Button {
-                        onSelectComp(comp)
-                    } label: {
-                        HStack(spacing: 4) {
-                            Circle()
-                                .fill(TFTTheme.tierColor(comp.tier))
-                                .frame(width: 5, height: 5)
-                            Text(comp.name)
-                                .font(.system(size: 10, weight: .bold, design: .rounded))
-                                .foregroundStyle(TFTTheme.textPrimary)
-                                .lineLimit(1)
+            GeometryReader { proxy in
+                let fit = CompLeadLayout.fit(
+                    leadsTo.map(\.name),
+                    availableWidth: proxy.size.width,
+                    spacing: Self.spacing,
+                    maxLines: Self.maxLines
+                )
+                VStack(alignment: .leading, spacing: Self.spacing) {
+                    ForEach(Array(fit.lines.enumerated()), id: \.offset) { index, line in
+                        HStack(spacing: Self.spacing) {
+                            ForEach(line, id: \.self) { name in
+                                if let comp = leadsTo.first(where: { $0.name == name }) {
+                                    capsule(for: comp)
+                                }
+                            }
+                            if index == fit.lines.count - 1, fit.overflow > 0 {
+                                overflowCounter(fit.hidden)
+                            }
+                            Spacer(minLength: 0)
                         }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(TFTTheme.elevatedBackground, in: Capsule())
                     }
-                    .buttonStyle(.plain)
-                    .focusable(false)
-                    .help(comp.name)
+                    // Not a fall-through case: when the row is too narrow for
+                    // even one whole comp name there are no lines to hang the
+                    // counter off, and without this the row draws literally
+                    // nothing while the unit does lead somewhere.
+                    if fit.lines.isEmpty, fit.overflow > 0 {
+                        HStack(spacing: Self.spacing) {
+                            overflowCounter(fit.hidden)
+                            Spacer(minLength: 0)
+                        }
+                    }
                 }
-                if leadsTo.count > Self.shownLimit {
-                    Text("+\(leadsTo.count - Self.shownLimit)")
-                        .font(.system(size: 10, weight: .heavy, design: .rounded))
-                        .foregroundStyle(TFTTheme.textSecondary)
-                }
-                Spacer(minLength: 0)
+                .frame(width: proxy.size.width, alignment: .leading)
             }
+            .frame(height: CompLeadLayout.height(maxLines: Self.maxLines, spacing: Self.spacing))
         }
+    }
+
+    /// Internal rather than private so a test can measure the real capsule's
+    /// intrinsic width instead of reimplementing its geometry — a duplicate
+    /// would drift from this one and stop detecting the truncation it exists
+    /// to detect.
+    func capsule(for comp: OpenerIndex.CompSummary) -> some View {
+        Button {
+            onSelectComp(comp)
+        } label: {
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(TFTTheme.tierColor(comp.tier))
+                    .frame(width: 5, height: 5)
+                Text(comp.name)
+                    .font(.system(size: 10, weight: .bold, design: .rounded))
+                    .foregroundStyle(TFTTheme.textPrimary)
+                    .lineLimit(1)
+                    // The layout already guaranteed this name fits, so let it
+                    // keep its intrinsic width. Without this SwiftUI would
+                    // compress it back to an ellipsis if the measurement were
+                    // ever a point out — a silent failure. Overflowing instead
+                    // is loud, and the right-margin raster assertions see it.
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(TFTTheme.elevatedBackground, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .focusable(false)
+        .accessibilityLabel("Show \(comp.name)")
+    }
+
+    /// The count of leads that did not fit.
+    ///
+    /// Drawn, not hovered: it is the affordance telling the player this unit
+    /// opens more than the row had room for. The tooltip listing them is a
+    /// convenience for someone already holding a mouse, never the only route —
+    /// the full set is in the comps list.
+    private func overflowCounter(_ hidden: [String]) -> some View {
+        Text(CompLeadLayout.overflowLabel(hidden.count))
+            .font(.system(size: 10, weight: .heavy, design: .rounded))
+            .foregroundStyle(TFTTheme.textSecondary)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
+            .help(hidden.joined(separator: ", "))
+            .accessibilityLabel("\(hidden.count) more comps: \(hidden.joined(separator: ", "))")
     }
 }
