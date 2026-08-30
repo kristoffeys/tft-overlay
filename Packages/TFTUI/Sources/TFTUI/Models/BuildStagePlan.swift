@@ -123,23 +123,72 @@ public struct BuildStagePlan: Sendable {
         let entry: LevelPlanEntry
     }
 
-    /// Splits parseable rows from unparseable ones and drops duplicate stages,
-    /// keeping the first. Duplicates are real: `riftbeast-summoners` ships two
-    /// `5-2` rows, and `LevelPlanEntry.id` is its stage, so handing both to a
-    /// SwiftUI `ForEach` would be a duplicate-identity bug in the view.
+    /// Splits parseable rows from unparseable ones and merges rows that share a
+    /// stage into one.
+    ///
+    /// Duplicates are real and they are not always duplicates:
+    /// `riftbeast-summoners` ships two `5-2` rows carrying *different* advice
+    /// ("add Ashe, Ivern, Maokai" and "add Alistar, Gnar"). `LevelPlanEntry.id`
+    /// is its stage, so both cannot reach a SwiftUI `ForEach` — but keeping the
+    /// first and dropping the second is silent data loss, which is exactly what
+    /// this type promises not to do. Merging keeps both, one identity.
     private static func partition(_ plan: [LevelPlanEntry]) -> ([DatedEntry], [LevelPlanEntry]) {
-        var scheduled: [DatedEntry] = []
         var unscheduled: [LevelPlanEntry] = []
-        var seen: Set<GameStage> = []
+        // First-appearance order, not sorted: the band grouping sorts anyway,
+        // and a stable order keeps the merged notes reading in corpus order.
+        var order: [GameStage] = []
+        var grouped: [GameStage: [LevelPlanEntry]] = [:]
         for entry in plan {
             guard let stage = GameStage(entry.stage) else {
                 unscheduled.append(entry)
                 continue
             }
-            guard seen.insert(stage).inserted else { continue }
-            scheduled.append(DatedEntry(stage: stage, entry: canonicalised(entry, at: stage)))
+            if grouped[stage] == nil {
+                order.append(stage)
+            }
+            grouped[stage, default: []].append(entry)
+        }
+        let scheduled = order.compactMap { stage -> DatedEntry? in
+            guard let rows = grouped[stage], let merged = merged(rows, at: stage) else { return nil }
+            return DatedEntry(stage: stage, entry: merged)
         }
         return (scheduled, unscheduled)
+    }
+
+    /// One row per stage, carrying every distinct piece of advice the corpus
+    /// filed under it.
+    ///
+    /// Byte-identical notes collapse — that is the genuine duplicate case.
+    /// Notes that differ are joined, in corpus order, because a player reading
+    /// "5-2" wants both sentences and cannot know a second one existed. A row
+    /// naming a *different* level keeps that level inside its own text: the
+    /// merged row can only be keyed to one, and the alternative is dropping the
+    /// number the advice depends on.
+    private static func merged(_ rows: [LevelPlanEntry], at stage: GameStage) -> LevelPlanEntry? {
+        guard let first = rows.first else { return nil }
+        guard rows.count > 1 else { return canonicalised(first, at: stage) }
+
+        var seen: Set<String> = []
+        var advice: [String] = []
+        for row in rows {
+            let notes = row.notes?.trimmingCharacters(in: .whitespacesAndNewlines)
+            let text: String
+            if row.level == first.level {
+                guard let notes, !notes.isEmpty else { continue }
+                text = notes
+            } else if let notes, !notes.isEmpty {
+                text = "Level \(row.level): \(notes)"
+            } else {
+                text = "Level \(row.level)"
+            }
+            guard seen.insert(text).inserted else { continue }
+            advice.append(text)
+        }
+        return LevelPlanEntry(
+            stage: stage.label,
+            level: first.level,
+            notes: advice.isEmpty ? nil : advice.joined(separator: " ")
+        )
     }
 
     /// Re-keys a parsed row to the stage's own notation.
