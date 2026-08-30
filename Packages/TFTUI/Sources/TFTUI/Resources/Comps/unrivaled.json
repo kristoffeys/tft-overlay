@@ -172,6 +172,13 @@
       "notes": "At level 9 you can add: Soraka, Kennen."
     }
   ],
+  "earlyUnits": [
+    "Ornn",
+    "Alistar",
+    "LeBlanc",
+    "Kha'Zix",
+    "Rengar"
+  ],
   "earlyOpener": "Prioritize Ornn, Alistar, Leblanc, Khazix, Rengar early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Alune → Soraka, Kennen."
 }

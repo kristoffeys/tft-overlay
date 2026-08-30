@@ -168,6 +168,13 @@
       "notes": "At level 9 you can add: Zyra, Alune, Ivern."
     }
   ],
+  "earlyUnits": [
+    "Akali",
+    "Gromp",
+    "Murkwolf",
+    "Scuttlecrab",
+    "Kha'Zix"
+  ],
   "earlyOpener": "Prioritize Akali, Gromp, Murkwolf, Scuttlecrab, Khazix early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Taric → Rakan, Elise."
 }

@@ -167,6 +167,13 @@
       "notes": "At level 9 you can add: Ivern, Kennen."
     }
   ],
+  "earlyUnits": [
+    "Leona",
+    "Ornn",
+    "Shen",
+    "Cassiopeia",
+    "Fiddlesticks"
+  ],
   "earlyOpener": "Prioritize Leona, Ornn, Shen, Cassiopeia, Fiddlesticks early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
 }

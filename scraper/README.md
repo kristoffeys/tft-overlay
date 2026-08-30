@@ -25,6 +25,20 @@ for why this exists and what it deliberately does not do.
 4. Never overwrites a file whose existing `source` is `"hand-authored"` --
    the two comps a human wrote stay a human's.
 
+The "Early Comp" subset is carried two ways: as the `earlyOpener` prose
+sentence, and (since #99) as the structured `earlyUnits` array the Openers
+panel ranks. `earlyUnits` names are resolved against live set data first,
+because the source's icons carry plain-ASCII alt text (`"RekSai"`) while the
+name champion art resolves by is the punctuated one (`"Rek'Sai"`); a name
+that doesn't resolve is dropped with a warning rather than shipped.
+`earlyUnits` is optional in the schema, so a comp whose early subset the
+scraper couldn't read omits it instead of guessing.
+
+To top up comps written before that field existed, run
+`python3 ../scripts/backfill_early_units.py` from the repo root -- it
+recovers `earlyUnits` from the `earlyOpener` prose offline, and reports any
+comp it could not extract rather than inventing a roster.
+
 Several schema fields tftactics.gg simply doesn't expose (exact star
 targets, per-comp augment picks, a prose difficulty rating, a clean
 `"18.1"`-style patch string) are filled with clearly-labeled heuristics/

@@ -167,6 +167,13 @@
       "notes": "At level 9 you can add: Ivern."
     }
   ],
+  "earlyUnits": [
+    "Camille",
+    "Rakan",
+    "Caitlyn",
+    "Elise",
+    "Tristana"
+  ],
   "earlyOpener": "Prioritize Camille, Rakan, Caitlyn, Elise, Tristana early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Kennen → Ivern."
 }

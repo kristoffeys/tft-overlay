@@ -166,6 +166,13 @@
       "notes": "At level 9 you can add: Azir, Lux (Inferno), Taric."
     }
   ],
+  "earlyUnits": [
+    "Akali",
+    "Varus",
+    "LeBlanc",
+    "Shen",
+    "Fiddlesticks"
+  ],
   "earlyOpener": "Prioritize Akali, Varus, Leblanc, Shen, Fiddlesticks early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
 }

@@ -169,6 +169,13 @@
       "notes": "At level 9 you can add: Alune, Ivern."
     }
   ],
+  "earlyUnits": [
+    "Ornn",
+    "Rakan",
+    "Varus",
+    "Xayah",
+    "Hecarim"
+  ],
   "earlyOpener": "Prioritize Ornn, Rakan, Varus, Xayah, Hecarim early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "Swaps this comp commonly runs: Taric → Rakan, Elise."
 }

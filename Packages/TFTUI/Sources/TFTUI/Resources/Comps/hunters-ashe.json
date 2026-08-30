@@ -180,6 +180,9 @@
       "notes": "Spend remaining gold rolling for a 3-star Ashe, the comp's win condition."
     }
   ],
+  "earlyUnits": [
+    "Cinderling"
+  ],
   "earlyOpener": "Play fast: take every augment and unit that helps hit level 4 by 2-1 and level 6 by 3-2. Use cheap Riftbeast/Hunter 1-costs like Cinderling as an econ-friendly early frontline, but do not spend gold 2-starring them.",
   "pivotNotes": "This comp needs 8 gold to function since Ashe is a 5-cost. If HP is too low to safely reach level 8 by stage 4, pivot down to a level-6 Hunter line using Caitlyn as a temporary carry, keeping the same Riftbeast frontline until HP stabilizes."
 }

@@ -157,6 +157,13 @@
       "notes": "At level 8 you can add: Gnar, Ivern."
     }
   ],
+  "earlyUnits": [
+    "Cinderling",
+    "Pebbles",
+    "Murkwolf",
+    "Scuttlecrab",
+    "Krug"
+  ],
   "earlyOpener": "Prioritize Cinderling, Pebbles, Murkwolf, Scuttlecrab, Krug early; these carry the comp online before its full identity is committed.",
   "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
 }
