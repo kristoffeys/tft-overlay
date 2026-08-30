@@ -48,7 +48,7 @@ struct OpeningPlan: Sendable {
         Step(
             when: "Stage 1",
             action: "Spend nothing — no rolling, no levelling. Take every component, "
-                + "and buy pairs of the cheap units above: a 2-star in stage 2 is a big lead."
+                + "and buy pairs of the cheap units below: a 2-star in stage 2 is a big lead."
         ),
         Step(
             when: "2-1 · level 4",
