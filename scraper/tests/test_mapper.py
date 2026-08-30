@@ -24,6 +24,7 @@ def champion_data():
             "Sivir": ChampionInfo(name="Sivir", cost=4, traits=["Primal", "Hunter"]),
             "Cinderling": ChampionInfo(name="Cinderling", cost=1, traits=["Riftbeast", "Hunter"]),
             "Kha'Zix": ChampionInfo(name="Kha'Zix", cost=3, traits=["Rival"]),
+            "Rek'Sai": ChampionInfo(name="Rek'Sai", cost=2, traits=["Riftbeast", "Ravager"]),
         },
     )
 
@@ -184,6 +185,68 @@ def test_apostrophised_champion_names_reach_every_display_field(champion_data, v
     # Nothing anywhere still spells it the source's way (the lowercase id is
     # unaffected by this case-sensitive check).
     assert "Khazix" not in json.dumps(comp)
+
+
+def test_early_units_carried_as_structure_and_canonicalized(champion_data, validator):
+    """The source's early-comp icons use plain-ASCII alt text ("RekSai"), and
+    the shipped name is the key champion art resolves by (#81).
+
+    The prose `earlyOpener` is canonicalized too, by the display-name
+    resolution added for #98 — so both the structured roster and the sentence
+    now spell the champion the way the set does, and neither can disagree
+    with the other the way `rivals-khazix` once did. The sentence is built
+    from the same resolved list, so a name the source repeats appears once
+    in both.
+    """
+    raw = RawComp(
+        tier="S", name="Early Comp", playstyle_text="Fast 8",
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=["RekSai", "Cinderling", "RekSai"],
+    )
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=lambda _m: None)
+    assert comp is not None
+    assert comp["earlyUnits"] == ["Rek'Sai", "Cinderling"]
+    assert comp["earlyOpener"].startswith("Prioritize Rek'Sai, Cinderling early;")
+    assert not list(validator.iter_errors(comp))
+
+
+def test_early_units_omitted_when_source_has_no_early_subset(champion_data, validator):
+    raw = RawComp(
+        tier="B", name="No Early Data", playstyle_text=None,
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=[],
+    )
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=lambda _m: None)
+    assert comp is not None
+    assert "earlyUnits" not in comp
+    assert not list(validator.iter_errors(comp))
+
+
+def test_unresolvable_early_unit_is_dropped_with_warning(champion_data, validator):
+    """A name that does not resolve must never be shipped: it would validate
+    fine and silently lose the champion's portrait in the app."""
+    raw = RawComp(
+        tier="A", name="Half Known Early", playstyle_text="Fast 8",
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=["Cinderling", "Totally Not A Real Champion"],
+    )
+    warnings = []
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=warnings.append)
+    assert comp is not None
+    assert comp["earlyUnits"] == ["Cinderling"]
+    assert any("Totally Not A Real Champion" in w and "earlyUnits" in w for w in warnings)
+    assert not list(validator.iter_errors(comp))
+
+
+def test_early_units_omitted_when_no_early_name_resolves(champion_data, validator):
+    raw = RawComp(
+        tier="B", name="All Junk Early", playstyle_text=None,
+        units=[{"name": "Ashe", "items": ["Infinity Edge"]}],
+        early_units=["Nobody At All"],
+    )
+    comp = map_comp(raw, champion_data, set_number=18, patch="18.1", warn=lambda _m: None)
+    assert comp is not None
+    assert "earlyUnits" not in comp
     assert not list(validator.iter_errors(comp))
 
 
