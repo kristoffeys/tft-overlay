@@ -192,9 +192,21 @@ private struct RosterCell: View {
     let showsCosts: Bool
     let showsItems: Bool
 
+    /// The unit card is on the portrait and the name, not on the whole cell,
+    /// so it does not compete with the item icons' own recipe card (#111).
+    ///
+    /// Every item icon in the app shows what it is built from on hover, and
+    /// the item row here sits *inside* this cell — with the card on the cell,
+    /// both hovers fire for one pointer position and the two cards fight over
+    /// `FloatingTooltip`'s single panel. Split into non-overlapping regions
+    /// instead: portrait or name asks about the unit, an item icon asks about
+    /// the item. Hovering an item used to show the unit card, which is
+    /// strictly less than what it shows now.
     var body: some View {
         VStack(spacing: 3) {
             portrait
+                .contentShape(Rectangle())
+                .unitItemTooltipOnHover(summary)
             if showsItems, entry.items.isEmpty == false {
                 itemRow
             } else if alignsNamesBelowItems {
@@ -210,11 +222,11 @@ private struct RosterCell: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                     .frame(width: metrics.cellWidth)
+                    .contentShape(Rectangle())
+                    .unitItemTooltipOnHover(summary)
             }
         }
         .frame(width: metrics.cellWidth)
-        .contentShape(Rectangle())
-        .unitItemTooltipOnHover(summary)
     }
 
     private var portrait: some View {
@@ -263,7 +275,9 @@ private struct RosterCell: View {
                 ItemIconPlaceholder(name: item, size: metrics.itemIcon)
             }
         }
-        .help(entry.allItems.joined(separator: " · "))
+        // No `.help` listing the names any more: each icon now summons a
+        // recipe card of its own, and an OS tooltip arriving a beat later
+        // over the top of it is noise, not a second source of truth.
     }
 
     /// Two-star is the default every unit is assumed to reach, so labelling
