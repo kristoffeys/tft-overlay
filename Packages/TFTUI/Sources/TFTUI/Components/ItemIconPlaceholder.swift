@@ -13,6 +13,7 @@ public struct ItemIconPlaceholder: View {
     let explicitImageURL: URL?
 
     @Environment(\.tftAssetCatalog) private var catalog
+    @Environment(\.tftItemRecipes) private var recipes
 
     public init(name: String, size: CGFloat = 32, imageURL: URL? = nil) {
         self.name = name
@@ -34,6 +35,10 @@ public struct ItemIconPlaceholder: View {
         }
         .frame(width: size, height: size)
         .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        // Every item icon in the app, rather than the ~14 call sites, so none
+        // of them can forget and the 11-20pt roster icons — too small for
+        // inline component art — answer the question too (#111).
+        .itemRecipeTooltipOnHover(name, recipe: recipes.recipe(forItemNamed: name))
     }
 
     private var cornerRadius: CGFloat {
