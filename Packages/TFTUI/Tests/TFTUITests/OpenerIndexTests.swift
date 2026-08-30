@@ -194,6 +194,28 @@ final class OpenerIndexTests: XCTestCase {
         XCTAssertNotEqual(index.mostPresent.first?.name, index.mostShared.first?.name)
     }
 
+    // MARK: - Cost resolution determinism
+
+    /// "Ambi" appears as a 1-cost in one S-tier comp and a 3-cost in
+    /// another. Last-write-wins would make the resolved cost depend on
+    /// which comp the tally visits last -- i.e. on input order. Resolving
+    /// to the minimum instead must produce the exact same output (not just
+    /// the same cost field) whether the comps are fed forward or reversed.
+    func testConflictingUnitCostResolvesToMinimumRegardlessOfOrder() throws {
+        let comps = try [
+            makeComp(id: "s1", tier: .s, units: [UnitFixture("Ambi", cost: 1, role: .frontline)]),
+            makeComp(id: "s2", tier: .s, units: [UnitFixture("Ambi", cost: 3, role: .frontline)]),
+        ]
+
+        let forward = OpenerIndex(comps: comps)
+        let reversed = OpenerIndex(comps: comps.reversed())
+
+        XCTAssertEqual(Set(forward.mostPresent), Set(reversed.mostPresent))
+        XCTAssertEqual(Set(forward.mostShared), Set(reversed.mostShared))
+        XCTAssertEqual(forward.mostPresent.first?.cost, 1)
+        XCTAssertEqual(reversed.mostPresent.first?.cost, 1)
+    }
+
     // MARK: - Smoke test against the real corpus
 
     func testBundledCorpusProducesNonCrashingResults() throws {
