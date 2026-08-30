@@ -129,7 +129,18 @@ public struct OpenerIndex: Sendable {
             let summary = CompSummary(id: comp.id, name: comp.name, tier: comp.tier)
             let weight = presenceWeight(for: comp.tier)
             for unit in comp.units where openerCostRange.contains(unit.cost) {
-                tallies.costByName[unit.name] = unit.cost
+                // A unit's true cost is fixed per champion, so any spread
+                // across comps in the corpus is bad input data, not a real
+                // ambiguity. Resolving to the minimum seen keeps the tally
+                // order-independent (unlike last-write-wins, which depends
+                // on comp iteration order) and is safe for a ranking that
+                // filters on cost 1-3: a lower resolved cost can only make a
+                // unit MORE eligible for that filter, never less.
+                if let existingCost = tallies.costByName[unit.name] {
+                    tallies.costByName[unit.name] = Swift.min(existingCost, unit.cost)
+                } else {
+                    tallies.costByName[unit.name] = unit.cost
+                }
                 tallies.sharedCountByName[unit.name, default: 0] += 1
                 tallies.weightedByName[unit.name, default: 0] += weight
                 tallies.leadsTo[unit.name, default: []].append(summary)
