@@ -18,7 +18,7 @@ struct StageBandDetail: View {
                         .foregroundStyle(TFTTheme.textPrimary)
                 }
             }
-            if !section.openerUnits.isEmpty {
+            if !section.openerUnits.isEmpty || !section.restOfBuild.isEmpty {
                 StageCard("Buy now · open with these") {
                     buyNowCard
                 }
@@ -59,12 +59,23 @@ struct StageBandDetail: View {
         }
     }
 
-    /// The shopping list: what the comp opens on, with its costs.
+    /// The shopping list, then the rest of the build under it.
     ///
-    /// A transitional opener — one the comp opens on and then sells — is
-    /// marked rather than dropped, and the footnote says what the mark means
-    /// once, because a player who buys Cinderling on this card's instruction
-    /// and then cannot find it in the build has been told half the truth.
+    /// One card, not two, and the openers stay the loud half: the buy-now
+    /// answer is what this band exists for, and the roster is there so a
+    /// 4-cost rolling through the shop in stage 2 is recognisable (#107).
+    ///
+    /// Everything here is priced in points, because the band had 65 of them
+    /// left before the 594pt above-the-fold budget bit (`elderwood-bloom` at
+    /// early measured 529pt of it, with a six-line opener paragraph). What the
+    /// whole build would have cost, measured: a second card's chrome 40pt, item
+    /// icons under the roster cells 14pt, names under them 10pt, a heading line
+    /// above them 13pt. So the roster shares this card; it draws no items — the
+    /// components card and the mid band's itemise card already answer that —
+    /// and no names, because 30pt art plus a cost number is what recognising a
+    /// unit in the shop needs, while the opener half, the half a player acts
+    /// on, keeps its names. `elderwood-bloom` lands at 565pt, under the 570pt
+    /// its own late band already needed before any of this.
     private var buyNowCard: some View {
         VStack(alignment: .leading, spacing: 6) {
             openerStrip
@@ -73,6 +84,31 @@ struct StageBandDetail: View {
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(TFTTheme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
+            }
+            if !section.restOfBuild.isEmpty {
+                // The label sits beside the strip rather than above it: a line
+                // of its own costs 13pt, and beside it costs none — the roster
+                // needs at most six 35pt cells of the 334pt left at the
+                // narrowest panel width.
+                HStack(alignment: .top, spacing: 6) {
+                    Text("REST OF\nTHE BUILD")
+                        .font(.system(size: 9, weight: .heavy, design: .rounded))
+                        .foregroundStyle(TFTTheme.textTertiary)
+                        .lineSpacing(-1)
+                        .frame(width: 56, alignment: .leading)
+                    CompRosterGrid(
+                        entries: section.restOfBuild,
+                        portraitSize: 30,
+                        showsNames: false,
+                        spacing: 5,
+                        showsCosts: true,
+                        showsItems: false
+                    )
+                    // Subordinate to the openers above without hiding anything:
+                    // recognition survives a dimmed portrait, and full contrast
+                    // on both halves would leave no buy-now answer at all.
+                    .opacity(0.75)
+                }
             }
         }
     }

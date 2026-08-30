@@ -64,6 +64,48 @@ final class EarlyBandOpenerTests: XCTestCase {
         XCTAssertEqual(byName["Gromp"]?.isTransitional, false)
     }
 
+    func testRestOfBuildIsEveryUnitTheOpenerStripDoesNotAlreadyShow() throws {
+        let comp = try CompFixture.make(
+            id: "wide-cost-spread",
+            tier: .s,
+            units: [
+                CompFixture.unit("Ornn", cost: 1),
+                CompFixture.unit("Xayah", cost: 1),
+                CompFixture.unit("Alistar", cost: 2),
+                CompFixture.unit("Hecarim", cost: 3),
+                CompFixture.unit("Ezreal", cost: 4, role: .carry),
+                CompFixture.unit("Gnar", cost: 5),
+            ],
+            carries: [CompCarry(unit: "Ezreal", itemPriority: ["Infinity Edge"])],
+            earlyUnits: ["Ornn", "Xayah", "Alistar"],
+            earlyOpener: "Open Ornn, Xayah, Alistar."
+        )
+        let early = plan(comp).section(for: .early)
+
+        XCTAssertEqual(
+            early.restOfBuild.map(\.unit.name),
+            ["Ezreal", "Gnar", "Hecarim"],
+            "itemised carry first, then descending cost — the 3- and 4-costs are the point of the strip"
+        )
+        // The claim the maintainer asked for: the whole build is on screen.
+        let shown = Set(early.openerUnits.map(\.name)).union(early.restOfBuild.map(\.unit.name))
+        XCTAssertEqual(shown, Set(comp.units.map(\.name)), "every champion in the build is drawn somewhere")
+        XCTAssertTrue(
+            early.restOfBuild.allSatisfy { $0.unit.cost > 0 },
+            "every rest-of-build cell has a cost to draw"
+        )
+    }
+
+    func testATransitionalOpenerDoesNotRemoveAnythingFromTheRestOfTheBuild() throws {
+        let early = try plan(riftbeastShapedComp()).section(for: .early)
+        let shown = Set(early.openerUnits.map(\.name)).union(early.restOfBuild.map(\.unit.name))
+        XCTAssertTrue(shown.isSuperset(of: ["Akali", "Kayle", "Leona", "Sejuani", "Shen"]))
+        XCTAssertFalse(
+            early.restOfBuild.contains { ["Gromp", "Murkwolf", "Scuttlecrab"].contains($0.unit.name) },
+            "a unit already in the opener strip is not repeated below it"
+        )
+    }
+
     /// `OpenerPick.id` is the name, and duplicate identities inside a SwiftUI
     /// `ForEach` are undefined behaviour by SwiftUI's own documentation.
     func testRepeatedEarlyNamesReachTheStripOnce() throws {
@@ -117,6 +159,14 @@ final class EarlyBandOpenerTests: XCTestCase {
                 XCTAssertTrue(
                     prose.contains(pick.name.lowercased()),
                     "\(comp.id): OPEN WITH does not mention \(pick.name), which the strip tells the player to buy"
+                )
+            }
+            let shown = Set(early.openerUnits.map { $0.name.lowercased() })
+                .union(early.restOfBuild.map { $0.unit.name.lowercased() })
+            for unit in comp.units {
+                XCTAssertTrue(
+                    shown.contains(unit.name.lowercased()),
+                    "\(comp.id): \(unit.name) is in the build but the early band never draws it"
                 )
             }
         }
