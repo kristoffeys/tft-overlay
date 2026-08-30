@@ -17,6 +17,27 @@ enum CompFixture {
         CompUnit(name: name, cost: cost, starTarget: 2, role: role, traits: [])
     }
 
+    /// A JSON string literal for `text`, escaped.
+    ///
+    /// Needed because the fixtures model scraper output, and scraper output is
+    /// where the interesting inputs live: a stage of `"1-2\n"` interpolated raw
+    /// makes the fixture JSON itself invalid, which reads as a broken test
+    /// rather than as the case being tested.
+    static func quoted(_ text: String) -> String {
+        var escaped = ""
+        for character in text.unicodeScalars {
+            switch character {
+            case "\"": escaped += "\\\""
+            case "\\": escaped += "\\\\"
+            case "\n": escaped += "\\n"
+            case "\r": escaped += "\\r"
+            case "\t": escaped += "\\t"
+            default: escaped.unicodeScalars.append(character)
+            }
+        }
+        return "\"\(escaped)\""
+    }
+
     static func make(
         id: String,
         tier: Comp.Tier,
@@ -39,9 +60,9 @@ enum CompFixture {
             """
         }.joined(separator: ",")
         let levelPlanJSON = levelPlan.map { entry in
-            let notes = entry.notes.map { "\"\($0)\"" } ?? "null"
+            let notes = entry.notes.map(quoted) ?? "null"
             return """
-            {"stage": "\(entry.stage)", "level": \(entry.level), "notes": \(notes)}
+            {"stage": \(quoted(entry.stage)), "level": \(entry.level), "notes": \(notes)}
             """
         }.joined(separator: ",")
         let json = """

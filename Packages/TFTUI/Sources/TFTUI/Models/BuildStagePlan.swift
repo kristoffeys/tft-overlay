@@ -137,9 +137,21 @@ public struct BuildStagePlan: Sendable {
                 continue
             }
             guard seen.insert(stage).inserted else { continue }
-            scheduled.append(DatedEntry(stage: stage, entry: entry))
+            scheduled.append(DatedEntry(stage: stage, entry: canonicalised(entry, at: stage)))
         }
         return (scheduled, unscheduled)
+    }
+
+    /// Re-keys a parsed row to the stage's own notation.
+    ///
+    /// The raw string is scraper output and reaches the badge in the view
+    /// verbatim, so `"1-2\n"` — which now parses rather than being exiled to
+    /// the unplaced list — would otherwise draw a line break inside a 38pt
+    /// chip. Once a row is parsed, `GameStage.label` is the authority on how
+    /// it reads.
+    private static func canonicalised(_ entry: LevelPlanEntry, at stage: GameStage) -> LevelPlanEntry {
+        guard entry.stage != stage.label else { return entry }
+        return LevelPlanEntry(stage: stage.label, level: entry.level, notes: entry.notes)
     }
 
     private static func levelTarget(

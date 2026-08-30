@@ -18,8 +18,16 @@ public struct GameStage: Hashable, Comparable, Sendable {
     /// hyphen. A scraped stage string that fails to parse is a data defect, not
     /// a stage — callers surface those separately rather than guessing an act
     /// for them, so nothing the corpus carries is silently dropped.
+    ///
+    /// Surrounding whitespace *and newlines* are ignored: the corpus is
+    /// scraper output (ADR 0004), where a cell copied with its line break
+    /// arrives as `"1-2\n"`. Treating that as a data defect would exile a
+    /// perfectly good row to "Unplaced plan rows" over a character the player
+    /// cannot see.
     public init?(_ raw: String) {
-        let parts = raw.trimmingCharacters(in: .whitespaces).split(separator: "-", omittingEmptySubsequences: false)
+        let parts = raw
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(separator: "-", omittingEmptySubsequences: false)
         guard parts.count == 2,
               let act = Int(parts[0]), let round = Int(parts[1]),
               act >= 0, round >= 0

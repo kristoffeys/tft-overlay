@@ -17,6 +17,16 @@ final class GameStageTests: XCTestCase {
         XCTAssertGreaterThan("9-1", "10-1", "string order disagrees, which is the bug this guards")
     }
 
+    /// The corpus is scraper output: a cell copied with its line break arrives
+    /// as `"1-2\n"`. Trimming only `.whitespaces` left that unparseable, which
+    /// sent a good row to "Unplaced plan rows" over an invisible character.
+    func testParsesStagesCarryingScraperWhitespaceAndNewlines() throws {
+        for raw in ["1-2\n", "\n1-2", " 3-2 ", "\t3-2\r\n", "3-2\n\n"] {
+            let stage = try XCTUnwrap(GameStage(raw), "\(raw.debugDescription) should parse")
+            XCTAssertEqual(stage.label, raw.trimmingCharacters(in: .whitespacesAndNewlines))
+        }
+    }
+
     func testRejectsMalformedStageStrings() {
         for raw in ["", "3", "3-", "-2", "three-two", "3-2-1", "-3-2"] {
             XCTAssertNil(GameStage(raw), "\(raw) is not a stage")
