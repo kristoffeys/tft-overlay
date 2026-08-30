@@ -21,6 +21,20 @@ public final class OverlayPanelController<Content: View> {
         public var idleRevertInterval: TimeInterval
         public var initialLayoutMode: OverlayLayoutMode
         public var initialAnchor: OverlayAnchor
+        /// Whether the panel accepts clicks on launch.
+        ///
+        /// Defaults to `true`: a panel that silently swallows nothing and
+        /// explains nothing is a dead end, and this overlay's stated
+        /// priority is being fully usable standalone with no game running.
+        /// Click-through is the mode the user opts *into*, via the lock
+        /// control or the hotkey.
+        public var startsInteractive: Bool
+        /// Whether an idle spell should return the panel to click-through.
+        ///
+        /// Off by default, and necessarily so: with `startsInteractive`, an
+        /// idle timer that flips the panel back would quietly undo the
+        /// user's default a few seconds after every launch.
+        public var autoLockWhenIdle: Bool
 
         public init(
             expandedSize: CGSize = CGSize(width: 420, height: 560),
@@ -30,7 +44,9 @@ public final class OverlayPanelController<Content: View> {
             defaultOpacity: Double = 0.9,
             idleRevertInterval: TimeInterval = 8,
             initialLayoutMode: OverlayLayoutMode = .expanded,
-            initialAnchor: OverlayAnchor = .bottomTrailing
+            initialAnchor: OverlayAnchor = .bottomTrailing,
+            startsInteractive: Bool = true,
+            autoLockWhenIdle: Bool = false
         ) {
             self.expandedSize = expandedSize
             self.compactSize = compactSize
@@ -40,6 +56,8 @@ public final class OverlayPanelController<Content: View> {
             self.idleRevertInterval = idleRevertInterval
             self.initialLayoutMode = initialLayoutMode
             self.initialAnchor = initialAnchor
+            self.startsInteractive = startsInteractive
+            self.autoLockWhenIdle = autoLockWhenIdle
         }
     }
 
@@ -49,10 +67,11 @@ public final class OverlayPanelController<Content: View> {
     private let state = OverlayPanelState()
 
     private var idleRevertInterval: TimeInterval
+    private var autoLockWhenIdle: Bool
     private var idleTimer: Timer?
     private var lastActivity: TimeInterval = ProcessInfo.processInfo.systemUptime
-    private var moveObserver: NSObjectProtocol?
-    private var resizeObserver: NSObjectProtocol?
+    private let geometryPersistence: OverlayGeometryPersistence
+    private var modifierDragController: OverlayModifierDragController?
 
     public init(
         content: Content,
@@ -62,6 +81,7 @@ public final class OverlayPanelController<Content: View> {
         self.configuration = configuration
         self.geometryStore = geometryStore
         idleRevertInterval = configuration.idleRevertInterval
+        autoLockWhenIdle = configuration.autoLockWhenIdle
 
         let startingSize = configuration.initialLayoutMode == .compact ? configuration.compactSize : configuration
             .expandedSize
@@ -73,15 +93,20 @@ public final class OverlayPanelController<Content: View> {
         )
 
         panel = OverlayPanel(contentRect: initialFrame)
+        geometryPersistence = OverlayGeometryPersistence(panel: panel, geometryStore: geometryStore)
         state.opacity = configuration.defaultOpacity
         state.layoutMode = configuration.initialLayoutMode
+        state.isInteractive = configuration.startsInteractive
+        panel.ignoresMouseEvents = !configuration.startsInteractive
 
         let chrome = OverlayChromeView(
             content: content,
             state: state,
             onResizeDrag: { [weak self] proposed in self?.applyResize(proposed) },
             onResizeEnd: { [weak self] in self?.persistCurrentGeometry() },
-            onActivity: { [weak self] in self?.noteActivity() }
+            onActivity: { [weak self] in self?.noteActivity() },
+            onLockRequested: { [weak self] in self?.setInteractive(false) },
+            onToggleLayoutMode: { [weak self] in self?.toggleLayoutMode() }
         )
         let hostingView = NSHostingView(rootView: chrome)
         // Without this, NSHostingView auto-sizes the panel to hosted
@@ -92,17 +117,18 @@ public final class OverlayPanelController<Content: View> {
         hostingView.sizingOptions = []
         panel.contentView = hostingView
 
-        restoreGeometryForCurrentDisplay()
-        observeWindowMoves()
-    }
-
-    deinit {
-        if let moveObserver {
-            NotificationCenter.default.removeObserver(moveObserver)
+        if let (frame, saved) = geometryPersistence.restoreGeometry() {
+            applyFrame(frame)
+            state.layoutMode = saved.layoutMode
+            state.opacity = saved.opacity
+            state.scale = saved.scale
         }
-        if let resizeObserver {
-            NotificationCenter.default.removeObserver(resizeObserver)
-        }
+        geometryPersistence.observeWindowMoves { [weak self] in self?.persistCurrentGeometry() }
+        modifierDragController = OverlayModifierDragController(
+            panel: panel,
+            onDragStart: { [weak self] in self?.noteActivity() },
+            onDragEnd: { [weak self] in self?.persistCurrentGeometry() }
+        )
     }
 
     // MARK: - Shutdown (#7)
@@ -126,10 +152,19 @@ public final class OverlayPanelController<Content: View> {
 
     public func show() {
         panel.orderFrontRegardless()
+        state.isVisible = true
     }
 
     public func hide() {
         panel.orderOut(nil)
+        state.isVisible = false
+    }
+
+    /// The panel's observable state, for app-layer UI that has to reflect it
+    /// (menu titles, indicators) rather than read a value that never
+    /// notifies.
+    public var observableState: OverlayPanelState {
+        state
     }
 
     public func toggleVisibility() {
@@ -161,6 +196,12 @@ public final class OverlayPanelController<Content: View> {
 
     public func toggleInteractive() {
         setInteractive(!isInteractive)
+    }
+
+    /// The click-through badge's text; `nil` shows none. Set from the app
+    /// layer, which knows the actual (rebindable) hotkey.
+    public func setInteractiveHintText(_ text: String?) {
+        state.interactiveHintText = text
     }
 
     // MARK: - Layout mode (#29)
@@ -229,6 +270,28 @@ public final class OverlayPanelController<Content: View> {
         idleRevertInterval = max(interval, 0)
     }
 
+    /// Turns idle auto-locking on or off at runtime. Switching it off stops
+    /// any timer already running, so the panel cannot lock itself after the
+    /// user has just said it should not.
+    public func setAutoLockWhenIdle(_ enabled: Bool) {
+        autoLockWhenIdle = enabled
+        if enabled, isInteractive {
+            startIdleTimerIfNeeded()
+        } else if !enabled {
+            stopIdleTimer()
+        }
+    }
+
+    /// Tooltip for the lock control shown while the panel is interactive.
+    public func setLockHintText(_ text: String?) {
+        state.lockHintText = text
+    }
+
+    /// Tooltip for the compact/expand control shown while interactive.
+    public func setLayoutHintText(_ text: String?) {
+        state.layoutHintText = text
+    }
+
     // MARK: - Diagnostics (#5)
 
     /// A snapshot of the panel's current placement/appearance, for
@@ -258,7 +321,8 @@ public final class OverlayPanelController<Content: View> {
     }
 
     private func startIdleTimerIfNeeded() {
-        guard idleTimer == nil else { return }
+        // Opt-in only: see `Configuration.autoLockWhenIdle`.
+        guard autoLockWhenIdle, idleTimer == nil else { return }
         let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
             Task { @MainActor in self?.checkIdle() }
         }
@@ -284,53 +348,11 @@ public final class OverlayPanelController<Content: View> {
 
     // MARK: - Persistence
 
-    private func displayID(for screen: NSScreen) -> OverlayDisplayID {
-        (screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.intValue ?? 0
-    }
-
-    private func restoreGeometryForCurrentDisplay() {
-        guard let screen = panel.screen ?? NSScreen.main else { return }
-        guard let saved = geometryStore.load(for: displayID(for: screen)) else { return }
-
-        let knownFrames = NSScreen.screens.map(\.visibleFrame)
-        let validated = OverlayPositioning.validated(
-            saved.frame,
-            against: knownFrames,
-            fallbackScreenFrame: screen.visibleFrame
-        )
-        applyFrame(validated)
-        state.layoutMode = saved.layoutMode
-        state.opacity = saved.opacity
-        state.scale = saved.scale
-    }
-
     private func persistCurrentGeometry() {
-        guard let screen = panel.screen ?? NSScreen.main else { return }
-        let geometry = OverlayGeometry(
-            frame: panel.frame,
+        geometryPersistence.persistCurrentGeometry(
             layoutMode: state.layoutMode,
             opacity: state.opacity,
             scale: state.scale
         )
-        geometryStore.save(geometry, for: displayID(for: screen))
-    }
-
-    private func observeWindowMoves() {
-        moveObserver = NotificationCenter.default.addObserver(
-            forName: NSWindow.didMoveNotification,
-            object: panel,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in self?.persistCurrentGeometry() }
-        }
-        // Safety net alongside the resize handle's own `onResizeEnd`, so any
-        // resize (ours or external, e.g. an accessibility client) persists.
-        resizeObserver = NotificationCenter.default.addObserver(
-            forName: NSWindow.didResizeNotification,
-            object: panel,
-            queue: .main
-        ) { [weak self] _ in
-            Task { @MainActor in self?.persistCurrentGeometry() }
-        }
     }
 }
