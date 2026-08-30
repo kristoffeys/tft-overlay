@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sprykin-hunters",
+  "name": "Sprykin Hunters",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "A-tier slow roll comp built around Sprykin and Brawler.",
+  "units": [
+    {
+      "name": "Kobuko",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Sprykin",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Teemo",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Sprykin",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Rammus",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Sprykin",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Tristana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Fae",
+        "Sprykin",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Lillia",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Fae",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Ashe",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Rammus",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Tristana",
+      "itemPriority": [
+        "Guinsoo's Rageblade",
+        "Infinity Edge",
+        "Kraken's Fury"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Kobuko",
+        "Sentinel",
+        "Lillia",
+        "Gnar",
+        "Rammus",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Teemo",
+        null,
+        null,
+        null,
+        null,
+        "Ashe",
+        "Tristana"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Kobuko, Veigar, Teemo, Rammus, Tristana"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Ivern, Taric."
+    }
+  ],
+  "earlyOpener": "Prioritize Kobuko, Veigar, Teemo, Rammus, Tristana early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Ashe → Sivir; Sentinel, Ashe → Vi, Sivir."
+}

@@ -1,0 +1,180 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "riftbeast-summoners",
+  "name": "Riftbeast Summoners",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "B",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "B-tier slow roll comp built around Summoner and Thornmaiden.",
+  "units": [
+    {
+      "name": "Yorick",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blossom",
+        "Juggernaut",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Krug",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Mama Beak",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Summoner",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Aphelios",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Lunar",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Sett",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Zyra",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Thornmaiden",
+        "Summoner"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Krug",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Mama Beak",
+      "itemPriority": [
+        "Deathblade",
+        "Guinsoo's Rageblade",
+        "Infinity Edge"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Sentinel",
+        "Yorick",
+        "Sett",
+        "Diana",
+        "Krug",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "Zyra",
+        "Aphelios",
+        "Mama Beak"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Cinderling, Pebbles, Scuttlecrab, Krug, Mama Beak"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Ashe, Ivern, Maokai."
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Alistar, Gnar."
+    }
+  ],
+  "earlyOpener": "Prioritize Cinderling, Pebbles, Scuttlecrab, Krug, Mama Beak early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Yorick, Diana, Aphelios → Xayah, Alistar, Gnar."
+}

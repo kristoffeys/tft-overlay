@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "blossom-executioners",
+  "name": "Blossom Executioners",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "A-tier slow roll comp built around Executioner and Blossom.",
+  "units": [
+    {
+      "name": "Alistar",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "LeBlanc",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Yunara",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Blossom",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Ahri",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Ezreal",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Sett",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Soraka",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Flora Fatalis",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Kennen",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Inferno",
+        "Executioner"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Alistar",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Yunara",
+      "itemPriority": [
+        "Deathblade",
+        "Spear of Shojin",
+        "Striker's Flail"
+      ]
+    },
+    {
+      "unit": "Ezreal",
+      "itemPriority": [
+        "Last Whisper"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        "Sett",
+        "Kennen",
+        "Alistar",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "LeBlanc",
+        "Ahri",
+        null,
+        null,
+        "Soraka",
+        "Ezreal",
+        "Yunara"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Rakan, Yorick, Karma, Leblanc, Yunara"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Amumu, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Rakan, Yorick, Karma, Leblanc, Yunara early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Kennen → Azir."
+}

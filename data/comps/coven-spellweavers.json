@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "coven-spellweavers",
+  "name": "Coven Spellweavers",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "S",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "S-tier fast 8 comp built around Emerald Aspect and Vanguard.",
+  "units": [
+    {
+      "name": "Elise",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Coven",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Cassiopeia",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Coven",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Fiddlesticks",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Flora Fatalis",
+        "Defender",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Ahri",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blossom",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Morgana",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Coven",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Ahri",
+      "itemPriority": [
+        "Jeweled Gauntlet",
+        "Spear of Shojin",
+        "Striker's Flail"
+      ]
+    },
+    {
+      "unit": "Sentinel",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Taric",
+        "Elise",
+        "Fiddlesticks",
+        "Diana",
+        "Sentinel",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "Morgana",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Cassiopeia",
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Ahri"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Camille, Rakan, Caitlyn, Elise, Cassiopeia"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Alune."
+    }
+  ],
+  "earlyOpener": "Prioritize Camille, Rakan, Caitlyn, Elise, Cassiopeia early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Cassiopeia → Alune."
+}

@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "caustic-adaptors",
+  "name": "Caustic Adaptors",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "S",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "S-tier slow roll comp built around Caustic and Brawler.",
+  "units": [
+    {
+      "name": "Yorick",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blossom",
+        "Juggernaut",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Kog'Maw",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Caustic",
+        "Adaptor",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Krug",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Master Yi",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blossom",
+        "Adaptor"
+      ]
+    },
+    {
+      "name": "Vi",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Primal",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Nidalee",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Primal",
+        "Adaptor"
+      ]
+    },
+    {
+      "name": "Sett",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Kog'Maw",
+      "itemPriority": [
+        "Infinity Edge",
+        "Red Buff",
+        "Spear of Shojin"
+      ]
+    },
+    {
+      "unit": "Master Yi",
+      "itemPriority": [
+        "Edge of Night",
+        "Guinsoo's Rageblade",
+        "Titan's Resolve"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Sett",
+        "Yorick",
+        "Vi",
+        "Master Yi",
+        "Krug",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "Gnar",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Nidalee",
+        "Kog'Maw"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Yorick, Karma, Gromp, Master Yi, Vi"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Gromp."
+    }
+  ],
+  "earlyOpener": "Prioritize Yorick, Karma, Gromp, Master Yi, Vi early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Sentinel → Gromp."
+}

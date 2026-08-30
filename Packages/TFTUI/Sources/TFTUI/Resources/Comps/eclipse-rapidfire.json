@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "eclipse-rapidfire",
+  "name": "Eclipse Rapidfire",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "B",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "B-tier fast 8 comp built around Solar and Attuned.",
+  "units": [
+    {
+      "name": "Leona",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Rakan",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Juggernaut",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Kayle",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Sejuani",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Aphelios",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Lunar",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Lillia",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Fae",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Alune",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Attuned",
+        "Lunar",
+        "Spellweaver"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Aphelios",
+      "itemPriority": [
+        "Deathblade",
+        "Guinsoo's Rageblade",
+        "Infinity Edge"
+      ]
+    },
+    {
+      "unit": "Lillia",
+      "itemPriority": [
+        "Protector's Vow",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Rakan",
+        "Leona",
+        "Sejuani",
+        "Diana",
+        "Lillia",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Alune",
+        null,
+        null,
+        null,
+        null,
+        "Kayle",
+        "Aphelios"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Leona, Rakan, Xayah, Kayle, Sejuani"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Ivern, Lux (Lunar)."
+    }
+  ],
+  "earlyOpener": "Prioritize Leona, Rakan, Xayah, Kayle, Sejuani early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Rakan, Lillia → Maokai, Taric."
+}

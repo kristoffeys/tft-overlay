@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "juggernaut-summoners",
+  "name": "Juggernaut Summoners",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "A-tier fast 8 comp built around Summoner and Old Growth.",
+  "units": [
+    {
+      "name": "Yorick",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blossom",
+        "Juggernaut",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Azir",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blackthorn",
+        "Executioner",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Malphite",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blackthorn",
+        "Monolith"
+      ]
+    },
+    {
+      "name": "Soraka",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Flora Fatalis",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Zyra",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Thornmaiden",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Ivern",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Greenfather"
+      ]
+    },
+    {
+      "name": "Kennen",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Inferno",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Maokai",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Old Growth",
+        "Juggernaut"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Malphite",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Protector's Vow",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Zyra",
+      "itemPriority": [
+        "Morellonomicon",
+        "Spear of Shojin",
+        "Void Staff"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        "Malphite",
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        "Maokai",
+        "Yorick",
+        "Kennen",
+        null,
+        null
+      ],
+      [
+        "Soraka",
+        null,
+        "Azir",
+        null,
+        "Ivern",
+        null,
+        "Zyra"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Karma, Yorick, Sejuani, Yunara, Fiddlesticks"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Fiddlesticks, Ezreal, Taric."
+    }
+  ],
+  "earlyOpener": "Prioritize Karma, Yorick, Sejuani, Yunara, Fiddlesticks early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
+}

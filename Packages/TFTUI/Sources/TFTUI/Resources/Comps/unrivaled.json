@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "unrivaled",
+  "name": "Unrivaled",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "S",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "S-tier slow roll comp built around Rival and Attuned.",
+  "units": [
+    {
+      "name": "LeBlanc",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Elderwood",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Hecarim",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Elderwood",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Kha'Zix",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Rival"
+      ]
+    },
+    {
+      "name": "Rengar",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Rival"
+      ]
+    },
+    {
+      "name": "Aphelios",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Lunar",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Ezreal",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Alune",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Attuned",
+        "Lunar",
+        "Spellweaver"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Hecarim",
+      "itemPriority": [
+        "Gargoyle Stoneplate"
+      ]
+    },
+    {
+      "unit": "Kha'Zix",
+      "itemPriority": [
+        "Edge of Night",
+        "Hand of Justice",
+        "Rabadon's Deathcap"
+      ]
+    },
+    {
+      "unit": "Rengar",
+      "itemPriority": [
+        "Edge of Night",
+        "Guinsoo's Rageblade",
+        "Titan's Resolve"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        "Hecarim",
+        "Diana",
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Kha'Zix",
+        "Rengar",
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Aphelios",
+        "Ezreal",
+        null,
+        null,
+        null,
+        "LeBlanc",
+        "Alune"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Ornn, Alistar, Leblanc, Khazix, Rengar"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Soraka, Kennen."
+    }
+  ],
+  "earlyOpener": "Prioritize Ornn, Alistar, Leblanc, Khazix, Rengar early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Alune → Soraka, Kennen."
+}

@@ -1,0 +1,175 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "blackthorn-sprykin",
+  "name": "Blackthorn Sprykin",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "A-tier slow roll comp built around Sprykin and Brawler.",
+  "units": [
+    {
+      "name": "Kobuko",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Sprykin",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Rek'Sai",
+      "cost": 1,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Blackthorn",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Veigar",
+      "cost": 1,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Blackthorn",
+        "Sprykin",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Fiddlesticks",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Flora Fatalis",
+        "Defender",
+        "Spellweaver"
+      ]
+    },
+    {
+      "name": "Rammus",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Sprykin",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Tristana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Sprykin",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Sett",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Rek'Sai",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Veigar",
+      "itemPriority": [
+        "Jeweled Gauntlet",
+        "Nashor's Tooth",
+        "Nashor's Tooth"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Kobuko",
+        "Rammus",
+        "Fiddlesticks",
+        "Sett",
+        "Rek'Sai",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "Gnar",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Tristana",
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Veigar"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Kobuko, RekSai, Veigar, Leblanc, Rammus"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Kobuko, RekSai, Veigar, Leblanc, Rammus early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Sett, Gnar → Soraka."
+}

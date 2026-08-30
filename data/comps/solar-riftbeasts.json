@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "solar-riftbeasts",
+  "name": "Solar Riftbeasts",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "B",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "B-tier slow roll comp built around Solar and Riftbeast.",
+  "units": [
+    {
+      "name": "Akali",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Inferno",
+        "Adaptor",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Leona",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Gromp",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Adaptor"
+      ]
+    },
+    {
+      "name": "Kayle",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Rapidfire"
+      ]
+    },
+    {
+      "name": "Murkwolf",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Scuttlecrab",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Sejuani",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Shen",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Inferno",
+        "Defender"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Gromp",
+      "itemPriority": [
+        "Jeweled Gauntlet",
+        "Nashor's Tooth",
+        "Nashor's Tooth"
+      ]
+    },
+    {
+      "unit": "Scuttlecrab",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Spirit Visage",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Sejuani",
+        "Leona",
+        "Shen",
+        "Murkwolf",
+        "Scuttlecrab",
+        "Akali"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Kayle",
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Gromp"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Cinderling, Gromp, Murkwolf, Scuttlecrab, Krug"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Nidalee, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Cinderling, Gromp, Murkwolf, Scuttlecrab, Krug early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Shen → Varus."
+}

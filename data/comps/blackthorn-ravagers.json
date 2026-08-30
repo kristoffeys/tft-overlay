@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "blackthorn-ravagers",
+  "name": "Blackthorn Ravagers",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "B",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "B-tier slow roll comp built around Monolith and Blackthorn.",
+  "units": [
+    {
+      "name": "Rek'Sai",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blackthorn",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Murkwolf",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Warwick",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Blackthorn",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Azir",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Blackthorn",
+        "Executioner",
+        "Summoner"
+      ]
+    },
+    {
+      "name": "Diana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Lunar",
+        "Ravager",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Krug",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Riftbeast",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Brambleback",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Ravager"
+      ]
+    },
+    {
+      "name": "Malphite",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Blackthorn",
+        "Monolith"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Warwick",
+      "itemPriority": [
+        "Spear of Shojin",
+        "Sterak's Gage",
+        "Titan's Resolve"
+      ]
+    },
+    {
+      "unit": "Malphite",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        null,
+        "Malphite",
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Brambleback",
+        "Diana",
+        "Rek'Sai",
+        null,
+        "Murkwolf",
+        "Krug",
+        "Warwick"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Azir"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: RekSai, Veigar, Murkwolf, Warwick, Azir"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Alune, Ivern, Taric."
+    }
+  ],
+  "earlyOpener": "Prioritize RekSai, Veigar, Murkwolf, Warwick, Azir early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Diana → Akali."
+}

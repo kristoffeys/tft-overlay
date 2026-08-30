@@ -1,0 +1,174 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "sprykin-invokers",
+  "name": "Sprykin Invokers",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "A-tier slow roll comp built around Emerald Aspect and Sprykin.",
+  "units": [
+    {
+      "name": "Kobuko",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Sprykin",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Teemo",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Sprykin",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Rammus",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Sprykin",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Tristana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Sprykin",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Lillia",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Fae",
+        "Defender"
+      ]
+    },
+    {
+      "name": "Gnar",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Elderwood",
+        "Sprykin",
+        "Brawler"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Teemo",
+      "itemPriority": [
+        "Jeweled Gauntlet",
+        "Nashor's Tooth",
+        "Nashor's Tooth"
+      ]
+    },
+    {
+      "unit": "Sentinel",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Taric",
+        "Kobuko",
+        "Sentinel",
+        "Lillia",
+        "Rammus",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        "Gnar",
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Tristana",
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Teemo"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Kobuko, Pebbles, Shen, Teemo, Rammus"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Morgana, Ivern."
+    }
+  ],
+  "earlyOpener": "Prioritize Kobuko, Pebbles, Shen, Teemo, Rammus early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "No specific pivot data available from source; if contested, look for an adjacent trait pairing that shares your itemized carries' items."
+}

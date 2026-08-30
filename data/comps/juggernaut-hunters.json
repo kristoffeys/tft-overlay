@@ -1,0 +1,179 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "juggernaut-hunters",
+  "name": "Juggernaut Hunters",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "slow_roll",
+  "difficulty": "medium",
+  "description": "A-tier slow roll comp built around Hunter and Juggernaut.",
+  "units": [
+    {
+      "name": "Rakan",
+      "cost": 1,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Juggernaut",
+        "Vanguard"
+      ]
+    },
+    {
+      "name": "Caitlyn",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Coven",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Scuttlecrab",
+      "cost": 2,
+      "starTarget": 3,
+      "role": "carry",
+      "traits": [
+        "Riftbeast",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Sejuani",
+      "cost": 2,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Solar",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Tristana",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Fae",
+        "Sprykin",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Vi",
+      "cost": 3,
+      "starTarget": 2,
+      "role": "frontline",
+      "traits": [
+        "Primal",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Sivir",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Primal",
+        "Hunter"
+      ]
+    },
+    {
+      "name": "Ashe",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Blossom",
+        "Hunter"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Caitlyn",
+      "itemPriority": [
+        "Guinsoo's Rageblade",
+        "Kraken's Fury",
+        "Kraken's Fury"
+      ]
+    },
+    {
+      "unit": "Scuttlecrab",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Sunfire Cape",
+        "Warmog's Armor"
+      ]
+    },
+    {
+      "unit": "Sivir",
+      "itemPriority": [
+        "Last Whisper"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        null,
+        "Sejuani",
+        "Rakan",
+        "Vi",
+        "Scuttlecrab",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "Tristana",
+        null,
+        null,
+        null,
+        "Ashe",
+        "Sivir",
+        "Caitlyn"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Rakan, Caitlyn, Sejuani, Scuttlecrab, Vi"
+    },
+    {
+      "stage": "5-2",
+      "level": 9,
+      "notes": "At level 9 you can add: Cinderling, Taric."
+    }
+  ],
+  "earlyOpener": "Prioritize Rakan, Caitlyn, Sejuani, Scuttlecrab, Vi early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Ashe → Cinderling, Taric."
+}

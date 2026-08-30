@@ -1,0 +1,165 @@
+{
+  "schemaVersion": "1.0.0",
+  "id": "apex-predator",
+  "name": "Apex Predator",
+  "set": 18,
+  "patch": "18.1",
+  "source": "scraped-feed",
+  "tier": "A",
+  "playstyle": "fast_8",
+  "difficulty": "medium",
+  "description": "A-tier fast 8 comp built around Bounty Seeker and Emerald Aspect.",
+  "units": [
+    {
+      "name": "Amumu",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Inferno",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Sentinel",
+      "cost": 4,
+      "starTarget": 2,
+      "role": "utility",
+      "traits": [
+        "Riftbeast",
+        "Vanguard",
+        "Invoker"
+      ]
+    },
+    {
+      "name": "Draven",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Bounty Seeker"
+      ]
+    },
+    {
+      "name": "Elder Dragon",
+      "cost": 5,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Apex Predator",
+        "Riftbeast"
+      ]
+    },
+    {
+      "name": "Ivern",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Greenfather"
+      ]
+    },
+    {
+      "name": "Kennen",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Inferno",
+        "Executioner"
+      ]
+    },
+    {
+      "name": "Maokai",
+      "cost": 5,
+      "starTarget": 2,
+      "role": "carry",
+      "traits": [
+        "Old Growth",
+        "Juggernaut"
+      ]
+    },
+    {
+      "name": "Taric",
+      "cost": 5,
+      "starTarget": 1,
+      "role": "utility",
+      "traits": [
+        "Emerald Aspect",
+        "Vanguard"
+      ]
+    }
+  ],
+  "carries": [
+    {
+      "unit": "Elder Dragon",
+      "itemPriority": [
+        "Infinity Edge",
+        "Last Whisper",
+        "Striker's Flail"
+      ]
+    },
+    {
+      "unit": "Maokai",
+      "itemPriority": [
+        "Gargoyle Stoneplate",
+        "Protector's Vow",
+        "Spirit Visage"
+      ]
+    }
+  ],
+  "boardPositioning": {
+    "grid": [
+      [
+        null,
+        "Taric",
+        "Sentinel",
+        "Amumu",
+        "Kennen",
+        "Maokai",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Elder Dragon"
+      ],
+      [
+        "Ivern",
+        null,
+        null,
+        null,
+        null,
+        null,
+        "Draven"
+      ]
+    ]
+  },
+  "augmentPreferences": {
+    "tier1": [],
+    "tier2": [],
+    "tier3": []
+  },
+  "levelPlan": [
+    {
+      "stage": "3-2",
+      "level": 6,
+      "notes": "Prioritize: Akali, Gromp, Murkwolf, Shen, Krug"
+    }
+  ],
+  "earlyOpener": "Prioritize Akali, Gromp, Murkwolf, Shen, Krug early; these carry the comp online before its full identity is committed.",
+  "pivotNotes": "Swaps this comp commonly runs: Draven → Kogmaw, Soraka, Ashe, Lux (Inferno)."
+}
