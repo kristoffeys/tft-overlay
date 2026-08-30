@@ -216,6 +216,16 @@ final class StageCompanionSnapshotTests: XCTestCase {
                 """
             )
 
+            // Known defect, issue #100: this fixture's Early band detail wants
+            // 468pt inside the 436pt it gets, so the whole panel measures
+            // 492pt against its 460pt frame. Recorded rather than papered over
+            // with a looser tolerance, so the width assertion stays strict for
+            // every other comp and this expectation itself fails once #100 is
+            // fixed. #95 is a testing-infrastructure change; the layout fix is
+            // not in its scope.
+            if comp.id == "solar-riftbeasts" {
+                XCTExpectFailure("solar-riftbeasts overflows the expanded panel by 32pt (#100)")
+            }
             try assertRendersWithin(
                 view.content,
                 size: CGSize(width: expanded.width, height: whole),

@@ -172,7 +172,11 @@ final class CompLeadRowTests: XCTestCase {
             row(leadsTo),
             size: CGSize(width: availableWidth(panelWidth: 300), height: natural.height),
             rightMargin: 2,
-            minimumInk: 0.002
+            minimumInk: 0.002,
+            // Nothing fits, so the whole row is the "+8" counter: 8pt of glyph
+            // in a 19pt capsule row (measured 0.42), the capsule's own fill
+            // sitting below the ink threshold.
+            minimumVerticalFill: 0.35
         )
     }
 
@@ -205,7 +209,9 @@ final class CompLeadRowTests: XCTestCase {
             row(leadsTo),
             size: CGSize(width: narrow, height: natural.height),
             rightMargin: 2,
-            minimumInk: 0.002
+            minimumInk: 0.002,
+            // As above: the counter alone, 8pt of glyph in a 19pt row.
+            minimumVerticalFill: 0.35
         )
     }
 

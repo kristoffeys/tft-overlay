@@ -11,16 +11,19 @@ import SwiftUI
 /// - It is not visible. Test support in one package's test target is not
 ///   importable from another, and exporting a test harness through a product
 ///   just to share it would put the harness in the shipping build.
-/// - The raster half is the broken half (#95): `render()` frames the view to
-///   the requested size and clips it, and SwiftUI centres an over-wide child,
-///   so over-wide content is cut at *both* ends and no margin check sees it.
-///   `measuredSize` does not clamp, which makes it the sound instrument for
-///   "does this fit" — a view that needs more width than it is offered
-///   reports the larger number.
+/// - The raster half cannot answer the question this target asks. `render()`
+///   frames the view to the requested size and clips it, and SwiftUI centres
+///   an over-wide child, so over-wide content is cut at *both* ends and no
+///   margin check sees it — which is what #95 corrected the harness's own
+///   documentation about. `measuredSize` does not clamp, which makes it the
+///   sound instrument for "does this fit": a view that needs more width than
+///   it is offered reports the larger number.
 ///
 /// So this is a ~15-line re-statement of the one function worth having, not a
-/// fork of a harness. If it grows a raster path, that is the moment to fix #95
-/// and find a real home for the shared version.
+/// fork of a harness. If it ever grows a raster path, port TFTUITests'
+/// `assertRendersWithin` wholesale — ink floor, vertical-fill distribution and
+/// the `TextField` placeholder seam included — rather than reinventing the
+/// parts of it that exist because they were once missing.
 @MainActor
 enum ViewSnapshot {
     /// Backing scale used for rasterisation. 1 keeps the pixel grid equal to
