@@ -73,6 +73,9 @@ public struct MyChampionsView: View {
                 .padding(.top, 4)
                 .padding(.bottom, 4)
             head
+            if mode == .suggestions, showsBasisNote {
+                basisNote
+            }
             ScrollView {
                 switch mode {
                 case .champions: rosterContent
@@ -240,7 +243,6 @@ public struct MyChampionsView: View {
             } else if suggestions.isEmpty {
                 emptyNote("No comp in this list uses any champion you marked.")
             } else {
-                basisNote
                 ForEach(suggestions) { suggestion in
                     CompSuggestionRow(suggestion: suggestion) {
                         onCommitBuild(suggestion.comp)
@@ -252,8 +254,23 @@ public struct MyChampionsView: View {
         .padding(12)
     }
 
+    /// Whether there is a ranking for the basis note to describe.
+    ///
+    /// The note explains an order, so it has nothing to say when there is
+    /// nothing ordered — both empty states carry their own copy instead.
+    var showsBasisNote: Bool {
+        ownedCount > 0 && !suggestions.isEmpty
+    }
+
     /// Says what the order is, in the panel, where a player can see it.
-    private var basisNote: some View {
+    ///
+    /// Above the scroll view, like the openers panel's note and for the same
+    /// reason: a disclaimer you have to scroll to is a disclaimer that does
+    /// not exist. It used to be the first child of `suggestionsContent`, which
+    /// put it inside the `ScrollView` and scrolled it out of sight after one
+    /// flick. Rendered as its own member so a snapshot test can measure it —
+    /// see `ViewSnapshot`'s note on `ScrollView` rasterising blank.
+    var basisNote: some View {
         HStack(alignment: .top, spacing: 6) {
             Image(systemName: "info.circle")
                 .font(.system(size: 10, weight: .heavy))
@@ -266,7 +283,8 @@ public struct MyChampionsView: View {
                 .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
-        .padding(.bottom, 2)
+        .padding(.horizontal, 12)
+        .padding(.bottom, 8)
     }
 
     private func emptyNote(_ text: String) -> some View {

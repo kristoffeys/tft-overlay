@@ -302,6 +302,58 @@ final class MyChampionsViewSnapshotTests: XCTestCase {
         )
     }
 
+    // MARK: - The basis note
+
+    /// The note explaining the ordering sits above the scroll view, so it
+    /// cannot be scrolled out of sight.
+    ///
+    /// It used to be the first child of `suggestionsContent`, i.e. inside the
+    /// `ScrollView`, and one flick made it vanish — the panel's own reasoning
+    /// says a disclaimer you have to scroll to does not exist. `basisNote` is a
+    /// member rendered by `body` above the `ScrollView`, exactly like the
+    /// openers panel's, and it has to stay a footnote rather than grow into a
+    /// banner that eats the rankings.
+    func testTheSuggestionsBasisNoteIsAFootnoteAtBothPanelWidths() throws {
+        let owned = store()
+        for name in ["Diana", "Hecarim", "Tristana"] {
+            owned.add(name)
+        }
+        let view = try panel(store: owned)
+        XCTAssertTrue(view.showsBasisNote)
+
+        for width in [expanded.width, compact.width] {
+            let height = try ViewSnapshot.measuredSize(of: view.basisNote, proposedWidth: width).height
+            XCTAssertGreaterThan(height, 0)
+            XCTAssertLessThanOrEqual(
+                height,
+                72,
+                "The always-on suggestions basis note is \(height)pt at \(width)pt; "
+                    + "it should be a footnote, not a banner"
+            )
+            try assertRendersWithin(
+                view.basisNote,
+                size: CGSize(width: width, height: height),
+                rightMargin: 8,
+                // A few lines of 10pt text in a wide strip is sparse ink.
+                minimumInk: 0.002
+            )
+        }
+    }
+
+    /// Both empty states carry their own copy, so the note has nothing to
+    /// explain and must not draw an ordering claim over an empty list.
+    func testTheBasisNoteIsHiddenWhenThereIsNoRankingToDescribe() throws {
+        let nothingMarked = try panel(store: store())
+        XCTAssertFalse(nothingMarked.showsBasisNote, "Nothing is marked, so there is no order to explain")
+
+        let noMatch = store()
+        noMatch.add("Nobodyhasthisunit")
+        let unmatched = try panel(store: noMatch)
+        XCTAssertEqual(unmatched.ownedCount, 1)
+        XCTAssertTrue(unmatched.suggestions.isEmpty)
+        XCTAssertFalse(unmatched.showsBasisNote, "Nothing matched, so there is no order to explain")
+    }
+
     /// The cap constant itself, against the literal the assertion above uses.
     func testTheSuggestionLimitIsTheOneTheListWasSizedFor() {
         XCTAssertEqual(
