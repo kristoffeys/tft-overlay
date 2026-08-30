@@ -18,6 +18,14 @@ public struct Comp: Identifiable, Hashable, Sendable, Codable {
     public let boardPositioning: BoardPositioning
     public let augmentPreferences: AugmentPreferences
     public let levelPlan: [LevelPlanEntry]
+    /// The board this comp actually opens on, as champion names (#104).
+    ///
+    /// Names only, by design: cost and traits stay single-sourced in the set
+    /// catalog and in `units`, so there is no second copy here to drift. It is
+    /// its own field because `units` is the *final* board and cheap openers get
+    /// replaced by the late game — no weighting of `units` can answer "what do
+    /// I open with" (#99). Empty when the scrape found no early subset.
+    public let earlyUnits: [String]
     public let earlyOpener: String
     public let pivotNotes: String
 
@@ -83,7 +91,8 @@ public struct Comp: Identifiable, Hashable, Sendable, Codable {
     private enum CodingKeys: String, CodingKey {
         case schemaVersion, id, name, set, patch, source, tier, playstyle, difficulty
         case compDescription = "description"
-        case units, carries, boardPositioning, augmentPreferences, levelPlan, earlyOpener, pivotNotes
+        case units, carries, boardPositioning, augmentPreferences, levelPlan
+        case earlyUnits, earlyOpener, pivotNotes
     }
 
     public init(from decoder: Decoder) throws {
@@ -103,6 +112,9 @@ public struct Comp: Identifiable, Hashable, Sendable, Codable {
         boardPositioning = try container.decode(BoardPositioning.self, forKey: .boardPositioning)
         augmentPreferences = try container.decode(AugmentPreferences.self, forKey: .augmentPreferences)
         levelPlan = try container.decode([LevelPlanEntry].self, forKey: .levelPlan)
+        // Optional in the schema: a comp whose source names no early subset
+        // omits the field rather than inventing one.
+        earlyUnits = try container.decodeIfPresent([String].self, forKey: .earlyUnits) ?? []
         earlyOpener = try container.decode(String.self, forKey: .earlyOpener)
         pivotNotes = try container.decode(String.self, forKey: .pivotNotes)
     }

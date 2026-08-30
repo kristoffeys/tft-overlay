@@ -18,9 +18,9 @@ struct StageBandDetail: View {
                         .foregroundStyle(TFTTheme.textPrimary)
                 }
             }
-            if !section.buyableUnits.isEmpty {
-                StageCard("Buy now · 1–\(BuildStagePlan.buyableEarlyCostLimit) cost") {
-                    unitStrip
+            if !section.openerUnits.isEmpty {
+                StageCard("Buy now · open with these") {
+                    buyNowCard
                 }
             }
             if !section.componentsToHold.isEmpty {
@@ -59,20 +59,54 @@ struct StageBandDetail: View {
         }
     }
 
-    private var unitStrip: some View {
+    /// The shopping list: what the comp opens on, with its costs.
+    ///
+    /// A transitional opener — one the comp opens on and then sells — is
+    /// marked rather than dropped, and the footnote says what the mark means
+    /// once, because a player who buys Cinderling on this card's instruction
+    /// and then cannot find it in the build has been told half the truth.
+    private var buyNowCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            openerStrip
+            if section.openerUnits.contains(where: \.isTransitional) {
+                Text("TEMP = an opener that is not in the final build. Buying it is correct; you sell it later.")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(TFTTheme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
+    private var openerStrip: some View {
         WrapHStack(horizontalSpacing: 8, verticalSpacing: 8) {
-            ForEach(section.buyableUnits) { unit in
+            ForEach(section.openerUnits) { pick in
                 VStack(spacing: 3) {
-                    UnitPortraitPlaceholder(name: unit.name, cost: unit.cost, size: 40)
-                    Text(unit.name)
+                    OpenerPortrait(pick: pick, size: 40)
+                    Text(pick.name)
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(TFTTheme.textPrimary)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
+                    if pick.isTransitional {
+                        Text("TEMP")
+                            .font(.system(size: 8, weight: .heavy, design: .rounded))
+                            .foregroundStyle(.black.opacity(0.85))
+                            .padding(.horizontal, 3)
+                            .background(TFTTheme.accent.opacity(0.8), in: Capsule())
+                    }
                 }
                 .frame(width: 48)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel(accessibilityLabel(for: pick))
             }
         }
+    }
+
+    private func accessibilityLabel(for pick: BuildStagePlan.OpenerPick) -> String {
+        guard let cost = pick.cost else {
+            return "\(pick.name), transitional opener, not in the final build"
+        }
+        return "\(pick.name), \(cost) cost"
     }
 
     private var componentStrip: some View {
@@ -96,6 +130,35 @@ struct StageBandDetail: View {
             }
             Spacer(minLength: 0)
         }
+    }
+}
+
+/// One opener's portrait, with its cost stated when the comp knows it.
+///
+/// A transitional opener — in `earlyUnits`, in no `units` entry — has no cost
+/// here at all, and gets a neutral border instead of one tinted by a cost this
+/// comp never authored. `UnitPortraitPlaceholder` takes an `Int`, and every
+/// value it could be handed means something: 0 draws the 5-cost gold. So the
+/// tint is overdrawn rather than guessed, and the `TEMP` chip under the name
+/// carries the meaning.
+private struct OpenerPortrait: View {
+    let pick: BuildStagePlan.OpenerPick
+    let size: CGFloat
+
+    var body: some View {
+        UnitPortraitPlaceholder(name: pick.name, cost: pick.cost ?? 0, size: size)
+            .overlay {
+                if pick.cost == nil {
+                    RoundedRectangle(cornerRadius: size * 0.22, style: .continuous)
+                        .strokeBorder(TFTTheme.textTertiary, lineWidth: 2)
+                }
+            }
+            .overlay(alignment: .bottomLeading) {
+                if let cost = pick.cost {
+                    UnitCostBadge(cost: cost, portraitSize: size)
+                        .padding(1)
+                }
+            }
     }
 }
 

@@ -16,11 +16,41 @@ import TFTData
 /// runtime: `levelPlan`, `earlyOpener` and `pivotNotes` are already stage-keyed
 /// in the corpus.
 public struct BuildStagePlan: Sendable {
-    /// Units cheap enough to actually appear in the shop while the opener is
-    /// still being built. 3-costs are excluded even though they show up from
-    /// 2-1: hitting one early is luck, and listing it as "buy now" turns a
-    /// glance-layer into a wishlist.
+    /// Fallback only. `openerUnits` comes from the comp's authored
+    /// `earlyUnits`; a comp that carries none at all falls back to its own
+    /// units this cheap, because they are the ones that can actually appear in
+    /// the shop while the opener is still being built. 3-costs are excluded
+    /// even there: hitting one early is luck, and listing it as "buy now"
+    /// turns a glance layer into a wishlist.
     public static let buyableEarlyCostLimit = 2
+
+    /// One champion the comp opens on, as the early band draws it.
+    ///
+    /// `cost` is nil exactly when the name is in `earlyUnits` but in no
+    /// `units` entry — a genuine transitional opener like `solar-riftbeasts`'s
+    /// Cinderling and Krug, which never reach the final board. That is real
+    /// advice, not a data error: a player who buys one should know it is a
+    /// stepping stone rather than think they misread the panel. Cost stays
+    /// single-sourced from `units`, so an off-board name simply has none here
+    /// and the view says so rather than inventing a number.
+    public struct OpenerPick: Identifiable, Hashable, Sendable {
+        public let name: String
+        public let cost: Int?
+
+        public var id: String {
+            name
+        }
+
+        /// In the early roster, absent from the final board.
+        public var isTransitional: Bool {
+            cost == nil
+        }
+
+        public init(name: String, cost: Int?) {
+            self.name = name
+            self.cost = cost
+        }
+    }
 
     /// The plan for one band, already reduced to what that band needs.
     ///
@@ -42,9 +72,15 @@ public struct BuildStagePlan: Sendable {
         public let levelTarget: LevelTarget?
         /// The comp's `earlyOpener`, on the early band only.
         public let opener: String?
-        /// This comp's own 1- and 2-cost units: the ones the player can act on
-        /// while the shop is still cheap, as opposed to the full roster.
-        public let buyableUnits: [CompUnit]
+        /// What to buy right now: the comp's authored early roster, in the same
+        /// order `earlyOpener` names it.
+        ///
+        /// Sourced from `earlyUnits`, not from the final board filtered to
+        /// cheap units, so this card and the `OPEN WITH` prose one card above
+        /// it cannot disagree — they did, badly: `solar-riftbeasts` opened on
+        /// Cinderling/Gromp/Murkwolf/Scuttlecrab/Krug while the derived strip
+        /// listed eight units of which five are never opened on (#107).
+        public let openerUnits: [OpenerPick]
         /// Components worth holding, decomposed from the carries' best-in-slot
         /// items. Names, not `Item`s, so the view stays free to render an icon
         /// or a label without this type knowing which.
@@ -64,7 +100,7 @@ public struct BuildStagePlan: Sendable {
         /// hiding it, so a sparse comp reads as "no extra advice here" instead
         /// of as a band that does not exist.
         public var isEmpty: Bool {
-            levelPlan.isEmpty && opener == nil && buyableUnits.isEmpty
+            levelPlan.isEmpty && opener == nil && openerUnits.isEmpty
                 && componentsToHold.isEmpty && itemisePriority == nil && pivots == nil && !showsFinalBoard
         }
     }
@@ -224,12 +260,13 @@ public struct BuildStagePlan: Sendable {
         recipeMatrix: RecipeMatrix
     ) -> Section {
         let isEarly = band == .early
+        let openers = isEarly ? openerUnits(comp) : []
         return Section(
             band: band,
             levelPlan: entries.map(\.entry),
             levelTarget: target,
             opener: isEarly ? nonEmpty(comp.earlyOpener) : nil,
-            buyableUnits: isEarly ? buyableUnits(comp) : [],
+            openerUnits: openers,
             componentsToHold: isEarly ? componentsToHold(comp, recipeMatrix: recipeMatrix) : [],
             // The primary carry is the first one authored; item priority is
             // ordered BiS-first, so "itemise this one first" needs no scoring.
@@ -239,12 +276,33 @@ public struct BuildStagePlan: Sendable {
         )
     }
 
-    /// Cheapest first so the list reads in the order the shop makes them
-    /// available; name ascending within a cost keeps it stable run to run.
-    private static func buyableUnits(_ comp: Comp) -> [CompUnit] {
-        comp.units
+    /// The comp's authored early roster, in corpus order.
+    ///
+    /// Corpus order, not cheapest-first: `earlyOpener`'s prose names these
+    /// units in this order, and the two are read one card apart, so re-sorting
+    /// the strip would reintroduce a smaller version of the disagreement this
+    /// is fixing. Names are de-duplicated case-insensitively because
+    /// `OpenerPick.id` is the name and a duplicate identity inside a SwiftUI
+    /// `ForEach` is undefined behaviour.
+    private static func openerUnits(_ comp: Comp) -> [OpenerPick] {
+        let index = CompUnitIndex(comp: comp)
+        var seen: Set<String> = []
+        var picks: [OpenerPick] = []
+        for name in comp.earlyUnits {
+            let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !trimmed.isEmpty, seen.insert(TFTNameKey.normalize(trimmed)).inserted else { continue }
+            // The unit's own spelling wins when the comp knows it, so the name
+            // under the portrait matches the art lookup key.
+            let unit = index.unit(named: trimmed)
+            picks.append(OpenerPick(name: unit?.name ?? trimmed, cost: unit?.cost))
+        }
+        guard picks.isEmpty else { return picks }
+        // No authored early roster: fall back to the cheap end of the final
+        // board, cheapest first, so the band still answers "buy what".
+        return comp.units
             .filter { $0.cost <= buyableEarlyCostLimit }
             .sorted { $0.cost != $1.cost ? $0.cost < $1.cost : $0.name < $1.name }
+            .map { OpenerPick(name: $0.name, cost: $0.cost) }
     }
 
     /// The components behind every carry's best-in-slot item, most-wanted

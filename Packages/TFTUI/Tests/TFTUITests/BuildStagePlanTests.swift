@@ -73,7 +73,11 @@ final class BuildStagePlanTests: XCTestCase {
     func testEarlyBandCarriesOpenerCheapUnitsAndComponents() throws {
         let early = try plan(denseComp()).section(for: .early)
         XCTAssertEqual(early.opener, "Prioritize Karma and Yorick early.")
-        XCTAssertEqual(early.buyableUnits.map(\.name), ["Karma", "Yorick", "Vi"], "cheapest first, name-stable")
+        XCTAssertEqual(
+            early.openerUnits.map(\.name),
+            ["Karma", "Yorick", "Vi"],
+            "no authored early roster, so the cheap fallback applies: cheapest first, name-stable"
+        )
         // Jeweled Gauntlet is the BiS; Infinity Edge is an alternate and must
         // not dilute what the player is told to hold.
         XCTAssertEqual(early.componentsToHold.sorted(), ["Needlessly Large Rod", "Sparring Gloves"])
@@ -87,7 +91,7 @@ final class BuildStagePlanTests: XCTestCase {
         XCTAssertEqual(mid.itemisePriority?.unit, "Ahri")
         XCTAssertEqual(mid.itemisePriority?.itemPriority.first, "Jeweled Gauntlet")
         XCTAssertNil(mid.opener, "the opener is over by act 3")
-        XCTAssertTrue(mid.buyableUnits.isEmpty)
+        XCTAssertTrue(mid.openerUnits.isEmpty)
     }
 
     func testLateBandCarriesPivotsAndTheFinalBoard() throws {
@@ -136,7 +140,7 @@ final class BuildStagePlanTests: XCTestCase {
             levelPlan: [LevelPlanEntry(stage: "3-2", level: 6)]
         )
         let plan = plan(comp)
-        XCTAssertTrue(plan.section(for: .early).isEmpty, "no opener, no cheap units, no components, no rows")
+        XCTAssertTrue(plan.section(for: .early).isEmpty, "no opener, nothing cheap to open on, no components, no rows")
         XCTAssertFalse(plan.section(for: .mid).isEmpty)
         XCTAssertFalse(plan.section(for: .late).isEmpty, "the final board always belongs to Late")
         XCTAssertEqual(plan.sections.count, StageBand.allCases.count, "an empty band is never dropped")
