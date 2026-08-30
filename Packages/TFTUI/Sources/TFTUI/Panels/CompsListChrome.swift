@@ -43,19 +43,7 @@ struct CompsListChrome: View {
     }
 
     private var searchField: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "magnifyingglass")
-                .foregroundStyle(TFTTheme.textTertiary)
-            TextField("Search unit, trait, or comp", text: $searchText)
-                .textFieldStyle(.plain)
-                .foregroundStyle(TFTTheme.textPrimary)
-        }
-        .font(.system(size: 13, weight: .medium))
-        .padding(9)
-        .background(
-            TFTTheme.panelBackground,
-            in: RoundedRectangle(cornerRadius: TFTTheme.smallCornerRadius, style: .continuous)
-        )
+        SearchField(placeholder: "Search unit, trait, or comp", text: $searchText)
     }
 
     private var filterDisclosure: some View {
